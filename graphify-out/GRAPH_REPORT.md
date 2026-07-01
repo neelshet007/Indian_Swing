@@ -1,12 +1,12 @@
 # Graph Report - C:\Indian_Swing  (2026-07-01)
 
 ## Corpus Check
-- 64 files · ~19,425 words
+- 64 files · ~84,271 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 472 nodes · 1041 edges · 39 communities detected
-- Extraction: 54% EXTRACTED · 46% INFERRED · 0% AMBIGUOUS · INFERRED: 482 edges (avg confidence: 0.6)
+- 477 nodes · 1063 edges · 39 communities detected
+- Extraction: 53% EXTRACTED · 47% INFERRED · 0% AMBIGUOUS · INFERRED: 501 edges (avg confidence: 0.6)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -54,13 +54,13 @@
 1. `ATR` - 33 edges
 2. `BaseIndicator` - 30 edges
 3. `OHLCVRepository` - 27 edges
-4. `Stock` - 24 edges
-5. `RecommendationScanner` - 24 edges
+4. `RecommendationScanner` - 27 edges
+5. `Stock` - 24 edges
 6. `StrategySignal` - 23 edges
 7. `BaseStrategy` - 23 edges
 8. `BacktestRunner` - 22 edges
-9. `SignalDirection` - 19 edges
-10. `RiskLevel` - 19 edges
+9. `DataPipeline` - 22 edges
+10. `SignalDirection` - 19 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Performance metrics engine. All institutional-grade metrics: CAGR, Sharpe, Sorti` --uses--> `Trade`  [INFERRED]
@@ -89,48 +89,48 @@ Cohesion: 0.09
 Nodes (27): dispose_engine(), get_engine(), get_session(), get_session_factory(), get_sync_session(), _get_sync_url(), init_db(), SQLAlchemy sync engine wrapped for async usage via run_in_executor. Python 3.14 (+19 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.1
-Nodes (14): BacktestRequest, run_backtest(), BacktestResult, Stock, OHLCVRepository, BacktestConfig, BacktestRunner, BacktestRunResult (+6 more)
+Cohesion: 0.08
+Nodes (26): data_download(), db_init(), list_strategies(), CLI entry point using Typer. Usage:   swing db init   swing data download --univ, List all discovered strategies., List all discovered strategies., Initialize database tables., Download OHLCV data for the specified universe. (+18 more)
 
 ### Community 4 - "Community 4"
+Cohesion: 0.1
+Nodes (15): BacktestRequest, list_saved_results(), run_backtest(), BacktestResult, Stock, OHLCVRepository, BacktestConfig, BacktestRunner (+7 more)
+
+### Community 5 - "Community 5"
 Cohesion: 0.09
 Nodes (20): OHLCVCleaner, OHLCVResampler, Data cleaning and corporate action adjustment. All timeframes are derived intern, Clean and adjust raw OHLCV data., Fill gaps in trading days (holidays etc.) using forward fill — max 3 days., Replace negative or zero volume with NaN then ffill., Derive weekly, monthly, quarterly, yearly candles from daily data.     Never cal, DataValidationError (+12 more)
 
-### Community 5 - "Community 5"
-Cohesion: 0.08
-Nodes (12): list_saved_results(), BaseRepository, Requested strategy is not registered., StrategyNotFoundError, Auto-discovery strategy registry. Scans the strategies/ package at startup. User, Singleton registry that auto-discovers and holds all BaseStrategy subclasses., Import every module in strategies/ and register concrete BaseStrategy subclasses, StrategyRegistry (+4 more)
-
 ### Community 6 - "Community 6"
-Cohesion: 0.13
-Nodes (19): DataProvider, Provider-agnostic interface for fetching OHLCV data and stock metadata.     Impl, Return True if provider is reachable. Default implementation always True., DataProvider, ConfigurationError, DataProviderError, Platform misconfiguration detected., External data provider failed to return data. (+11 more)
+Cohesion: 0.09
+Nodes (11): BaseRepository, Requested strategy is not registered., StrategyNotFoundError, Auto-discovery strategy registry. Scans the strategies/ package at startup. User, Singleton registry that auto-discovers and holds all BaseStrategy subclasses., Import every module in strategies/ and register concrete BaseStrategy subclasses, StrategyRegistry, ReplayPage() (+3 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.12
-Nodes (17): data_download(), db_init(), list_strategies(), CLI entry point using Typer. Usage:   swing db init   swing data download --univ, List all discovered strategies., Initialize database tables., Download OHLCV data for the specified universe., Run the recommendation scanner. (+9 more)
+Cohesion: 0.13
+Nodes (20): DataProvider, Provider-agnostic interface for fetching OHLCV data and stock metadata.     Impl, Return True if provider is reachable. Default implementation always True., DataProvider, ConfigurationError, DataProviderError, Platform misconfiguration detected., External data provider failed to return data. (+12 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.16
 Nodes (12): BaseSettings, APISettings, BacktestSettings, DatabaseSettings, get_settings(), _merge_yaml_into_env(), PipelineSettings, ProviderSettings (+4 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.15
-Nodes (10): _uuid(), _rec_dict(), list_scan_jobs(), Trigger a manual scan. Runs in the background, returns immediately., trigger_scan(), get_ohlcv(), get_stock(), list_stocks() (+2 more)
-
-### Community 10 - "Community 10"
 Cohesion: 0.14
 Nodes (3): ABC, compute(), name()
 
-### Community 11 - "Community 11"
+### Community 10 - "Community 10"
 Cohesion: 0.27
 Nodes (11): compute_metrics(), compute_monthly_returns(), _empty_metrics(), _equity_series(), _max_drawdown(), _profit_factor(), Performance metrics engine. All institutional-grade metrics: CAGR, Sharpe, Sorti, Compute all backtest performance metrics from trade list and equity curve. (+3 more)
 
-### Community 12 - "Community 12"
+### Community 11 - "Community 11"
 Cohesion: 0.47
 Nodes (3): ConfidenceBadge(), getConvictionClass(), RecCard()
 
-### Community 13 - "Community 13"
+### Community 12 - "Community 12"
 Cohesion: 0.4
 Nodes (0): 
+
+### Community 13 - "Community 13"
+Cohesion: 0.6
+Nodes (4): get_ohlcv(), get_stock(), list_stocks(), _stock_dict()
 
 ### Community 14 - "Community 14"
 Cohesion: 0.67
@@ -285,17 +285,17 @@ Nodes (0):
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `OHLCVRepository` connect `Community 3` to `Community 1`, `Community 2`, `Community 4`, `Community 5`?**
-  _High betweenness centrality (0.079) - this node is a cross-community bridge._
-- **Why does `Stock` connect `Community 3` to `Community 1`, `Community 2`, `Community 4`, `Community 7`?**
+- **Why does `OHLCVRepository` connect `Community 4` to `Community 1`, `Community 2`, `Community 3`, `Community 5`, `Community 6`?**
   _High betweenness centrality (0.077) - this node is a cross-community bridge._
+- **Why does `Stock` connect `Community 4` to `Community 1`, `Community 2`, `Community 3`, `Community 5`?**
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
 - **Why does `ATR` connect `Community 0` to `Community 1`?**
-  _High betweenness centrality (0.072) - this node is a cross-community bridge._
+  _High betweenness centrality (0.071) - this node is a cross-community bridge._
 - **Are the 28 inferred relationships involving `ATR` (e.g. with `Average True Range (Wilder's smoothing).` and `EMA`) actually correct?**
   _`ATR` has 28 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 25 inferred relationships involving `str` (e.g. with `list_saved_results()` and `_rec_dict()`) actually correct?**
+  _`str` has 25 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 26 inferred relationships involving `BaseIndicator` (e.g. with `RSI` and `Stochastic`) actually correct?**
   _`BaseIndicator` has 26 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 22 inferred relationships involving `str` (e.g. with `list_saved_results()` and `_rec_dict()`) actually correct?**
-  _`str` has 22 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 21 inferred relationships involving `OHLCVRepository` (e.g. with `BacktestConfig` and `BacktestRunResult`) actually correct?**
   _`OHLCVRepository` has 21 INFERRED edges - model-reasoned connections that need verification._
