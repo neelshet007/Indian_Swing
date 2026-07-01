@@ -115,15 +115,16 @@ class ReplaySession:
         return self.current_state()
 
     def _compute_indicators(self, df: pd.DataFrame) -> dict:
-        from indian_swing.indicators.trend import EMA
+        from indian_swing.indicators.trend import SMA
         from indian_swing.indicators.momentum import RSI
         from indian_swing.indicators.volatility import ATR
         result: dict = {}
         try:
-            result["ema20"] = round(float(EMA().compute(df, period=20).iloc[-1]), 2)
-            result["ema50"] = round(float(EMA().compute(df, period=50).iloc[-1]), 2)
+            result["sma50"] = round(float(SMA().compute(df, period=50).iloc[-1]), 2)
+            if len(df) >= 150:
+                result["sma150"] = round(float(SMA().compute(df, period=150).iloc[-1]), 2)
             if len(df) >= 200:
-                result["ema200"] = round(float(EMA().compute(df, period=200).iloc[-1]), 2)
+                result["sma200"] = round(float(SMA().compute(df, period=200).iloc[-1]), 2)
             result["rsi"] = round(float(RSI().compute(df).iloc[-1]), 2)
             result["atr"] = round(float(ATR().compute(df).iloc[-1]), 2)
         except Exception:
