@@ -45,6 +45,7 @@ def data_download(
     universe: str = typer.Option("nifty50", help="nifty50 | nifty500 | custom | all"),
     symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols to download."),
     years: int = typer.Option(10, help="Years of historical data to fetch."),
+    force: bool = typer.Option(False, "--force", help="Force complete refresh of all data."),
 ):
     """Download OHLCV data for the specified universe."""
     configure_logging(fmt="console")
@@ -68,10 +69,13 @@ def data_download(
 
         typer.echo(f"Downloading data for {len(syms)} symbols ({years} years)...")
         pipeline = DataPipeline()
-        summary = await pipeline.run_incremental(syms)
+        from datetime import date, timedelta
+        end_date = date.today()
+        start_date = end_date - timedelta(days=years * 365)
+        summary = await pipeline.run_full(syms, start=start_date, end=end_date, force_refresh=force)
         typer.echo(f"[OK] Done: {summary.succeeded} succeeded, {summary.failed} failed, {summary.records_added} records added.")
         if summary.errors:
-            typer.echo(f"⚠ Errors: {len(summary.errors)}")
+            typer.echo(f"[WARN] Errors: {len(summary.errors)}")
             for e in summary.errors[:10]:
                 typer.echo(f"  - {e}")
 

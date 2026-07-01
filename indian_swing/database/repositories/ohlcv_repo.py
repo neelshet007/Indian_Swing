@@ -74,7 +74,9 @@ class OHLCVRepository(BaseRepository[OHLCV]):
         if not records:
             return 0
         from sqlalchemy.dialects.sqlite import insert as sqlite_insert
-        stmt = sqlite_insert(OHLCV).values(records).on_conflict_do_nothing(
+        # On conflict do nothing matching the unique index on (stock_id, date, timeframe)
+        stmt = sqlite_insert(OHLCV).values(records)
+        stmt = stmt.on_conflict_do_nothing(
             index_elements=["stock_id", "date", "timeframe"]
         )
         result = self._session.execute(stmt)

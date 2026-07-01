@@ -69,7 +69,7 @@ class OHLCV(Base):
         Index("ix_ohlcv_date_tf", "date", "timeframe"),
     )
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     stock_id: Mapped[int] = mapped_column(ForeignKey("sw_stocks.id"), nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
     timeframe: Mapped[str] = mapped_column(String(5), nullable=False, default="1d")
