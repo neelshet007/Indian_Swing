@@ -1,12 +1,12 @@
 # Graph Report - C:\Indian_Swing  (2026-07-01)
 
 ## Corpus Check
-- 62 files · ~83,826 words
+- 62 files · ~83,131 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 474 nodes · 1023 edges · 41 communities detected
-- Extraction: 54% EXTRACTED · 46% INFERRED · 0% AMBIGUOUS · INFERRED: 467 edges (avg confidence: 0.59)
+- 474 nodes · 1025 edges · 41 communities detected
+- Extraction: 54% EXTRACTED · 46% INFERRED · 0% AMBIGUOUS · INFERRED: 469 edges (avg confidence: 0.59)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -58,8 +58,8 @@
 3. `ATR` - 27 edges
 4. `RecommendationScanner` - 27 edges
 5. `Stock` - 24 edges
-6. `BacktestRunner` - 22 edges
-7. `DataPipeline` - 22 edges
+6. `DataPipeline` - 23 edges
+7. `BacktestRunner` - 22 edges
 8. `BaseStrategy` - 22 edges
 9. `StrategySignal` - 20 edges
 10. `StockRepository` - 19 edges
@@ -73,8 +73,8 @@
   C:\Indian_Swing\indian_swing\backtesting\metrics.py → C:\Indian_Swing\indian_swing\backtesting\trade.py
 - `lifespan()` --calls--> `dispose_engine()`  [INFERRED]
   C:\Indian_Swing\indian_swing\api\main.py → C:\Indian_Swing\indian_swing\database\connection.py
-- `FastAPI application entry point. Mounts all routers, configures CORS, lifespan e` --uses--> `RecommendationScanner`  [INFERRED]
-  C:\Indian_Swing\indian_swing\api\main.py → C:\Indian_Swing\indian_swing\recommendations\scanner.py
+- `FastAPI application entry point. Mounts all routers, configures CORS, lifespan e` --uses--> `UniverseManager`  [INFERRED]
+  C:\Indian_Swing\indian_swing\api\main.py → C:\Indian_Swing\indian_swing\core\universe.py
 
 ## Communities
 
@@ -99,12 +99,12 @@ Cohesion: 0.08
 Nodes (34): BaseModel, Exception, BacktestError, DatabaseError, DataError, DataNotFoundError, DuplicateRecordError, EngineError (+26 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.08
-Nodes (12): list_saved_results(), BaseRepository, Requested strategy is not registered., StrategyNotFoundError, Auto-discovery strategy registry. Scans the strategies/ package at startup. User, Singleton registry that auto-discovers and holds all BaseStrategy subclasses., Import every module in strategies/ and register concrete BaseStrategy subclasses, StrategyRegistry (+4 more)
-
-### Community 6 - "Community 6"
 Cohesion: 0.11
 Nodes (16): ReplayEngine, ReplaySession, _uuid(), _rec_dict(), create_replay_session(), get_replay_state(), jump_to_date(), replay_websocket() (+8 more)
+
+### Community 6 - "Community 6"
+Cohesion: 0.08
+Nodes (12): list_saved_results(), BaseRepository, Requested strategy is not registered., StrategyNotFoundError, Auto-discovery strategy registry. Scans the strategies/ package at startup. User, Singleton registry that auto-discovers and holds all BaseStrategy subclasses., Import every module in strategies/ and register concrete BaseStrategy subclasses, StrategyRegistry (+4 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.13
@@ -296,10 +296,10 @@ Nodes (0):
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `OHLCVRepository` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 5`, `Community 6`?**
-  _High betweenness centrality (0.082) - this node is a cross-community bridge._
-- **Why does `Stock` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 6`, `Community 8`?**
+  _High betweenness centrality (0.081) - this node is a cross-community bridge._
+- **Why does `Stock` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 5`, `Community 8`?**
   _High betweenness centrality (0.077) - this node is a cross-community bridge._
-- **Why does `ATR` connect `Community 0` to `Community 6`?**
+- **Why does `ATR` connect `Community 0` to `Community 5`?**
   _High betweenness centrality (0.061) - this node is a cross-community bridge._
 - **Are the 25 inferred relationships involving `str` (e.g. with `list_saved_results()` and `_rec_dict()`) actually correct?**
   _`str` has 25 INFERRED edges - model-reasoned connections that need verification._
