@@ -1,0 +1,55 @@
+app_env: development
+log_level: INFO
+log_format: json   # json | console
+
+database:
+  url: "sqlite+aiosqlite:///./data/swing.db"
+  pool_size: 10
+  echo: false
+
+data:
+  dir: "./data"
+  cache_dir: "./data/cache"
+  cache_ttl_seconds: 3600
+  universe_file: "./config/universe.csv"
+
+provider:
+  default: yfinance
+  yfinance:
+    threads: 4
+    rate_limit_delay: 0.5
+    retry_attempts: 3
+    retry_wait: 2.0
+
+pipeline:
+  lookback_years: 10
+  min_trading_days: 252
+  min_price: 10.0
+  min_volume: 50000
+  max_gap_pct: 20.0
+
+scanner:
+  enabled: true
+  cron: "0 16 * * 1-5"          # 4 PM weekdays (IST)
+  max_workers: 8
+  min_confidence_score: 0.6
+  max_recommendations: 50
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  cors_origins:
+    - "http://localhost:5173"
+    - "http://localhost:3000"
+
+backtesting:
+  initial_capital: 1000000
+  brokerage_pct: 0.0003
+  stt_pct: 0.001
+  slippage_pct: 0.0005
+  max_positions: 10
+  risk_per_trade_pct: 0.02
+
+strategies:
+  enabled: []    # empty = all discovered strategies enabled
+  disabled: []
