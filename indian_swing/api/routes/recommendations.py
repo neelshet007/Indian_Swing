@@ -25,6 +25,7 @@ async def get_recommendations(
     def _fetch():
         with get_sync_session() as session:
             repo = RecommendationRepository(session)
+            ohlcv_repo = OHLCVRepository(session)
             if scan_date:
                 recs = repo.get_by_date(scan_date)
             else:
@@ -36,8 +37,9 @@ async def get_recommendations(
                     continue
                 stock = session.get(Stock, rec.stock_id)
                 signal = session.get(Signal, rec.signal_id)
+                current_price = ohlcv_repo.get_latest_close(rec.stock_id) if stock else None
                 if stock and signal:
-                    result.append(_rec_dict(rec, stock, signal))
+                    result.append(_rec_dict(rec, stock, signal, current_price))
             return result
 
     return await loop.run_in_executor(None, _fetch)
@@ -67,7 +69,9 @@ async def get_recommendation_detail(rec_id: str):
                 return None
             stock = session.get(Stock, rec.stock_id)
             signal = session.get(Signal, rec.signal_id)
-            return _rec_dict(rec, stock, signal, detailed=True)
+            ohlcv_repo = OHLCVRepository(session)
+            current_price = ohlcv_repo.get_latest_close(rec.stock_id) if stock else None
+            return _rec_dict(rec, stock, signal, current_price=current_price, detailed=True)
 
     result = await loop.run_in_executor(None, _fetch)
     if result is None:
@@ -75,7 +79,7 @@ async def get_recommendation_detail(rec_id: str):
     return result
 
 
-def _rec_dict(rec, stock, signal, detailed=False) -> dict:
+def _rec_dict(rec, stock, signal, current_price=None, detailed=False) -> dict:
     base = {
         "id": rec.id,
         "rank": rec.rank,
@@ -97,6 +101,7 @@ def _rec_dict(rec, stock, signal, detailed=False) -> dict:
         "reasons": signal.reasons,
         "historical_win_rate": rec.historical_win_rate,
         "summary": rec.summary,
+        "current_price": current_price,
     }
     if detailed:
         base["metadata"] = signal.metadata_

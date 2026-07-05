@@ -31,10 +31,11 @@ async def list_stocks(
             if sector:
                 q = q.where(Stock.sector == sector)
             q = q.order_by(Stock.symbol).offset(offset).limit(limit)
-            return session.execute(q).scalars().all()
+            stocks = session.execute(q).scalars().all()
+            ohlcv_repo = OHLCVRepository(session)
+            return [_stock_dict(s, ohlcv_repo.get_latest_close(s.id)) for s in stocks]
 
-    stocks = await loop.run_in_executor(None, _fetch)
-    return [_stock_dict(s) for s in stocks]
+    return await loop.run_in_executor(None, _fetch)
 
 
 @router.get("/{symbol}")
@@ -44,12 +45,16 @@ async def get_stock(symbol: str):
 
     def _fetch():
         with get_sync_session() as session:
-            return StockRepository(session).get_by_symbol(symbol.upper())
+            stock = StockRepository(session).get_by_symbol(symbol.upper())
+            if not stock:
+                return None
+            ohlcv_repo = OHLCVRepository(session)
+            return _stock_dict(stock, ohlcv_repo.get_latest_close(stock.id))
 
-    stock = await loop.run_in_executor(None, _fetch)
-    if not stock:
+    stock_data = await loop.run_in_executor(None, _fetch)
+    if not stock_data:
         raise HTTPException(status_code=404, detail=f"Stock '{symbol}' not found.")
-    return _stock_dict(stock)
+    return stock_data
 
 
 @router.get("/{symbol}/ohlcv")
@@ -82,7 +87,7 @@ async def get_ohlcv(
     ]
 
 
-def _stock_dict(s: Stock) -> dict:
+def _stock_dict(s: Stock, current_price: float = None) -> dict:
     return {
         "id": s.id,
         "symbol": s.symbol,
@@ -91,4 +96,5 @@ def _stock_dict(s: Stock) -> dict:
         "industry": s.industry,
         "market_cap_category": s.market_cap_category,
         "is_active": s.is_active,
+        "current_price": current_price,
     }

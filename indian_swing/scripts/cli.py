@@ -83,9 +83,7 @@ def data_download(
 
 
 @scan_app.command("run")
-def scan_run(
-    scan_date: Optional[str] = typer.Option(None, help="Date to scan (YYYY-MM-DD). Defaults to today."),
-):
+def scan_run():
     """Run the recommendation scanner."""
     configure_logging(fmt="console")
 
@@ -95,7 +93,7 @@ def scan_run(
 
         await init_db()
         scanner = RecommendationScanner()
-        target = date.fromisoformat(scan_date) if scan_date else date.today()
+        target = date.today()
         typer.echo(f"Scanning {target}...")
         result = await scanner.scan(target)
         typer.echo(

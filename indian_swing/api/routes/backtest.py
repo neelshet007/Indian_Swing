@@ -25,7 +25,7 @@ class BacktestRequest(BaseModel):
 @router.post("/run")
 async def run_backtest(req: BacktestRequest):
     config = BacktestConfig(
-        strategy_names=req.strategy_names,
+        strategy_names=["institutional_vcp"],
         symbols=req.symbols,
         start_date=req.start_date,
         end_date=req.end_date,

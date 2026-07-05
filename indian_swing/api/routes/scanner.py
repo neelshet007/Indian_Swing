@@ -13,15 +13,14 @@ router = APIRouter()
 @router.post("/run")
 async def trigger_scan(
     background_tasks: BackgroundTasks,
-    scan_date: Optional[date] = None,
 ):
     """Trigger a manual scan. Runs in the background, returns immediately."""
     async def _scan():
         scanner = RecommendationScanner()
-        await scanner.scan(scan_date)
+        await scanner.scan(date.today())
 
     background_tasks.add_task(_scan)
-    return {"status": "queued", "scan_date": str(scan_date or date.today())}
+    return {"status": "queued", "scan_date": str(date.today())}
 
 
 @router.get("/jobs")

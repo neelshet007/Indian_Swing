@@ -16,7 +16,8 @@ dependencies = [
     # Database
     "sqlalchemy>=2.0.30",
     "alembic>=1.13.0",
-    "aiosqlite>=0.20.0",
+    "psycopg2-binary>=2.9.9",
+    "asyncpg>=0.29.0",
     # Data
     "yfinance>=0.2.40",
     "pandas>=2.2.0",
@@ -59,10 +60,6 @@ dev = [
     "ruff>=0.4.7",
     "mypy>=1.10.0",
     "pre-commit>=3.7.1",
-]
-postgres = [
-    "psycopg2-binary>=2.9.9",
-    "asyncpg>=0.29.0",
 ]
 
 [project.scripts]

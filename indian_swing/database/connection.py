@@ -1,7 +1,7 @@
 """
 SQLAlchemy sync engine wrapped for async usage via run_in_executor.
 Python 3.14 compatible — no greenlet required.
-Uses SQLite with WAL mode for performance.
+Uses PostgreSQL via psycopg2 and asyncpg.
 """
 from __future__ import annotations
 
@@ -31,25 +31,12 @@ def get_engine():
     if _engine is None:
         sync_url = _get_sync_url(settings.database.url)
         connect_args = {}
-        if "sqlite" in sync_url:
-            connect_args["check_same_thread"] = False
 
         _engine = create_engine(
             sync_url,
             connect_args=connect_args,
             echo=settings.database.echo,
         )
-
-        # Apply SQLite optimizations on new connections
-        if "sqlite" in sync_url:
-            @event.listens_for(_engine, "connect")
-            def _set_sqlite_pragma(dbapi_conn, _):
-                cursor = dbapi_conn.cursor()
-                cursor.execute("PRAGMA journal_mode=WAL")
-                cursor.execute("PRAGMA synchronous=NORMAL")
-                cursor.execute("PRAGMA cache_size=-65536")
-                cursor.execute("PRAGMA temp_store=MEMORY")
-                cursor.close()
 
     return _engine
 

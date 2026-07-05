@@ -23,7 +23,7 @@ async def create_replay_session(req: CreateReplayRequest):
     try:
         session_id = await replay_engine.create_session(
             symbol=req.symbol,
-            strategy_name=req.strategy_name,
+            strategy_name="institutional_vcp",
             start_date=req.start_date,
             end_date=req.end_date,
         )

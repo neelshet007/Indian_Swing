@@ -44,6 +44,15 @@ class OHLCVRepository(BaseRepository[OHLCV]):
         ).scalar_one_or_none()
         return result
 
+    def get_latest_close(self, stock_id: int, timeframe: str = "1d") -> float | None:
+        result = self._session.execute(
+            select(OHLCV.close)
+            .where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
+            .order_by(OHLCV.date.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+        return result
+
     def to_dataframe(
         self,
         stock_id: int,
@@ -73,9 +82,9 @@ class OHLCVRepository(BaseRepository[OHLCV]):
     def bulk_insert_ignore(self, records: list[dict]) -> int:
         if not records:
             return 0
-        from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+        from sqlalchemy.dialects.postgresql import insert as pg_insert
         # On conflict do nothing matching the unique index on (stock_id, date, timeframe)
-        stmt = sqlite_insert(OHLCV).values(records)
+        stmt = pg_insert(OHLCV).values(records)
         stmt = stmt.on_conflict_do_nothing(
             index_elements=["stock_id", "date", "timeframe"]
         )

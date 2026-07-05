@@ -49,8 +49,12 @@ class RecommendationScanner:
             loop = asyncio.get_event_loop()
 
             batch_size = self._cfg.max_workers
+            total_batches = (len(stocks) + batch_size - 1) // batch_size
             for i in range(0, len(stocks), batch_size):
                 batch = stocks[i: i + batch_size]
+                batch_idx = i // batch_size + 1
+                logger.info("scanner.batch_start", batch=batch_idx, total_batches=total_batches, stocks_in_batch=len(batch))
+
                 tasks = [
                     loop.run_in_executor(None, self._scan_stock_sync, stock, scan_date)
                     for stock in batch
@@ -59,6 +63,7 @@ class RecommendationScanner:
 
                 for stock, br in zip(batch, batch_results):
                     if isinstance(br, Exception):
+                        logger.error("scanner.batch_error", symbol=stock.symbol, error=str(br))
                         result.errors.append(f"{stock.symbol}: {br}")
                     else:
                         all_signals.extend([(sig, stock.id) for sig in br])

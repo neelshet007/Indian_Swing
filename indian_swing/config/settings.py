@@ -26,7 +26,7 @@ def _load_yaml() -> dict[str, Any]:
 
 
 class DatabaseSettings(BaseSettings):
-    url: str = "sqlite+aiosqlite:///./data/swing.db"
+    url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/indian_swing"
     pool_size: int = 10
     echo: bool = False
 
