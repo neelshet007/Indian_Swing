@@ -119,4 +119,14 @@ app.include_router(strategies.router, prefix="/api/strategies", tags=["Strategie
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "version": "1.0.0", "env": settings.app_env}
+    from indian_swing.database.connection import get_engine
+    from sqlalchemy import text
+    try:
+        engine = get_engine()
+        # Test connection directly
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return {"status": "ok", "db": "connected", "version": "1.0.0", "env": settings.app_env}
+    except Exception as e:
+        # Cleanly return the error message without crashing
+        return {"status": "error", "db": "disconnected", "error": str(e), "version": "1.0.0"}

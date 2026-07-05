@@ -120,6 +120,8 @@ export default function Dashboard() {
   const [filter, setFilter] = useState('all')
   const [scanning, setScanning] = useState(false)
   const [scanDate, setScanDate] = useState('')
+  const [scanStatus, setScanStatus] = useState(null)
+  const [scanSummary, setScanSummary] = useState(null)
 
   const fetchRecs = async () => {
     setLoading(true)
@@ -138,13 +140,40 @@ export default function Dashboard() {
 
   const triggerScan = async () => {
     setScanning(true)
+    setScanStatus(null)
+    setScanSummary(null)
     try {
       await axios.post('/api/scanner/run')
-      setTimeout(fetchRecs, 2000)
+      pollProgress()
     } catch (e) {
       alert('Scan failed: ' + (e.response?.data?.detail || e.message))
-    } finally {
       setScanning(false)
+    }
+  }
+
+  const pollProgress = async () => {
+    try {
+      const { data } = await axios.get('/api/scanner/jobs?limit=1')
+      const job = data[0]
+      if (job && (job.status === 'running' || job.status === 'pending')) {
+        setScanStatus({ scanned: job.stocks_scanned || 0, total: job.total_stocks || 0 })
+        setTimeout(pollProgress, 1000)
+      } else if (job && job.status === 'completed') {
+        setScanning(false)
+        setScanStatus(null)
+        setScanSummary(`Recommended setups ${job.recommendations_created} out of ${job.total_stocks}`)
+        fetchRecs()
+      } else {
+        setScanning(false)
+        setScanStatus(null)
+        if (job?.status === 'failed') {
+          alert(`Scan failed: ${job.error}`)
+        }
+      }
+    } catch (e) {
+      console.error("Polling error", e)
+      setScanning(false)
+      setScanStatus(null)
     }
   }
 
@@ -183,10 +212,18 @@ export default function Dashboard() {
             onClick={triggerScan}
             disabled={scanning}
           >
-            {scanning ? '⟳ Scanning...' : '▶ Run Scan'}
+            {scanning 
+              ? (scanStatus?.total ? `⟳ Scanning ${scanStatus.scanned} of ${scanStatus.total}...` : '⟳ Starting Scan...') 
+              : '▶ Run Scan'}
           </button>
         </div>
       </div>
+
+      {scanSummary && (
+        <div style={{ padding: '0 32px 12px', color: 'var(--accent-green)', fontWeight: 500 }}>
+          ✓ {scanSummary}
+        </div>
+      )}
 
       {recs.length > 0 && <StatsBar recs={recs} />}
 

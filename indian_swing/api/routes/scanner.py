@@ -26,20 +26,26 @@ async def trigger_scan(
 @router.get("/jobs")
 async def list_scan_jobs(limit: int = 20):
     from sqlalchemy import select
-    from indian_swing.database.connection import get_session
+    from indian_swing.database.connection import get_sync_session
     from indian_swing.database.models import ScanJob
+    import asyncio
 
-    async with get_session() as session:
-        result = await session.execute(
-            select(ScanJob).order_by(ScanJob.created_at.desc()).limit(limit)
-        )
-        jobs = result.scalars().all()
+    def _fetch_jobs():
+        with get_sync_session() as session:
+            result = session.execute(
+                select(ScanJob).order_by(ScanJob.created_at.desc()).limit(limit)
+            )
+            return result.scalars().all()
+
+    loop = asyncio.get_event_loop()
+    jobs = await loop.run_in_executor(None, _fetch_jobs)
 
     return [
         {
             "id": j.id,
             "scan_date": str(j.scan_date),
             "status": j.status,
+            "total_stocks": getattr(j, "total_stocks", 0),
             "stocks_scanned": j.stocks_scanned,
             "signals_generated": j.signals_generated,
             "recommendations_created": j.recommendations_created,

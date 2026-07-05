@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import Dashboard from './pages/Dashboard'
 import TradeDetail from './pages/TradeDetail'
 import Backtesting from './pages/Backtesting'
@@ -14,7 +15,21 @@ const NAV = [
 ]
 
 function Sidebar() {
+  const [health, setHealth] = useState({ db: 'checking', error: null })
   const sections = [...new Set(NAV.map(n => n.section))]
+
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const { data } = await axios.get('/api/health')
+        setHealth({ db: data.db, error: data.error })
+      } catch (e) {
+        setHealth({ db: 'disconnected', error: 'API unreachable' })
+      }
+    }
+    checkHealth()
+  }, [])
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -40,11 +55,16 @@ function Sidebar() {
         ))}
       </nav>
       <div className="sidebar-footer">
-        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          <span className="status-dot" />
-          API Connected
+        <div style={{ fontSize: '0.75rem', color: health.db === 'connected' ? 'var(--accent-green)' : 'var(--accent-red)' }}>
+          <span className="status-dot" style={{ background: health.db === 'connected' ? 'var(--accent-green)' : 'var(--accent-red)' }} />
+          {health.db === 'connected' ? 'DB Connected' : 'DB Disconnected'}
         </div>
-        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 4 }}>
+        {health.error && (
+          <div style={{ fontSize: '0.65rem', color: 'var(--accent-red)', marginTop: 4, lineHeight: 1.3, wordBreak: 'break-word' }}>
+            {health.error}
+          </div>
+        )}
+        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 8 }}>
           v1.0.0 — Indian Equities
         </div>
       </div>

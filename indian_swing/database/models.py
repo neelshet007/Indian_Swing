@@ -197,6 +197,7 @@ class ScanJob(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     scan_date: Mapped[date] = mapped_column(Date, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    total_stocks: Mapped[int] = mapped_column(Integer, default=0)
     stocks_scanned: Mapped[int] = mapped_column(Integer, default=0)
     signals_generated: Mapped[int] = mapped_column(Integer, default=0)
     recommendations_created: Mapped[int] = mapped_column(Integer, default=0)

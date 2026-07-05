@@ -24,6 +24,7 @@ logger = get_logger(__name__)
 @dataclass
 class ScanResult:
     scan_date: date
+    job_id: str = ""
     signals_generated: int = 0
     stocks_scanned: int = 0
     recommendations_saved: int = 0
@@ -40,10 +41,12 @@ class RecommendationScanner:
         scan_date = scan_date or date.today()
         result = ScanResult(scan_date=scan_date)
 
-        job_id = self._create_scan_job(scan_date)
         try:
             stocks = self._get_active_stocks()
             logger.info("scanner.start", date=str(scan_date), stocks=len(stocks))
+
+            job_id = self._create_scan_job(scan_date, total_stocks=len(stocks))
+            result.job_id = job_id
 
             all_signals: list[tuple[StrategySignal, int]] = []
             loop = asyncio.get_event_loop()
@@ -68,6 +71,9 @@ class RecommendationScanner:
                     else:
                         all_signals.extend([(sig, stock.id) for sig in br])
                         result.stocks_scanned += 1
+
+                # Update progress in DB after each batch
+                self._update_scan_progress(job_id, result.stocks_scanned, len(all_signals))
 
             result.signals_generated = len(all_signals)
             top = self._rank_signals(all_signals)
@@ -152,13 +158,21 @@ class RecommendationScanner:
                 )
                 session.add(rec)
 
-    def _create_scan_job(self, scan_date: date) -> str:
+    def _create_scan_job(self, scan_date: date, total_stocks: int = 0) -> str:
         from datetime import datetime
         with get_sync_session() as session:
-            job = ScanJob(scan_date=scan_date, status="running", started_at=datetime.utcnow())
+            job = ScanJob(scan_date=scan_date, status="running", total_stocks=total_stocks, started_at=datetime.utcnow())
             session.add(job)
             session.flush()
             return job.id
+
+    def _update_scan_progress(self, job_id: str, stocks_scanned: int, signals_generated: int) -> None:
+        with get_sync_session() as session:
+            job = session.get(ScanJob, job_id)
+            if job:
+                job.stocks_scanned = stocks_scanned
+                job.signals_generated = signals_generated
+                session.commit()
 
     def _complete_scan_job(self, job_id: str, result: ScanResult) -> None:
         from datetime import datetime

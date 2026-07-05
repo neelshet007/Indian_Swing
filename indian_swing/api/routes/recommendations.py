@@ -10,6 +10,7 @@ from sqlalchemy import select
 from indian_swing.database.connection import get_sync_session
 from indian_swing.database.models import Recommendation, Signal, Stock
 from indian_swing.database.repositories.signal_repo import RecommendationRepository
+from indian_swing.database.repositories.ohlcv_repo import OHLCVRepository
 
 router = APIRouter()
 

@@ -84,14 +84,18 @@ class UniverseManager:
         with path.open(newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                symbol = row.get("symbol", "").strip().upper()
+                symbol = row.get("symbol") or row.get("Symbol")
                 if not symbol:
                     continue
+                symbol = symbol.strip().upper()
+                name = row.get("name") or row.get("Company Name") or symbol
+                sector = row.get("sector") or ""
+                industry = row.get("industry") or row.get("Industry") or ""
                 stocks.append(UniverseStock(
                     symbol=symbol,
-                    name=row.get("name", symbol),
-                    sector=row.get("sector", ""),
-                    industry=row.get("industry", ""),
+                    name=name,
+                    sector=sector,
+                    industry=industry,
                     market_cap_category=row.get("market_cap_category", "large"),
                 ))
         logger.info("universe.loaded_csv", path=str(path), count=len(stocks))

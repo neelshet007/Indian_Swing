@@ -14,7 +14,7 @@ from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 CONFIG_YAML = ROOT_DIR / "config" / "config.yaml"
 
 
@@ -26,8 +26,16 @@ def _load_yaml() -> dict[str, Any]:
 
 
 class DatabaseSettings(BaseSettings):
-    url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/indian_swing"
-    pool_size: int = 10
+    model_config = SettingsConfigDict(
+        env_file=ROOT_DIR / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+    url: str = Field(
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/indian_swing", 
+        validation_alias="DATABASE_URL"
+    )
+    pool_size: int = Field(default=10, validation_alias="DATABASE_POOL_SIZE")
     echo: bool = False
 
 
