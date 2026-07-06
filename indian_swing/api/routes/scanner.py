@@ -5,7 +5,7 @@ from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks
 
-from indian_swing.recommendations.scanner import RecommendationScanner
+from indian_swing.core.scanner import SIVCSScanner
 
 router = APIRouter()
 
@@ -16,8 +16,11 @@ async def trigger_scan(
 ):
     """Trigger a manual scan. Runs in the background, returns immediately."""
     async def _scan():
-        scanner = RecommendationScanner()
-        await scanner.scan(date.today())
+        # Run SIVCSScanner in a separate thread so it doesn't block the async event loop
+        import asyncio
+        loop = asyncio.get_event_loop()
+        scanner = SIVCSScanner()
+        await loop.run_in_executor(None, scanner.run_scan)
 
     background_tasks.add_task(_scan)
     return {"status": "queued", "scan_date": str(date.today())}

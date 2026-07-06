@@ -48,6 +48,14 @@ class RecommendationScanner:
             job_id = self._create_scan_job(scan_date, total_stocks=len(stocks))
             result.job_id = job_id
 
+            logger.info("scanner.data_pipeline.start")
+            from indian_swing.data.pipeline import DataPipeline
+            pipeline = DataPipeline()
+            # Fetch data sequentially or asynchronously depending on scanner loop setup
+            # We are inside an async function so we can await
+            await pipeline.run_incremental([s.symbol for s in stocks])
+            logger.info("scanner.data_pipeline.complete")
+
             all_signals: list[tuple[StrategySignal, int]] = []
             loop = asyncio.get_event_loop()
 
