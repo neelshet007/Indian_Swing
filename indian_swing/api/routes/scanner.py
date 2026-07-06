@@ -55,8 +55,87 @@ async def trigger_scan(
                 global ACTIVE_SCAN_STATE
                 ACTIVE_SCAN_STATE.update(state)
                 
+            from indian_swing.database.connection import get_sync_session
+            from indian_swing.database.models import ScanJob, Signal, Recommendation, Stock
+            from datetime import datetime
+            
             logger.info("Scan Background Task: Starting executor")
-            await loop.run_in_executor(None, scanner.run_scan, update_progress)
+            scan_date = date.today()
+            
+            # 1. Create ScanJob
+            def _create_job():
+                with get_sync_session() as session:
+                    job = ScanJob(scan_date=scan_date, status="running", started_at=datetime.utcnow())
+                    session.add(job)
+                    session.commit()
+                    return job.id
+            job_id = await loop.run_in_executor(None, _create_job)
+            
+            # 2. Run scan
+            signals = await loop.run_in_executor(None, scanner.run_scan, update_progress)
+            
+            # 3. Save to DB
+            def _save_signals():
+                with get_sync_session() as session:
+                    job = session.get(ScanJob, job_id)
+                    job.total_stocks = ACTIVE_SCAN_STATE["total_stocks"]
+                    job.stocks_scanned = ACTIVE_SCAN_STATE["completed"]
+                    job.signals_generated = len(signals)
+                    
+                    if not signals:
+                        job.status = "completed"
+                        job.completed_at = datetime.utcnow()
+                        session.commit()
+                        return
+                    
+                    from sqlalchemy import select
+                    stocks = session.execute(select(Stock)).scalars().all()
+                    stock_map = {s.symbol: s.id for s in stocks}
+                    
+                    rank = 1
+                    for s in signals:
+                        stock_id = stock_map.get(s.symbol)
+                        if not stock_id: continue
+                        
+                        # create signal
+                        new_signal = Signal(
+                            stock_id=stock_id,
+                            strategy_name=scanner.strategy.__class__.__name__,
+                            signal_date=scan_date,
+                            direction=s.direction.value if hasattr(s.direction, "value") else str(s.direction),
+                            entry_price=s.entry_price,
+                            stop_loss=s.stop_loss,
+                            target_1=s.target_1,
+                            target_2=s.target_2,
+                            risk_reward=s.risk_reward,
+                            confidence_score=s.confidence_score,
+                            quality=s.quality.value if hasattr(s.quality, "value") else str(s.quality),
+                            holding_days=s.holding_days,
+                            reasons=s.reasons,
+                            metadata_=s.metadata
+                        )
+                        session.add(new_signal)
+                        session.flush() # get signal id
+                        
+                        # create recommendation
+                        rec = Recommendation(
+                            stock_id=stock_id,
+                            signal_id=new_signal.id,
+                            scan_date=scan_date,
+                            rank=rank,
+                            confidence_score=s.confidence_score,
+                            risk_level=s.risk_level.value if hasattr(s.risk_level, "value") else str(s.risk_level),
+                            summary=f"{s.symbol} Breakout Setup"
+                        )
+                        session.add(rec)
+                        rank += 1
+                        
+                    job.recommendations_created = rank - 1
+                    job.status = "completed"
+                    job.completed_at = datetime.utcnow()
+                    session.commit()
+            
+            await loop.run_in_executor(None, _save_signals)
             
             # Reset stage when done
             ACTIVE_SCAN_STATE["current_stage"] = "Completed"
