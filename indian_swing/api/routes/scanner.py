@@ -30,21 +30,43 @@ async def trigger_scan(
     background_tasks: BackgroundTasks,
 ):
     """Trigger a manual scan. Runs in the background, returns immediately."""
+    global ACTIVE_SCAN_STATE
+    
+    if ACTIVE_SCAN_STATE["current_stage"] not in ("Idle", "Completed", "Failed"):
+        return {"status": "error", "detail": "A scan is already running"}
+        
+    ACTIVE_SCAN_STATE["current_stage"] = "Starting..."
+    ACTIVE_SCAN_STATE["completed"] = 0
+    ACTIVE_SCAN_STATE["failed"] = 0
+    ACTIVE_SCAN_STATE["total_stocks"] = 0
+    
     async def _scan():
-        # Run SIVCSScanner in a separate thread so it doesn't block the async event loop
-        import asyncio
-        loop = asyncio.get_event_loop()
-        scanner = SIVCSScanner()
+        from indian_swing.core.logging_setup import get_logger
+        logger = get_logger(__name__)
         
-        def update_progress(state):
-            global ACTIVE_SCAN_STATE
-            ACTIVE_SCAN_STATE.update(state)
+        try:
+            logger.info("Scan Background Task: Initialized")
+            # Run SIVCSScanner in a separate thread so it doesn't block the async event loop
+            import asyncio
+            loop = asyncio.get_event_loop()
+            scanner = SIVCSScanner()
             
-        await loop.run_in_executor(None, scanner.run_scan, update_progress)
-        
-        # Reset stage when done
-        ACTIVE_SCAN_STATE["current_stage"] = "Completed"
-        ACTIVE_SCAN_STATE["current_symbol"] = ""
+            def update_progress(state):
+                global ACTIVE_SCAN_STATE
+                ACTIVE_SCAN_STATE.update(state)
+                
+            logger.info("Scan Background Task: Starting executor")
+            await loop.run_in_executor(None, scanner.run_scan, update_progress)
+            
+            # Reset stage when done
+            ACTIVE_SCAN_STATE["current_stage"] = "Completed"
+            ACTIVE_SCAN_STATE["current_symbol"] = ""
+            logger.info("Scan Background Task: Completed successfully")
+            
+        except Exception as e:
+            logger.error(f"Scan Background Task: Crashed with exception: {e}")
+            ACTIVE_SCAN_STATE["current_stage"] = "Failed"
+            ACTIVE_SCAN_STATE["current_symbol"] = f"Crash: {str(e)}"
 
     background_tasks.add_task(_scan)
     return {"status": "queued", "scan_date": str(date.today())}

@@ -143,7 +143,12 @@ export default function Dashboard() {
     setScanStatus({ current_stage: "Starting..." })
     setScanSummary(null)
     try {
-      await axios.post('/api/scanner/run')
+      const response = await axios.post('/api/scanner/run')
+      if (response.data.status === 'error') {
+         alert(response.data.detail)
+         setScanning(false)
+         return
+      }
       pollProgress()
     } catch (e) {
       alert('Scan failed: ' + (e.response?.data?.detail || e.message))

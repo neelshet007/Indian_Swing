@@ -1,7 +1,7 @@
 from typing import List, Optional
 from datetime import date
 from sqlalchemy import select, and_, func
-from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+
 from sqlalchemy.orm import Session
 
 from indian_swing.database.models import Stock, OHLCV
@@ -40,10 +40,45 @@ class MarketDataRepository:
         if not records:
             return
             
-        # Using SQLite ON CONFLICT DO NOTHING behavior
-        stmt = sqlite_insert(OHLCV).values(records)
-        stmt = stmt.on_conflict_do_nothing(
-            index_elements=["stock_id", "date", "timeframe"]
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Database insert started for {len(records)} OHLCV records")
+        
+        stock_ids = list(set(r["stock_id"] for r in records))
+        timeframes = list(set(r["timeframe"] for r in records))
+        dates = list(set(r["date"] for r in records))
+        
+        stmt = select(OHLCV.stock_id, OHLCV.date, OHLCV.timeframe).where(
+            and_(
+                OHLCV.stock_id.in_(stock_ids),
+                OHLCV.timeframe.in_(timeframes),
+                OHLCV.date.in_(dates)
+            )
         )
-        self.session.execute(stmt)
+        
+        existing_tuples = set()
+        for row in self.session.execute(stmt).fetchall():
+            existing_tuples.add((row[0], str(row[1])[:10], row[2]))
+        
+        inserted_count = 0
+        skipped_count = 0
+        
+        for record in records:
+            try:
+                # Normalize record date for comparison
+                d_str = str(record["date"])
+                if " " in d_str: d_str = d_str.split(" ")[0]
+                elif "T" in d_str: d_str = d_str.split("T")[0]
+                
+                key = (record["stock_id"], d_str[:10], record["timeframe"])
+                if key in existing_tuples:
+                    skipped_count += 1
+                else:
+                    new_ohlcv = OHLCV(**record)
+                    self.session.add(new_ohlcv)
+                    inserted_count += 1
+            except Exception as e:
+                logger.error(f"Failed to process OHLCV record for stock_id {record.get('stock_id')}: {e}")
+                
         self.session.commit()
+        logger.info(f"Transaction committed: Inserted {inserted_count}, Skipped (duplicate) {skipped_count}")
