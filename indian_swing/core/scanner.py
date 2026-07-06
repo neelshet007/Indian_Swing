@@ -20,8 +20,8 @@ class SIVCSScanner:
         self.strategy = InstitutionalVCP()
         self.fetcher = DataFetcher()
 
-    def run_scan(self, progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None) -> List[StrategySignal]:
-        logger.info("Starting SIVCS Institutional Scan")
+    def run_scan(self, progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None, as_of_date: Optional[date] = None) -> List[StrategySignal]:
+        logger.info(f"Starting SIVCS Institutional Scan (as of date: {as_of_date or 'today'})")
         all_signals = []
         
         with get_sync_session() as session:
@@ -110,6 +110,12 @@ class SIVCSScanner:
                         "close": h.close,
                         "volume": h.volume
                     } for h in history])
+                    
+                    if as_of_date:
+                        # Ensure we convert dates to datetime.date objects for robust comparison
+                        import datetime as dt_module
+                        df['date_dt'] = pd.to_datetime(df['date']).dt.date
+                        df = df[df['date_dt'] <= as_of_date].drop(columns=['date_dt'])
                     
                     if len(df) < required_lookback_days:
                         logger.warning(f"  Insufficient history ({len(df)} bars), requires {required_lookback_days}. Skipping.")

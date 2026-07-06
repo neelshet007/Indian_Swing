@@ -38,6 +38,26 @@ class StrategySignal:
     reasons: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self):
+        self.entry_price = float(self.entry_price)
+        self.stop_loss = float(self.stop_loss)
+        if self.target_1 is not None:
+            self.target_1 = float(self.target_1)
+        if self.target_2 is not None:
+            self.target_2 = float(self.target_2)
+        if self.confidence_score is not None:
+            self.confidence_score = float(self.confidence_score)
+        if self.holding_days is not None:
+            self.holding_days = int(self.holding_days)
+        if self.metadata:
+            cleaned = {}
+            for k, v in self.metadata.items():
+                if hasattr(v, "item"):
+                    cleaned[k] = v.item()
+                else:
+                    cleaned[k] = v
+            self.metadata = cleaned
+
     @property
     def risk_reward(self) -> float:
         risk = abs(self.entry_price - self.stop_loss)

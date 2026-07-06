@@ -143,7 +143,9 @@ export default function Dashboard() {
     setScanStatus({ current_stage: "Starting..." })
     setScanSummary(null)
     try {
-      const response = await axios.post('/api/scanner/run')
+      const response = await axios.post('/api/scanner/run', null, {
+        params: scanDate ? { scan_date: scanDate } : {}
+      })
       if (response.data.status === 'error') {
          alert(response.data.detail)
          setScanning(false)
