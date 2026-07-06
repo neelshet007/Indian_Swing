@@ -9,6 +9,21 @@ from indian_swing.core.scanner import SIVCSScanner
 
 router = APIRouter()
 
+# Global state to hold real-time scan progress
+ACTIVE_SCAN_STATE = {
+    "total_stocks": 0,
+    "completed": 0,
+    "failed": 0,
+    "remaining": 0,
+    "current_symbol": "",
+    "current_stage": "Idle"
+}
+
+@router.get("/progress")
+async def get_progress():
+    """Returns the real-time progress of the active scan."""
+    return ACTIVE_SCAN_STATE
+
 
 @router.post("/run")
 async def trigger_scan(
@@ -20,7 +35,16 @@ async def trigger_scan(
         import asyncio
         loop = asyncio.get_event_loop()
         scanner = SIVCSScanner()
-        await loop.run_in_executor(None, scanner.run_scan)
+        
+        def update_progress(state):
+            global ACTIVE_SCAN_STATE
+            ACTIVE_SCAN_STATE.update(state)
+            
+        await loop.run_in_executor(None, scanner.run_scan, update_progress)
+        
+        # Reset stage when done
+        ACTIVE_SCAN_STATE["current_stage"] = "Completed"
+        ACTIVE_SCAN_STATE["current_symbol"] = ""
 
     background_tasks.add_task(_scan)
     return {"status": "queued", "scan_date": str(date.today())}

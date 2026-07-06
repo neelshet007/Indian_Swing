@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import List, Optional
+from typing import List, Optional, Callable, Dict, Any
 from datetime import date
 
 from indian_swing.core.logging_setup import get_logger
@@ -20,7 +20,7 @@ class SIVCSScanner:
         self.strategy = InstitutionalVCP()
         self.fetcher = DataFetcher()
 
-    def run_scan(self) -> List[StrategySignal]:
+    def run_scan(self, progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None) -> List[StrategySignal]:
         logger.info("Starting SIVCS Institutional Scan")
         all_signals = []
         
@@ -38,16 +38,29 @@ class SIVCSScanner:
             active_stocks = repo.get_active_stocks()
             logger.info(f"Loaded {len(active_stocks)} active stocks.")
             
-            # Step 2-7 for each stock
-            # Calculate dynamic lookback once
-            required_lookback_days = DynamicLookbackEngine.get_required_lookback(self.strategy)
+            total_stocks = len(active_stocks)
+            completed_count = 0
+            failed_count = 0
+            
+            def emit_progress(symbol: str, stage: str):
+                if progress_callback:
+                    progress_callback({
+                        "total_stocks": total_stocks,
+                        "completed": completed_count,
+                        "failed": failed_count,
+                        "remaining": total_stocks - completed_count - failed_count,
+                        "current_symbol": symbol,
+                        "current_stage": stage
+                    })
             
             for i, stock in enumerate(active_stocks):
-                logger.info(f"[{i+1}/{len(active_stocks)}] Scanning {stock.symbol}")
+                logger.info(f"[{i+1}/{total_stocks}] Scanning {stock.symbol}")
                 try:
+                    emit_progress(stock.symbol, "Verifying Data")
                     # Step 2: Verify Historical Data & Missing Data Check
                     latest_date = repo.get_latest_ohlcv_date(stock.id, "1d")
                     
+                    emit_progress(stock.symbol, "Downloading Delta")
                     # Step 3 & 4: Fetch missing Data
                     delta_df = self.fetcher.fetch_missing_data(
                         symbol=stock.symbol, 
@@ -93,6 +106,7 @@ class SIVCSScanner:
                         logger.warning(f"  Insufficient history ({len(df)} bars), requires {required_lookback_days}. Skipping.")
                         continue
 
+                    emit_progress(stock.symbol, "Aggregating Weekly")
                     # Step 6: Build Weekly/Monthly Data and store in DB
                     if not delta_df.empty:
                         weekly_df = DataAggregator.aggregate_weekly(df)
@@ -127,9 +141,11 @@ class SIVCSScanner:
                             })
                         repo.bulk_insert_ohlcv(monthly_records)
                         
+                    emit_progress(stock.symbol, "Calculating Indicators")
                     # Step 7: Indicator Calculation (Calculate once, reuse)
                     df_with_indicators = IndicatorCalculator.add_daily_indicators(df)
                     
+                    emit_progress(stock.symbol, "Evaluating Strategy")
                     # Step 9: Scan Every Stock (Apply Strategy Rules)
                     signals = self.strategy.generate_signals(stock.symbol, df_with_indicators)
                     
@@ -139,8 +155,13 @@ class SIVCSScanner:
                             logger.info(f"      Reasons: {', '.join(s.reasons)}")
                             all_signals.append(s)
                             
+                    completed_count += 1
+                    emit_progress(stock.symbol, "Completed")
+                            
                 except Exception as e:
                      logger.error(f"  Error processing {stock.symbol}: {e}")
+                     failed_count += 1
+                     emit_progress(stock.symbol, "Failed")
                      continue # Continue to next stock on failure
 
         logger.info(f"Scan complete. Generated {len(all_signals)} valid setups.")

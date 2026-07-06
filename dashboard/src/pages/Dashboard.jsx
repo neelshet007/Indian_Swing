@@ -140,7 +140,7 @@ export default function Dashboard() {
 
   const triggerScan = async () => {
     setScanning(true)
-    setScanStatus(null)
+    setScanStatus({ current_stage: "Starting..." })
     setScanSummary(null)
     try {
       await axios.post('/api/scanner/run')
@@ -153,22 +153,23 @@ export default function Dashboard() {
 
   const pollProgress = async () => {
     try {
-      const { data } = await axios.get('/api/scanner/jobs?limit=1')
-      const job = data[0]
-      if (job && (job.status === 'running' || job.status === 'pending')) {
-        setScanStatus({ scanned: job.stocks_scanned || 0, total: job.total_stocks || 0 })
-        setTimeout(pollProgress, 1000)
-      } else if (job && job.status === 'completed') {
+      const { data } = await axios.get('/api/scanner/progress')
+      
+      if (data.current_stage !== "Idle" && data.current_stage !== "Completed") {
+        setScanStatus(data)
+        setTimeout(pollProgress, 500) // Poll twice a second for real-time updates
+      } else if (data.current_stage === "Completed") {
         setScanning(false)
         setScanStatus(null)
-        setScanSummary(`Recommended setups ${job.recommendations_created} out of ${job.total_stocks}`)
+        setScanSummary(`Scan finished! Found recommendations.`)
         fetchRecs()
+        
+        // Reset state on server to Idle so next scan can trigger properly
+        // (FastAPI will eventually handle this properly on next /run)
       } else {
+        // Idle
         setScanning(false)
         setScanStatus(null)
-        if (job?.status === 'failed') {
-          alert(`Scan failed: ${job.error}`)
-        }
       }
     } catch (e) {
       console.error("Polling error", e)
@@ -213,7 +214,7 @@ export default function Dashboard() {
             disabled={scanning}
           >
             {scanning 
-              ? (scanStatus?.total ? `⟳ Scanning ${scanStatus.scanned} of ${scanStatus.total}...` : '⟳ Starting Scan...') 
+              ? '⟳ Scanning...'
               : '▶ Run Scan'}
           </button>
         </div>
@@ -222,6 +223,27 @@ export default function Dashboard() {
       {scanSummary && (
         <div style={{ padding: '0 32px 12px', color: 'var(--accent-green)', fontWeight: 500 }}>
           ✓ {scanSummary}
+        </div>
+      )}
+
+      {scanStatus && scanStatus.total_stocks > 0 && (
+        <div style={{ margin: '0 32px 20px', padding: '16px', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+           <h3 style={{ margin: '0 0 12px 0', fontSize: '1.1rem', color: 'var(--text-primary)' }}>Scan Progress</h3>
+           <div style={{ display: 'flex', gap: '20px', fontSize: '0.9rem', color: 'var(--text-secondary)', flexWrap: 'wrap' }}>
+             <div><strong>Total:</strong> {scanStatus.total_stocks}</div>
+             <div><strong style={{ color: 'var(--accent-green)' }}>Completed:</strong> {scanStatus.completed}</div>
+             <div><strong style={{ color: 'var(--accent-red)' }}>Failed:</strong> {scanStatus.failed}</div>
+             <div><strong>Remaining:</strong> {scanStatus.remaining}</div>
+           </div>
+           
+           <div style={{ marginTop: '16px', background: 'var(--bg)', padding: '12px', borderRadius: '6px' }}>
+              <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--accent-blue-bright)' }}>
+                 Processing: {scanStatus.current_symbol}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                 Stage: {scanStatus.current_stage}
+              </div>
+           </div>
         </div>
       )}
 
