@@ -38,6 +38,15 @@ class SIVCSScanner:
             active_stocks = repo.get_active_stocks()
             logger.info(f"Loaded {len(active_stocks)} active stocks.")
             
+            # Calculate dynamic lookback once before scanning
+            required_lookback_days = DynamicLookbackEngine.get_required_lookback(self.strategy)
+            
+            # Fail Fast Validation
+            if not isinstance(required_lookback_days, int) or required_lookback_days <= 0:
+                error_msg = f"Lookback Engine failed to determine a valid historical period. Got: {required_lookback_days}"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
+                
             total_stocks = len(active_stocks)
             completed_count = 0
             failed_count = 0
