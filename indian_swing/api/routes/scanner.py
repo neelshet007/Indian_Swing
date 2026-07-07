@@ -81,7 +81,7 @@ async def trigger_scan(
             def _save_signals():
                 with get_sync_session() as session:
                     # Clean up existing recommendations and signals for this scan_date to avoid duplicates
-                    from sqlalchemy import delete
+                    from sqlalchemy import delete, select
                     existing_signals = session.execute(
                         select(Signal.id).where(Signal.signal_date == scan_date)
                     ).scalars().all()
@@ -104,8 +104,6 @@ async def trigger_scan(
                         job.completed_at = datetime.utcnow()
                         session.commit()
                         return
-                    
-                    from sqlalchemy import select
                     stocks = session.execute(select(Stock)).scalars().all()
                     stock_map = {s.symbol: s.id for s in stocks}
                     
