@@ -14,9 +14,9 @@ class SignalRepository(BaseRepository[Signal]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, Signal)
 
-    def get_by_stock_date(self, stock_id: str, signal_date: date, strategy: str | None = None) -> Sequence[Signal]:
+    def get_by_stock_date(self, stock_uuid: str, signal_date: date, strategy: str | None = None) -> Sequence[Signal]:
         query = select(Signal).where(
-            and_(Signal.stock_id == stock_id, Signal.signal_date == signal_date)
+            and_(Signal.stock_uuid == stock_uuid, Signal.signal_date == signal_date)
         )
         if strategy:
             query = query.where(Signal.strategy_name == strategy)
@@ -27,10 +27,10 @@ class RecommendationRepository(BaseRepository[Recommendation]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, Recommendation)
 
-    def get_by_scan(self, scan_job_id: str) -> Sequence[Recommendation]:
+    def get_by_scan(self, scan_uuid: str) -> Sequence[Recommendation]:
         return self._session.execute(
             select(Recommendation)
-            .where(Recommendation.scan_job_id == scan_job_id)
+            .where(Recommendation.scan_uuid == scan_uuid)
             .options(joinedload(Recommendation.stock), joinedload(Recommendation.signal))
             .order_by(Recommendation.rank)
         ).scalars().all()
@@ -57,7 +57,7 @@ class RecommendationRepository(BaseRepository[Recommendation]):
             return []
         return self._session.execute(
             select(Recommendation)
-            .where(Recommendation.scan_job_id == latest_scan)
+            .where(Recommendation.scan_uuid == latest_scan)
             .options(joinedload(Recommendation.stock), joinedload(Recommendation.signal))
             .order_by(Recommendation.rank)
             .limit(limit)

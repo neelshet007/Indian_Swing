@@ -27,7 +27,7 @@ logger = get_logger(__name__)
 @dataclass
 class ScanResult:
     scan_date: date
-    job_id: str = ""
+    scan_uuid: str = ""
     signals_generated: int = 0
     stocks_scanned: int = 0
     recommendations_saved: int = 0
@@ -45,7 +45,7 @@ class RecommendationScanner:
         self.validator = RecommendationValidator()
         self.progress_state = {
             "status": "idle",
-            "scan_job_id": None,
+            "scan_uuid": None,
             "scan_date": None,
             "total_stocks": 0,
             "completed": 0,
@@ -65,11 +65,11 @@ class RecommendationScanner:
         if benchmark_symbol not in pipeline_symbols:
             pipeline_symbols.append(benchmark_symbol)
 
-        result.job_id = await asyncio.get_running_loop().run_in_executor(None, self._create_scan_job, scan_date, len(stocks))
+        result.scan_uuid = await asyncio.get_running_loop().run_in_executor(None, self._create_scan_job, scan_date, len(stocks))
         self.progress_state.update(
             {
                 "status": "running",
-                "scan_job_id": result.job_id,
+                "scan_uuid": result.scan_uuid,
                 "scan_date": str(scan_date),
                 "total_stocks": len(stocks),
                 "completed": 0,
@@ -125,7 +125,7 @@ class RecommendationScanner:
                         if not validation.valid:
                             validation_counter[validation.reason or "Rejected"] += 1
                             continue
-                        existing_signal_keys.add((stock.id, signal.metadata.get("strategy_name", ""), latest_daily_date))
+                        existing_signal_keys.add((stock.stock_uuid, signal.metadata.get("strategy_name", ""), latest_daily_date))
                         filter_counter["BUY"] += 1
                         persisted.append((stock, context, signal))
 
@@ -141,7 +141,7 @@ class RecommendationScanner:
             await asyncio.get_running_loop().run_in_executor(
                 None,
                 self._persist_scan_results,
-                result.job_id,
+                result.scan_uuid,
                 scan_date,
                 persisted,
                 filter_counter,
@@ -156,7 +156,7 @@ class RecommendationScanner:
             self.progress_state["status"] = "completed"
             self.progress_state["current_stage"] = "Completed"
         except Exception as exc:
-            await asyncio.get_running_loop().run_in_executor(None, self._fail_scan_job, result.job_id, str(exc))
+            await asyncio.get_running_loop().run_in_executor(None, self._fail_scan_job, result.scan_uuid, str(exc))
             self.progress_state["status"] = "failed"
             self.progress_state["current_stage"] = "Failed"
             raise
@@ -179,8 +179,8 @@ class RecommendationScanner:
                 )
             ).scalar_one_or_none()
             if existing:
-                session.execute(delete(Recommendation).where(Recommendation.scan_job_id == existing.id))
-                session.execute(delete(Signal).where(Signal.scan_job_id == existing.id))
+                session.execute(delete(Recommendation).where(Recommendation.scan_uuid == existing.id))
+                session.execute(delete(Signal).where(Signal.scan_uuid == existing.id))
                 session.delete(existing)
                 session.flush()
 
@@ -202,7 +202,7 @@ class RecommendationScanner:
         with get_sync_session() as session:
             repo = OHLCVRepository(session)
             start = scan_date - timedelta(days=int(lookback * 1.8))
-            daily = repo.to_dataframe(stock.id, start, scan_date, "1d")
+            daily = repo.to_dataframe(stock.stock_uuid, start, scan_date, "1d")
             if daily.empty:
                 raise ValueError("No daily history available")
             benchmark = StockRepository(session).get_by_symbol(
@@ -224,7 +224,7 @@ class RecommendationScanner:
 
     def _persist_scan_results(
         self,
-        job_id: str,
+        scan_uuid: str,
         scan_date: date,
         items: list[tuple[Stock, StrategyContext, StrategySignal]],
         filter_counter: Counter[str],
@@ -234,8 +234,8 @@ class RecommendationScanner:
         with get_sync_session() as session:
             for rank, (stock, _context, signal) in enumerate(ranked, start=1):
                 signal_model = Signal(
-                    scan_job_id=job_id,
-                    stock_id=stock.id,
+                    scan_uuid=scan_uuid,
+                    stock_uuid=stock.stock_uuid,
                     strategy_name=self.strategy.name,
                     strategy_version=self.strategy.version,
                     signal_date=scan_date,
@@ -258,9 +258,9 @@ class RecommendationScanner:
                 session.flush()
 
                 recommendation = Recommendation(
-                    scan_job_id=job_id,
+                    scan_uuid=scan_uuid,
                     signal_id=signal_model.id,
-                    stock_id=stock.id,
+                    stock_uuid=stock.stock_uuid,
                     scan_date=scan_date,
                     strategy_name=self.strategy.name,
                     strategy_version=self.strategy.version,
@@ -279,7 +279,7 @@ class RecommendationScanner:
                 )
                 session.add(recommendation)
 
-            job = session.get(ScanJob, job_id)
+            job = session.get(ScanJob, scan_uuid)
             if job is not None:
                 job.signals_generated = len(ranked)
                 job.recommendations_created = len(ranked)
@@ -288,7 +288,7 @@ class RecommendationScanner:
 
     def _complete_scan_job(self, result: ScanResult) -> None:
         with get_sync_session() as session:
-            job = session.get(ScanJob, result.job_id)
+            job = session.get(ScanJob, result.scan_uuid)
             if job is None:
                 return
             job.status = "completed"
@@ -300,9 +300,9 @@ class RecommendationScanner:
             job.validation_summary = result.validation_summary
             job.completed_at = datetime.utcnow()
 
-    def _fail_scan_job(self, job_id: str, error: str) -> None:
+    def _fail_scan_job(self, scan_uuid: str, error: str) -> None:
         with get_sync_session() as session:
-            job = session.get(ScanJob, job_id)
+            job = session.get(ScanJob, scan_uuid)
             if job is None:
                 return
             job.status = "failed"

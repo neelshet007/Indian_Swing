@@ -136,7 +136,7 @@ class BacktestRunner:
                     logger.warning("backtest.stock_not_found", symbol=symbol)
                     continue
                 repo = OHLCVRepository(session, type(None))
-                df = await repo.to_dataframe(stock.id, self.config.start_date, self.config.end_date)
+                df = await repo.to_dataframe(stock.stock_uuid, self.config.start_date, self.config.end_date)
                 if not df.empty:
                     data[symbol] = df
         return data

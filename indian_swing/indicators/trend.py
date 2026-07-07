@@ -8,20 +8,21 @@ import numpy as np
 import pandas as pd
 
 from indian_swing.indicators.base import BaseIndicator
+from indian_swing.indicators.standardized import ema, sma
 
 
 class EMA(BaseIndicator):
     name = "EMA"
 
     def compute(self, df: pd.DataFrame, period: int = 20, column: str = "close") -> pd.Series:
-        return df[column].ewm(span=period, adjust=False).mean()
+        return ema(df[column], period)
 
 
 class SMA(BaseIndicator):
     name = "SMA"
 
     def compute(self, df: pd.DataFrame, period: int = 20, column: str = "close") -> pd.Series:
-        return df[column].rolling(window=period).mean()
+        return sma(df[column], period)
 
 
 class MACD(BaseIndicator):

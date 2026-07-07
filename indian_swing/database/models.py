@@ -32,12 +32,12 @@ def _uuid() -> str:
 class Stock(Base):
     __tablename__ = "sw_stocks"
     __table_args__ = (
-        UniqueConstraint("environment", "exchange", "symbol", name="uq_stock_env_exchange_symbol"),
-        UniqueConstraint("environment", "isin", name="uq_stock_env_isin"),
+        UniqueConstraint("exchange", "symbol", name="uq_stock_exchange_symbol"),
+        UniqueConstraint("isin", name="uq_stock_isin"),
         Index("ix_stock_exchange_symbol", "exchange", "symbol"),
     )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    stock_uuid: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     environment: Mapped[str] = mapped_column(String(20), nullable=False, default="DEVELOPMENT")
     exchange: Mapped[str] = mapped_column(String(16), nullable=False, default="NSE")
     symbol: Mapped[str] = mapped_column(String(32), nullable=False)
@@ -73,14 +73,14 @@ class Stock(Base):
 class OHLCV(Base):
     __tablename__ = "sw_ohlcv"
     __table_args__ = (
-        UniqueConstraint("stock_id", "date", "timeframe", name="uq_ohlcv_stock_date_tf"),
-        Index("ix_ohlcv_stock_date", "stock_id", "date"),
+        UniqueConstraint("stock_uuid", "date", "timeframe", name="uq_ohlcv_stock_date_tf"),
+        Index("ix_ohlcv_stock_date", "stock_uuid", "date"),
         Index("ix_ohlcv_timeframe_date", "timeframe", "date"),
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    stock_id: Mapped[str] = mapped_column(
-        ForeignKey("sw_stocks.id", ondelete="CASCADE"),
+    stock_uuid: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.stock_uuid", ondelete="CASCADE"),
         nullable=False,
     )
     date: Mapped[date] = mapped_column(Date, nullable=False)
@@ -101,16 +101,15 @@ class ScanJob(Base):
     __tablename__ = "sw_scan_jobs"
     __table_args__ = (
         UniqueConstraint(
-            "environment",
             "strategy_name",
             "strategy_version",
             "scan_date",
-            name="uq_scan_env_strategy_version_date",
+            name="uq_scan_strategy_version_date",
         ),
         Index("ix_scan_status_created", "status", "created_at"),
     )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    scan_uuid: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     environment: Mapped[str] = mapped_column(String(20), nullable=False, default="DEVELOPMENT")
     strategy_name: Mapped[str] = mapped_column(String(80), nullable=False)
     strategy_version: Mapped[str] = mapped_column(String(32), nullable=False)
@@ -144,21 +143,21 @@ class Signal(Base):
     __tablename__ = "sw_signals"
     __table_args__ = (
         UniqueConstraint(
-            "scan_job_id",
-            "stock_id",
+            "scan_uuid",
+            "stock_uuid",
             "strategy_name",
             name="uq_signal_scan_stock_strategy",
         ),
-        Index("ix_signal_scan_stock", "scan_job_id", "stock_id"),
+        Index("ix_signal_scan_stock", "scan_uuid", "stock_uuid"),
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    scan_job_id: Mapped[str] = mapped_column(
-        ForeignKey("sw_scan_jobs.id", ondelete="CASCADE"),
+    scan_uuid: Mapped[str] = mapped_column(
+        ForeignKey("sw_scan_jobs.scan_uuid", ondelete="CASCADE"),
         nullable=False,
     )
-    stock_id: Mapped[str] = mapped_column(
-        ForeignKey("sw_stocks.id", ondelete="CASCADE"),
+    stock_uuid: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.stock_uuid", ondelete="CASCADE"),
         nullable=False,
     )
     strategy_name: Mapped[str] = mapped_column(String(80), nullable=False)
@@ -191,14 +190,14 @@ class Signal(Base):
 class Recommendation(Base):
     __tablename__ = "sw_recommendations"
     __table_args__ = (
-        UniqueConstraint("scan_job_id", "stock_id", name="uq_recommendation_scan_stock"),
-        Index("ix_recommendation_scan_rank", "scan_job_id", "rank"),
+        UniqueConstraint("scan_uuid", "stock_uuid", name="uq_recommendation_scan_stock"),
+        Index("ix_recommendation_scan_rank", "scan_uuid", "rank"),
         Index("ix_recommendation_scan_date", "scan_date"),
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    scan_job_id: Mapped[str] = mapped_column(
-        ForeignKey("sw_scan_jobs.id", ondelete="CASCADE"),
+    scan_uuid: Mapped[str] = mapped_column(
+        ForeignKey("sw_scan_jobs.scan_uuid", ondelete="CASCADE"),
         nullable=False,
     )
     signal_id: Mapped[str] = mapped_column(
@@ -206,14 +205,22 @@ class Recommendation(Base):
         nullable=False,
         unique=True,
     )
-    stock_id: Mapped[str] = mapped_column(
-        ForeignKey("sw_stocks.id", ondelete="CASCADE"),
+    stock_uuid: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.stock_uuid", ondelete="CASCADE"),
         nullable=False,
     )
     recommendation_uuid: Mapped[str] = mapped_column(String(36), nullable=False, default=_uuid)
     scan_date: Mapped[date] = mapped_column(Date, nullable=False)
     strategy_name: Mapped[str] = mapped_column(String(80), nullable=False)
     strategy_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    indicator_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.0.0")
+    scanner_version: Mapped[str] = mapped_column(String(32), nullable=False, default="1.0.0")
+    config_hash: Mapped[str] = mapped_column(String(64), nullable=False, default="unknown")
+    yahoo_version: Mapped[str] = mapped_column(String(32), nullable=False, default="unknown")
+    download_time: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    history_used: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    indicator_warmup: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    calculation_timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     action: Mapped[str] = mapped_column(String(16), nullable=False, default="BUY")
     rank: Mapped[int] = mapped_column(Integer, nullable=False)
     confidence_score: Mapped[float] = mapped_column(Float, nullable=False)
@@ -269,8 +276,8 @@ class ReplaySession(Base):
     __tablename__ = "sw_replay_sessions"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    stock_id: Mapped[str] = mapped_column(
-        ForeignKey("sw_stocks.id", ondelete="CASCADE"),
+    stock_uuid: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.stock_uuid", ondelete="CASCADE"),
         nullable=False,
     )
     strategy_name: Mapped[str] = mapped_column(String(80), nullable=False)

@@ -7,6 +7,7 @@ import pandas as pd
 
 from indian_swing.core.exceptions import InsufficientDataError
 from indian_swing.data.cleaner import OHLCVResampler
+from indian_swing.indicators.standardized import average_true_range, relative_strength_index
 
 
 @dataclass(frozen=True)
@@ -47,11 +48,8 @@ class IndicatorCalculator:
         frame["vol_50"] = frame["volume"].rolling(50, min_periods=50).mean()
         frame["turnover_50"] = frame["vol_50"] * frame["close"]
 
-        high_low = frame["high"] - frame["low"]
-        high_close = (frame["high"] - frame["close"].shift(1)).abs()
-        low_close = (frame["low"] - frame["close"].shift(1)).abs()
-        frame["true_range"] = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
-        frame["atr_14"] = frame["true_range"].rolling(14, min_periods=14).mean()
+        frame["atr_14"] = average_true_range(frame, 14)
+        frame["rsi_14"] = relative_strength_index(frame, 14)
 
         frame["high_20"] = frame["high"].rolling(20, min_periods=20).max()
         frame["high_50"] = frame["high"].rolling(50, min_periods=50).max()
@@ -74,8 +72,28 @@ class IndicatorCalculator:
         frame["sma_40w"] = frame["close"].rolling(40, min_periods=40).mean()
         frame["high_13w"] = frame["high"].rolling(13, min_periods=13).max()
         frame["low_13w"] = frame["low"].rolling(13, min_periods=13).min()
-        frame["stage2"] = (frame["close"] > frame["sma_30w"]) & (frame["sma_30w"] > frame["sma_40w"])
-        frame["weekly_uptrend"] = frame["sma_30w"] > frame["sma_30w"].shift(4)
+        
+        ma_30 = frame["sma_30w"]
+        ma_40 = frame["sma_40w"]
+        ma_30_slope = ma_30 - ma_30.shift(4)
+
+        stage_2 = (frame["close"] > ma_30) & (ma_30 > ma_40) & (ma_30_slope > 0)
+        stage_4 = (frame["close"] < ma_30) & (ma_30 < ma_40) & (ma_30_slope < 0)
+        
+        # Determine stages 1 to 4
+        frame["stage"] = 0
+        frame.loc[stage_2, "stage"] = 2
+        frame.loc[stage_4, "stage"] = 4
+        
+        # Basic approximation for 1 and 3 if not 2 or 4
+        stage_1 = (~stage_2) & (~stage_4) & (ma_30_slope >= 0)
+        stage_3 = (~stage_2) & (~stage_4) & (ma_30_slope < 0)
+        
+        frame.loc[stage_1, "stage"] = 1
+        frame.loc[stage_3, "stage"] = 3
+        
+        frame["stage2"] = stage_2
+        frame["weekly_uptrend"] = ma_30_slope > 0
         return frame
 
     @staticmethod
@@ -84,10 +102,9 @@ class IndicatorCalculator:
         benchmark = benchmark_daily[["close"]].rename(columns={"close": "benchmark_close"})
         merged = stock.join(benchmark, how="left")
         merged["benchmark_close"] = merged["benchmark_close"].ffill()
-        merged["stock_return_63"] = merged["close"] / merged["close"].shift(63)
-        merged["benchmark_return_63"] = merged["benchmark_close"] / merged["benchmark_close"].shift(63)
-        merged["rs_ratio_63"] = merged["stock_return_63"] / merged["benchmark_return_63"]
-        merged["rs_score"] = merged["rs_ratio_63"].rolling(20, min_periods=5).mean()
+        merged["rs_ratio"] = merged["close"] / merged["benchmark_close"]
+        merged["rs_sma_252"] = merged["rs_ratio"].rolling(252, min_periods=63).mean()
+        merged["rs_score"] = ((merged["rs_ratio"] / merged["rs_sma_252"]) - 1.0) * 100
         return merged
 
     @staticmethod

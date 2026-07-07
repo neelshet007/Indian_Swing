@@ -50,7 +50,7 @@ async def get_stock(symbol: str):
             if not stock:
                 return None
             ohlcv_repo = OHLCVRepository(session)
-            return _stock_dict(stock, ohlcv_repo.get_latest_close(stock.id))
+            return _stock_dict(stock, ohlcv_repo.get_latest_close(stock.stock_uuid))
 
     stock_data = await loop.run_in_executor(None, _fetch)
     if not stock_data:
@@ -75,7 +75,7 @@ async def get_ohlcv(
                 return None, []
             end = date.today()
             start = end - timedelta(days=days)
-            rows = OHLCVRepository(session).get_range(stock.id, start, end, timeframe)
+            rows = OHLCVRepository(session).get_range(stock.stock_uuid, start, end, timeframe)
             return stock, rows
 
     stock, rows = await loop.run_in_executor(None, _fetch)

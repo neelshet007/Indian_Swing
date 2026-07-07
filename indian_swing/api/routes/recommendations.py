@@ -98,7 +98,7 @@ def _serialize_recommendation(recommendation: Recommendation, detailed: bool = F
     payload = {
         "id": recommendation.id,
         "recommendation_uuid": recommendation.recommendation_uuid,
-        "scan_job_id": recommendation.scan_job_id,
+        "scan_uuid": recommendation.scan_uuid,
         "scan_date": str(recommendation.scan_date),
         "strategy_name": recommendation.strategy_name,
         "strategy_version": recommendation.strategy_version,

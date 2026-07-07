@@ -67,12 +67,14 @@ class SIVCSScanner:
                 try:
                     emit_progress(stock.symbol, "Verifying Data")
                     # Step 2: Verify Historical Data & Missing Data Check
-                    latest_date = repo.get_latest_ohlcv_date(stock.id, "1d")
+                    earliest_date = repo.get_earliest_ohlcv_date(stock.stock_uuid, "1d")
+                    latest_date = repo.get_latest_ohlcv_date(stock.stock_uuid, "1d")
                     
                     emit_progress(stock.symbol, "Downloading Delta")
                     # Step 3 & 4: Fetch missing Data
                     delta_df = self.fetcher.fetch_missing_data(
                         symbol=stock.symbol, 
+                        earliest_db_date=earliest_date,
                         latest_db_date=latest_date, 
                         required_lookback_days=required_lookback_days
                     )
@@ -83,7 +85,7 @@ class SIVCSScanner:
                         records = []
                         for _, row in delta_df.iterrows():
                             records.append({
-                                "stock_id": stock.id,
+                                "stock_uuid": stock.stock_uuid,
                                 "date": row['date'],
                                 "timeframe": "1d",
                                 "open": row['open'],
@@ -96,7 +98,7 @@ class SIVCSScanner:
                         repo.bulk_insert_ohlcv(records)
                     
                     # Fetch Full History from DB for processing
-                    history = repo.get_ohlcv_data(stock.id, "1d")
+                    history = repo.get_ohlcv_data(stock.stock_uuid, "1d")
                     if not history:
                         logger.warning(f"  No history found in DB for {stock.symbol}, skipping.")
                         continue
@@ -128,7 +130,7 @@ class SIVCSScanner:
                         weekly_records = []
                         for _, row in weekly_df.iterrows():
                              weekly_records.append({
-                                "stock_id": stock.id,
+                                "stock_uuid": stock.stock_uuid,
                                 "date": row['date'],
                                 "timeframe": "1W",
                                 "open": row['open'],
@@ -144,7 +146,7 @@ class SIVCSScanner:
                         monthly_records = []
                         for _, row in monthly_df.iterrows():
                              monthly_records.append({
-                                "stock_id": stock.id,
+                                "stock_uuid": stock.stock_uuid,
                                 "date": row['date'],
                                 "timeframe": "1M",
                                 "open": row['open'],

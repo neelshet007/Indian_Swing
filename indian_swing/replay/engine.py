@@ -147,7 +147,7 @@ class ReplayEngine:
                 if stock is None:
                     raise ReplayError(f"Stock {symbol} not found.")
                 repo = OHLCVRepository(session)
-                return repo.to_dataframe(stock.id, start_date, end_date)
+                return repo.to_dataframe(stock.stock_uuid, start_date, end_date)
 
         df = await loop.run_in_executor(None, _load)
         if df.empty:

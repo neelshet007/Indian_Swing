@@ -26,7 +26,7 @@ class RecommendationValidator:
         existing_signal_keys: set[tuple[str, str, str]],
         latest_daily_date: str,
     ) -> ValidationResult:
-        if not stock.id or not stock.symbol or not stock.exchange:
+        if not stock.stock_uuid or not stock.symbol or not stock.exchange:
             return ValidationResult(False, "Invalid stock identity")
         if signal.direction.value != "LONG":
             return ValidationResult(False, "Only LONG recommendations are supported")
@@ -40,10 +40,10 @@ class RecommendationValidator:
             return ValidationResult(False, "Target must be above entry")
         if latest_daily_date != str(context.daily.index[-1].date()):
             return ValidationResult(False, "Stale data")
-        signal_key = (stock.id, signal.metadata.get("strategy_name", ""), latest_daily_date)
+        signal_key = (stock.stock_uuid, signal.metadata.get("strategy_name", ""), latest_daily_date)
         if signal_key in existing_signal_keys:
             return ValidationResult(False, "Duplicate recommendation")
-        required_steps = {"Liquidity", "Trend Template", "Stage Analysis", "Weekly Trend", "Relative Strength", "VCP", "Breakout", "Risk"}
+        required_steps = {"Market Filter", "Sector Filter", "Liquidity", "Trend", "Stage", "Relative Strength", "VCP", "Breakout", "Risk"}
         explanation = signal.explanation or {}
         if set(explanation.keys()) != required_steps:
             return ValidationResult(False, "Incomplete explanation")

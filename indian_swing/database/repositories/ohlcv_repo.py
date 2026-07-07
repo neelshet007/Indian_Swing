@@ -16,12 +16,12 @@ class OHLCVRepository(BaseRepository[OHLCV]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, OHLCV)
 
-    def get_range(self, stock_id: str, start: date, end: date, timeframe: str = "1d") -> Sequence[OHLCV]:
+    def get_range(self, stock_uuid: str, start: date, end: date, timeframe: str = "1d") -> Sequence[OHLCV]:
         return self._session.execute(
             select(OHLCV)
             .where(
                 and_(
-                    OHLCV.stock_id == stock_id,
+                    OHLCV.stock_uuid == stock_uuid,
                     OHLCV.date >= start,
                     OHLCV.date <= end,
                     OHLCV.timeframe == timeframe,
@@ -30,31 +30,31 @@ class OHLCVRepository(BaseRepository[OHLCV]):
             .order_by(OHLCV.date)
         ).scalars().all()
 
-    def get_coverage(self, stock_id: str, timeframe: str = "1d") -> tuple[date | None, date | None, int]:
+    def get_coverage(self, stock_uuid: str, timeframe: str = "1d") -> tuple[date | None, date | None, int]:
         row = self._session.execute(
             select(func.min(OHLCV.date), func.max(OHLCV.date), func.count())
-            .where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
+            .where(and_(OHLCV.stock_uuid == stock_uuid, OHLCV.timeframe == timeframe))
         ).one()
         return row[0], row[1], int(row[2] or 0)
 
-    def get_latest_date(self, stock_id: str, timeframe: str = "1d") -> date | None:
+    def get_latest_date(self, stock_uuid: str, timeframe: str = "1d") -> date | None:
         return self._session.execute(
             select(OHLCV.date)
-            .where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
+            .where(and_(OHLCV.stock_uuid == stock_uuid, OHLCV.timeframe == timeframe))
             .order_by(OHLCV.date.desc())
             .limit(1)
         ).scalar_one_or_none()
 
-    def get_latest_close(self, stock_id: str, timeframe: str = "1d") -> float | None:
+    def get_latest_close(self, stock_uuid: str, timeframe: str = "1d") -> float | None:
         return self._session.execute(
             select(OHLCV.close)
-            .where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
+            .where(and_(OHLCV.stock_uuid == stock_uuid, OHLCV.timeframe == timeframe))
             .order_by(OHLCV.date.desc())
             .limit(1)
         ).scalar_one_or_none()
 
-    def to_dataframe(self, stock_id: str, start: date, end: date, timeframe: str = "1d") -> pd.DataFrame:
-        rows = self.get_range(stock_id, start, end, timeframe)
+    def to_dataframe(self, stock_uuid: str, start: date, end: date, timeframe: str = "1d") -> pd.DataFrame:
+        rows = self.get_range(stock_uuid, start, end, timeframe)
         if not rows:
             return pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
         frame = pd.DataFrame(
@@ -80,16 +80,16 @@ class OHLCVRepository(BaseRepository[OHLCV]):
         dialect = self._session.bind.dialect.name
         if dialect == "postgresql":
             stmt = pg_insert(OHLCV).values(records)
-            stmt = stmt.on_conflict_do_nothing(index_elements=["stock_id", "date", "timeframe"])
+            stmt = stmt.on_conflict_do_nothing(index_elements=["stock_uuid", "date", "timeframe"])
             result = self._session.execute(stmt)
             self._session.flush()
             return result.rowcount or 0
 
         existing = set(
             self._session.execute(
-                select(OHLCV.stock_id, OHLCV.date, OHLCV.timeframe).where(
+                select(OHLCV.stock_uuid, OHLCV.date, OHLCV.timeframe).where(
                     and_(
-                        OHLCV.stock_id.in_({record["stock_id"] for record in records}),
+                        OHLCV.stock_uuid.in_({record["stock_uuid"] for record in records}),
                         OHLCV.timeframe.in_({record["timeframe"] for record in records}),
                     )
                 )
@@ -97,7 +97,7 @@ class OHLCVRepository(BaseRepository[OHLCV]):
         )
         inserted = 0
         for record in records:
-            key = (record["stock_id"], record["date"], record["timeframe"])
+            key = (record["stock_uuid"], record["date"], record["timeframe"])
             if key in existing:
                 continue
             self._session.add(OHLCV(**record))
@@ -106,9 +106,9 @@ class OHLCVRepository(BaseRepository[OHLCV]):
         self._session.flush()
         return inserted
 
-    def replace_timeframe(self, stock_id: str, timeframe: str, records: list[dict]) -> int:
+    def replace_timeframe(self, stock_uuid: str, timeframe: str, records: list[dict]) -> int:
         self._session.execute(
-            delete(OHLCV).where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
+            delete(OHLCV).where(and_(OHLCV.stock_uuid == stock_uuid, OHLCV.timeframe == timeframe))
         )
         count = self.bulk_insert_ignore(records)
         self._session.flush()
