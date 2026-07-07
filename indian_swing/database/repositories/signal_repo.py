@@ -3,10 +3,10 @@ from __future__ import annotations
 from datetime import date
 from typing import Sequence
 
-from sqlalchemy import and_, select, func, distinct
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, distinct, func, select
+from sqlalchemy.orm import Session, joinedload
 
-from indian_swing.database.models import Recommendation, Signal
+from indian_swing.database.models import Recommendation, ScanJob, Signal
 from indian_swing.database.repositories.base import BaseRepository
 
 
@@ -14,45 +14,69 @@ class SignalRepository(BaseRepository[Signal]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, Signal)
 
-    def get_by_stock_date(
-        self, stock_id: int, signal_date: date, strategy: str | None = None
-    ) -> Sequence[Signal]:
-        q = select(Signal).where(
+    def get_by_stock_date(self, stock_id: str, signal_date: date, strategy: str | None = None) -> Sequence[Signal]:
+        query = select(Signal).where(
             and_(Signal.stock_id == stock_id, Signal.signal_date == signal_date)
         )
         if strategy:
-            q = q.where(Signal.strategy_name == strategy)
-        return self._session.execute(q.order_by(Signal.confidence_score.desc())).scalars().all()
+            query = query.where(Signal.strategy_name == strategy)
+        return self._session.execute(query.order_by(Signal.confidence_score.desc())).scalars().all()
 
 
 class RecommendationRepository(BaseRepository[Recommendation]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, Recommendation)
 
-    def get_by_date(self, scan_date: date) -> Sequence[Recommendation]:
+    def get_by_scan(self, scan_job_id: str) -> Sequence[Recommendation]:
         return self._session.execute(
             select(Recommendation)
-            .where(Recommendation.scan_date == scan_date)
+            .where(Recommendation.scan_job_id == scan_job_id)
+            .options(joinedload(Recommendation.stock), joinedload(Recommendation.signal))
             .order_by(Recommendation.rank)
         ).scalars().all()
 
-    def get_latest(self, limit: int = 50) -> Sequence[Recommendation]:
-        latest_date = self._session.execute(
-            select(func.max(Recommendation.scan_date))
+    def get_by_date(self, scan_date: date) -> Sequence[Recommendation]:
+        latest_scan = self._session.execute(
+            select(ScanJob.id)
+            .where(and_(ScanJob.scan_date == scan_date, ScanJob.status == "completed"))
+            .order_by(ScanJob.completed_at.desc(), ScanJob.created_at.desc())
+            .limit(1)
         ).scalar_one_or_none()
-        if not latest_date:
+        if not latest_scan:
+            return []
+        return self.get_by_scan(latest_scan)
+
+    def get_latest(self, limit: int = 50) -> Sequence[Recommendation]:
+        latest_scan = self._session.execute(
+            select(ScanJob.id)
+            .where(ScanJob.status == "completed")
+            .order_by(ScanJob.completed_at.desc(), ScanJob.created_at.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+        if not latest_scan:
             return []
         return self._session.execute(
             select(Recommendation)
-            .where(Recommendation.scan_date == latest_date)
+            .where(Recommendation.scan_job_id == latest_scan)
+            .options(joinedload(Recommendation.stock), joinedload(Recommendation.signal))
             .order_by(Recommendation.rank)
             .limit(limit)
         ).scalars().all()
 
+    def get_latest_scan(self) -> ScanJob | None:
+        return self._session.execute(
+            select(ScanJob)
+            .where(ScanJob.status == "completed")
+            .order_by(ScanJob.completed_at.desc(), ScanJob.created_at.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+
     def get_available_dates(self, limit: int = 30) -> list[date]:
-        result = self._session.execute(
-            select(distinct(Recommendation.scan_date))
-            .order_by(Recommendation.scan_date.desc())
-            .limit(limit)
-        ).scalars().all()
-        return list(result)
+        return list(
+            self._session.execute(
+                select(distinct(ScanJob.scan_date))
+                .where(ScanJob.status == "completed")
+                .order_by(ScanJob.scan_date.desc())
+                .limit(limit)
+            ).scalars().all()
+        )

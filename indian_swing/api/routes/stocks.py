@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import and_, select
 
+from indian_swing.config.settings import settings
 from indian_swing.database.connection import get_sync_session
 from indian_swing.database.models import Stock
 from indian_swing.database.repositories.stock_repo import StockRepository
@@ -27,10 +28,10 @@ async def list_stocks(
         with get_sync_session() as session:
             q = select(Stock)
             if active_only:
-                q = q.where(Stock.is_active == True)
+                q = q.where(and_(Stock.environment == settings.environment_name, Stock.is_active == True))
             if sector:
                 q = q.where(Stock.sector == sector)
-            q = q.order_by(Stock.symbol).offset(offset).limit(limit)
+            q = q.order_by(Stock.exchange, Stock.symbol).offset(offset).limit(limit)
             stocks = session.execute(q).scalars().all()
             ohlcv_repo = OHLCVRepository(session)
             return [_stock_dict(s, ohlcv_repo.get_latest_close(s.id)) for s in stocks]
@@ -90,6 +91,7 @@ async def get_ohlcv(
 def _stock_dict(s: Stock, current_price: float = None) -> dict:
     return {
         "id": s.id,
+        "exchange": s.exchange,
         "symbol": s.symbol,
         "name": s.name,
         "sector": s.sector,

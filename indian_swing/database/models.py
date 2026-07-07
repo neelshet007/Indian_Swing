@@ -1,7 +1,3 @@
-"""
-SQLAlchemy ORM models.
-All tables prefixed with `sw_` to avoid collisions if sharing a database.
-"""
 from __future__ import annotations
 
 import uuid
@@ -9,7 +5,6 @@ from datetime import date, datetime
 from typing import Optional
 
 from sqlalchemy import (
-    BigInteger,
     Boolean,
     Date,
     DateTime,
@@ -34,110 +29,211 @@ def _uuid() -> str:
     return str(uuid.uuid4())
 
 
-# ── Stock Universe ────────────────────────────────────────────────────────────
-
 class Stock(Base):
     __tablename__ = "sw_stocks"
+    __table_args__ = (
+        UniqueConstraint("environment", "exchange", "symbol", name="uq_stock_env_exchange_symbol"),
+        UniqueConstraint("environment", "isin", name="uq_stock_env_isin"),
+        Index("ix_stock_exchange_symbol", "exchange", "symbol"),
+    )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    symbol: Mapped[str] = mapped_column(String(20), unique=True, nullable=False, index=True)
-    name: Mapped[str] = mapped_column(String(120), nullable=False)
-    sector: Mapped[Optional[str]] = mapped_column(String(80))
-    industry: Mapped[Optional[str]] = mapped_column(String(80))
-    market_cap_category: Mapped[Optional[str]] = mapped_column(String(20))  # large/mid/small
-    isin: Mapped[Optional[str]] = mapped_column(String(12), unique=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    environment: Mapped[str] = mapped_column(String(20), nullable=False, default="DEVELOPMENT")
+    exchange: Mapped[str] = mapped_column(String(16), nullable=False, default="NSE")
+    symbol: Mapped[str] = mapped_column(String(32), nullable=False)
+    isin: Mapped[Optional[str]] = mapped_column(String(16))
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    sector: Mapped[Optional[str]] = mapped_column(String(120))
+    industry: Mapped[Optional[str]] = mapped_column(String(120))
+    market_cap_category: Mapped[Optional[str]] = mapped_column(String(24))
+    instrument_type: Mapped[str] = mapped_column(String(24), nullable=False, default="EQUITY")
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), onupdate=func.now()
+        DateTime,
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
     )
 
-    ohlcv_records: Mapped[list["OHLCV"]] = relationship(back_populates="stock", lazy="dynamic")
-    signals: Mapped[list["Signal"]] = relationship(back_populates="stock", lazy="dynamic")
+    ohlcv_records: Mapped[list["OHLCV"]] = relationship(
+        back_populates="stock",
+        cascade="all, delete-orphan",
+    )
+    signals: Mapped[list["Signal"]] = relationship(
+        back_populates="stock",
+        cascade="all, delete-orphan",
+    )
     recommendations: Mapped[list["Recommendation"]] = relationship(
-        back_populates="stock", lazy="dynamic"
+        back_populates="stock",
+        cascade="all, delete-orphan",
     )
 
-
-# ── OHLCV Data ────────────────────────────────────────────────────────────────
 
 class OHLCV(Base):
     __tablename__ = "sw_ohlcv"
     __table_args__ = (
         UniqueConstraint("stock_id", "date", "timeframe", name="uq_ohlcv_stock_date_tf"),
         Index("ix_ohlcv_stock_date", "stock_id", "date"),
-        Index("ix_ohlcv_date_tf", "date", "timeframe"),
+        Index("ix_ohlcv_timeframe_date", "timeframe", "date"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    stock_id: Mapped[int] = mapped_column(ForeignKey("sw_stocks.id"), nullable=False)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    stock_id: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     date: Mapped[date] = mapped_column(Date, nullable=False)
-    timeframe: Mapped[str] = mapped_column(String(5), nullable=False, default="1d")
+    timeframe: Mapped[str] = mapped_column(String(8), nullable=False, default="1d")
     open: Mapped[float] = mapped_column(Float, nullable=False)
     high: Mapped[float] = mapped_column(Float, nullable=False)
     low: Mapped[float] = mapped_column(Float, nullable=False)
     close: Mapped[float] = mapped_column(Float, nullable=False)
-    volume: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    adj_close: Mapped[Optional[float]] = mapped_column(Float)
-    is_adjusted: Mapped[bool] = mapped_column(Boolean, default=False)
+    volume: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_adjusted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    source: Mapped[str] = mapped_column(String(40), nullable=False, default="yfinance")
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
     stock: Mapped["Stock"] = relationship(back_populates="ohlcv_records")
 
 
-# ── Signals ───────────────────────────────────────────────────────────────────
+class ScanJob(Base):
+    __tablename__ = "sw_scan_jobs"
+    __table_args__ = (
+        UniqueConstraint(
+            "environment",
+            "strategy_name",
+            "strategy_version",
+            "scan_date",
+            name="uq_scan_env_strategy_version_date",
+        ),
+        Index("ix_scan_status_created", "status", "created_at"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    environment: Mapped[str] = mapped_column(String(20), nullable=False, default="DEVELOPMENT")
+    strategy_name: Mapped[str] = mapped_column(String(80), nullable=False)
+    strategy_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    scan_date: Mapped[date] = mapped_column(Date, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    market_status: Mapped[str] = mapped_column(String(20), nullable=False, default="unknown")
+    total_stocks: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    stocks_scanned: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    signals_generated: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    recommendations_created: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    failed_stocks: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    filter_summary: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    validation_summary: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    notes: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    error: Mapped[Optional[str]] = mapped_column(Text)
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+
+    signals: Mapped[list["Signal"]] = relationship(
+        back_populates="scan_job",
+        cascade="all, delete-orphan",
+    )
+    recommendations: Mapped[list["Recommendation"]] = relationship(
+        back_populates="scan_job",
+        cascade="all, delete-orphan",
+    )
+
 
 class Signal(Base):
     __tablename__ = "sw_signals"
     __table_args__ = (
-        Index("ix_signal_symbol_date", "stock_id", "signal_date"),
-        Index("ix_signal_strategy", "strategy_name"),
+        UniqueConstraint(
+            "scan_job_id",
+            "stock_id",
+            "strategy_name",
+            name="uq_signal_scan_stock_strategy",
+        ),
+        Index("ix_signal_scan_stock", "scan_job_id", "stock_id"),
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    stock_id: Mapped[int] = mapped_column(ForeignKey("sw_stocks.id"), nullable=False)
+    scan_job_id: Mapped[str] = mapped_column(
+        ForeignKey("sw_scan_jobs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    stock_id: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     strategy_name: Mapped[str] = mapped_column(String(80), nullable=False)
+    strategy_version: Mapped[str] = mapped_column(String(32), nullable=False)
     signal_date: Mapped[date] = mapped_column(Date, nullable=False)
-    direction: Mapped[str] = mapped_column(String(10), nullable=False)  # LONG/SHORT
+    direction: Mapped[str] = mapped_column(String(16), nullable=False)
     entry_price: Mapped[float] = mapped_column(Float, nullable=False)
     stop_loss: Mapped[float] = mapped_column(Float, nullable=False)
     target_1: Mapped[float] = mapped_column(Float, nullable=False)
     target_2: Mapped[Optional[float]] = mapped_column(Float)
     risk_reward: Mapped[float] = mapped_column(Float, nullable=False)
     confidence_score: Mapped[float] = mapped_column(Float, nullable=False)
-    quality: Mapped[str] = mapped_column(String(10), nullable=False)   # STRONG/MODERATE/WEAK
-    holding_days: Mapped[int] = mapped_column(Integer, default=10)
-    reasons: Mapped[list] = mapped_column(JSON, default=list)
-    metadata_: Mapped[dict] = mapped_column("metadata", JSON, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    quality: Mapped[str] = mapped_column(String(16), nullable=False)
+    risk_level: Mapped[str] = mapped_column(String(16), nullable=False)
+    holding_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    reasons: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    explanation: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    indicator_snapshot: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    metadata_: Mapped[dict] = mapped_column("metadata", JSON, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
+    scan_job: Mapped["ScanJob"] = relationship(back_populates="signals")
     stock: Mapped["Stock"] = relationship(back_populates="signals")
+    recommendation: Mapped[Optional["Recommendation"]] = relationship(
+        back_populates="signal",
+        uselist=False,
+    )
 
-
-# ── Recommendations ───────────────────────────────────────────────────────────
 
 class Recommendation(Base):
     __tablename__ = "sw_recommendations"
     __table_args__ = (
-        Index("ix_rec_date_score", "scan_date", "confidence_score"),
+        UniqueConstraint("scan_job_id", "stock_id", name="uq_recommendation_scan_stock"),
+        Index("ix_recommendation_scan_rank", "scan_job_id", "rank"),
+        Index("ix_recommendation_scan_date", "scan_date"),
     )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    stock_id: Mapped[int] = mapped_column(ForeignKey("sw_stocks.id"), nullable=False)
-    signal_id: Mapped[str] = mapped_column(ForeignKey("sw_signals.id"), nullable=False)
+    scan_job_id: Mapped[str] = mapped_column(
+        ForeignKey("sw_scan_jobs.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    signal_id: Mapped[str] = mapped_column(
+        ForeignKey("sw_signals.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    stock_id: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    recommendation_uuid: Mapped[str] = mapped_column(String(36), nullable=False, default=_uuid)
     scan_date: Mapped[date] = mapped_column(Date, nullable=False)
+    strategy_name: Mapped[str] = mapped_column(String(80), nullable=False)
+    strategy_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    action: Mapped[str] = mapped_column(String(16), nullable=False, default="BUY")
     rank: Mapped[int] = mapped_column(Integer, nullable=False)
     confidence_score: Mapped[float] = mapped_column(Float, nullable=False)
-    risk_level: Mapped[str] = mapped_column(String(10), nullable=False)
-    historical_win_rate: Mapped[Optional[float]] = mapped_column(Float)
-    historical_occurrences: Mapped[Optional[int]] = mapped_column(Integer)
+    risk_level: Mapped[str] = mapped_column(String(16), nullable=False)
+    entry_price: Mapped[float] = mapped_column(Float, nullable=False)
+    stop_loss: Mapped[float] = mapped_column(Float, nullable=False)
+    target_price: Mapped[float] = mapped_column(Float, nullable=False)
+    risk_per_share: Mapped[float] = mapped_column(Float, nullable=False)
+    risk_pct: Mapped[float] = mapped_column(Float, nullable=False)
+    position_size: Mapped[Optional[int]] = mapped_column(Integer)
+    portfolio_weight_pct: Mapped[Optional[float]] = mapped_column(Float)
+    explanation: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     summary: Mapped[Optional[str]] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    generated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
+    scan_job: Mapped["ScanJob"] = relationship(back_populates="recommendations")
     stock: Mapped["Stock"] = relationship(back_populates="recommendations")
-    signal: Mapped["Signal"] = relationship()
+    signal: Mapped["Signal"] = relationship(back_populates="recommendation")
 
-
-# ── Backtest Results ──────────────────────────────────────────────────────────
 
 class BacktestResult(Base):
     __tablename__ = "sw_backtest_results"
@@ -149,59 +245,45 @@ class BacktestResult(Base):
     end_date: Mapped[date] = mapped_column(Date, nullable=False)
     initial_capital: Mapped[float] = mapped_column(Float, nullable=False)
     final_capital: Mapped[float] = mapped_column(Float, nullable=False)
-    total_return_pct: Mapped[float] = mapped_column(Float)
-    cagr: Mapped[float] = mapped_column(Float)
+    total_return_pct: Mapped[Optional[float]] = mapped_column(Float)
+    cagr: Mapped[Optional[float]] = mapped_column(Float)
     sharpe_ratio: Mapped[Optional[float]] = mapped_column(Float)
     sortino_ratio: Mapped[Optional[float]] = mapped_column(Float)
     calmar_ratio: Mapped[Optional[float]] = mapped_column(Float)
-    max_drawdown_pct: Mapped[float] = mapped_column(Float)
-    win_rate: Mapped[float] = mapped_column(Float)
-    total_trades: Mapped[int] = mapped_column(Integer)
-    winning_trades: Mapped[int] = mapped_column(Integer)
-    losing_trades: Mapped[int] = mapped_column(Integer)
+    max_drawdown_pct: Mapped[Optional[float]] = mapped_column(Float)
+    win_rate: Mapped[Optional[float]] = mapped_column(Float)
+    total_trades: Mapped[Optional[int]] = mapped_column(Integer)
+    winning_trades: Mapped[Optional[int]] = mapped_column(Integer)
+    losing_trades: Mapped[Optional[int]] = mapped_column(Integer)
     avg_gain_pct: Mapped[Optional[float]] = mapped_column(Float)
     avg_loss_pct: Mapped[Optional[float]] = mapped_column(Float)
     expectancy: Mapped[Optional[float]] = mapped_column(Float)
-    equity_curve: Mapped[list] = mapped_column(JSON, default=list)
-    monthly_returns: Mapped[dict] = mapped_column(JSON, default=dict)
-    trade_log: Mapped[list] = mapped_column(JSON, default=list)
-    params: Mapped[dict] = mapped_column(JSON, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    equity_curve: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    monthly_returns: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    trade_log: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    params: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
-
-# ── Replay Sessions ───────────────────────────────────────────────────────────
 
 class ReplaySession(Base):
     __tablename__ = "sw_replay_sessions"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    stock_id: Mapped[int] = mapped_column(ForeignKey("sw_stocks.id"), nullable=False)
+    stock_id: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     strategy_name: Mapped[str] = mapped_column(String(80), nullable=False)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     current_date: Mapped[date] = mapped_column(Date, nullable=False)
     end_date: Mapped[date] = mapped_column(Date, nullable=False)
-    state: Mapped[dict] = mapped_column(JSON, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    state: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), onupdate=func.now()
+        DateTime,
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
     )
 
     stock: Mapped["Stock"] = relationship()
-
-
-# ── Scan Jobs ─────────────────────────────────────────────────────────────────
-
-class ScanJob(Base):
-    __tablename__ = "sw_scan_jobs"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
-    scan_date: Mapped[date] = mapped_column(Date, nullable=False)
-    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
-    total_stocks: Mapped[int] = mapped_column(Integer, default=0)
-    stocks_scanned: Mapped[int] = mapped_column(Integer, default=0)
-    signals_generated: Mapped[int] = mapped_column(Integer, default=0)
-    recommendations_created: Mapped[int] = mapped_column(Integer, default=0)
-    error: Mapped[Optional[str]] = mapped_column(Text)
-    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

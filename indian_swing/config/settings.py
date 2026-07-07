@@ -52,6 +52,7 @@ class PipelineSettings(BaseSettings):
     min_price: float = 10.0
     min_volume: int = 50_000
     max_gap_pct: float = 20.0
+    warmup_days: int = 30
 
 
 class ScannerSettings(BaseSettings):
@@ -60,6 +61,10 @@ class ScannerSettings(BaseSettings):
     max_workers: int = 8
     min_confidence_score: float = 0.6
     max_recommendations: int = 50
+    benchmark_symbol: str = "^NSEI"
+    benchmark_exchange: str = "INDEX"
+    risk_per_trade_pct: float = 0.01
+    max_portfolio_allocation_pct: float = 10.0
 
 
 class BacktestSettings(BaseSettings):
@@ -110,11 +115,15 @@ class Settings(BaseSettings):
 
     @property
     def is_development(self) -> bool:
-        return self.app_env == "development"
+        return self.app_env.lower() == "development"
 
     @property
     def is_production(self) -> bool:
-        return self.app_env == "production"
+        return self.app_env.lower() == "production"
+
+    @property
+    def environment_name(self) -> str:
+        return self.app_env.upper()
 
     def ensure_dirs(self) -> None:
         self.data_dir.mkdir(parents=True, exist_ok=True)

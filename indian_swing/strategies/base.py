@@ -1,8 +1,3 @@
-"""
-BaseStrategy contract.
-Strategies inherit this, implement generate_signals(), and are auto-discovered.
-The engine never imports strategy classes directly.
-"""
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -12,51 +7,66 @@ from typing import Any
 
 import pandas as pd
 
-from indian_swing.core.types import (
-    RiskLevel,
-    Score,
-    SignalDirection,
-    SignalQuality,
-    Symbol,
-)
+from indian_swing.core.types import RiskLevel, Score, SignalDirection, SignalQuality, Symbol
+
+
+@dataclass(frozen=True)
+class IndicatorRequirement:
+    column: str
+    lookback_bars: int
+    timeframe: str = "1d"
+    warmup_bars: int = 0
+
+
+@dataclass(frozen=True)
+class StrategyDataRequirements:
+    daily_bars: int
+    weekly_bars: int = 0
+    benchmark_bars: int = 0
+    benchmark_symbol: str | None = None
+    warmup_bars: int = 0
+
+    @property
+    def total_daily_bars(self) -> int:
+        return self.daily_bars + self.warmup_bars
+
+
+@dataclass
+class StrategyContext:
+    symbol: str
+    daily: pd.DataFrame
+    weekly: pd.DataFrame
+    benchmark_daily: pd.DataFrame | None = None
+    as_of_date: date | None = None
+    exchange: str = "NSE"
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class StrategySignal:
-    """Standardized output from every strategy — the engine only knows this type."""
-
     symbol: Symbol
     direction: SignalDirection
     entry_price: float
     stop_loss: float
     target_1: float
     target_2: float | None
-    confidence_score: Score              # 0.0 – 1.0
+    confidence_score: Score
     quality: SignalQuality
     risk_level: RiskLevel
     holding_days: int
     reasons: list[str] = field(default_factory=list)
+    explanation: dict[str, Any] = field(default_factory=dict)
+    indicator_snapshot: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.entry_price = float(self.entry_price)
         self.stop_loss = float(self.stop_loss)
-        if self.target_1 is not None:
-            self.target_1 = float(self.target_1)
+        self.target_1 = float(self.target_1)
         if self.target_2 is not None:
             self.target_2 = float(self.target_2)
-        if self.confidence_score is not None:
-            self.confidence_score = float(self.confidence_score)
-        if self.holding_days is not None:
-            self.holding_days = int(self.holding_days)
-        if self.metadata:
-            cleaned = {}
-            for k, v in self.metadata.items():
-                if hasattr(v, "item"):
-                    cleaned[k] = v.item()
-                else:
-                    cleaned[k] = v
-            self.metadata = cleaned
+        self.confidence_score = float(self.confidence_score)
+        self.holding_days = int(self.holding_days)
 
     @property
     def risk_reward(self) -> float:
@@ -70,61 +80,44 @@ class StrategySignal:
 
 
 class BaseStrategy(ABC):
-    """
-    All strategies must inherit from this.
-    Implement generate_signals() and optionally required_lookback.
-
-    Engine contract:
-    - The engine provides a clean OHLCV DataFrame up to the analysis date.
-    - Strategies must not access external data or databases.
-    - Strategies must not have side effects.
-    - Strategies must be stateless between calls.
-    """
-
-    #: Minimum bars required before strategy can produce reliable signals.
-    required_lookback: int = 200
-
     @property
     @abstractmethod
     def name(self) -> str:
-        """Unique strategy identifier e.g. 'EMABreakout'."""
         ...
 
     @property
     @abstractmethod
     def description(self) -> str:
-        """Human-readable strategy description."""
         ...
 
     @property
     def version(self) -> str:
-        return "1.0.0"
+        return "2.0.0"
 
     @property
-    def default_params(self) -> dict[str, Any]:
-        """Override to provide configurable defaults."""
-        return {}
+    def indicator_requirements(self) -> tuple[IndicatorRequirement, ...]:
+        return ()
+
+    @property
+    def data_requirements(self) -> StrategyDataRequirements:
+        max_daily = max(
+            [req.lookback_bars + req.warmup_bars for req in self.indicator_requirements if req.timeframe == "1d"],
+            default=0,
+        )
+        max_weekly = max(
+            [req.lookback_bars + req.warmup_bars for req in self.indicator_requirements if req.timeframe == "1wk"],
+            default=0,
+        )
+        return StrategyDataRequirements(
+            daily_bars=max(max_daily, 252),
+            weekly_bars=max_weekly,
+            warmup_bars=30,
+        )
+
+    def validate_context(self, context: StrategyContext) -> bool:
+        requirements = self.data_requirements
+        return len(context.daily) >= requirements.daily_bars and len(context.weekly) >= requirements.weekly_bars
 
     @abstractmethod
-    def generate_signals(
-        self,
-        symbol: Symbol,
-        df: pd.DataFrame,
-        as_of_date: date | None = None,
-    ) -> list[StrategySignal]:
-        """
-        Analyze the DataFrame and return zero or more signals.
-
-        Args:
-            symbol: Stock symbol.
-            df: OHLCV DataFrame up to as_of_date (no lookahead).
-            as_of_date: Analysis date (last bar date if None).
-
-        Returns:
-            List of StrategySignal objects. Empty list = no signal.
-        """
+    def generate_signals(self, symbol: Symbol, context: StrategyContext) -> list[StrategySignal]:
         ...
-
-    def validate_df(self, df: pd.DataFrame) -> bool:
-        """Return False if DataFrame is insufficient for this strategy."""
-        return len(df) >= self.required_lookback

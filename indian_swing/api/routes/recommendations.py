@@ -5,12 +5,10 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
-from sqlalchemy import select
 
 from indian_swing.database.connection import get_sync_session
-from indian_swing.database.models import Recommendation, Signal, Stock
+from indian_swing.database.models import Recommendation
 from indian_swing.database.repositories.signal_repo import RecommendationRepository
-from indian_swing.database.repositories.ohlcv_repo import OHLCVRepository
 
 router = APIRouter()
 
@@ -21,58 +19,72 @@ async def get_recommendations(
     limit: int = Query(50, le=200),
     min_confidence: float = Query(0.0, ge=0.0, le=1.0),
 ):
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
 
-    def _fetch():
+    def _fetch() -> list[dict]:
         with get_sync_session() as session:
             repo = RecommendationRepository(session)
-            ohlcv_repo = OHLCVRepository(session)
-            if scan_date:
-                recs = repo.get_by_date(scan_date)
-            else:
-                recs = repo.get_latest(limit=limit)
-
-            result = []
-            for rec in recs:
-                if rec.confidence_score < min_confidence:
+            recommendations = repo.get_by_date(scan_date) if scan_date else repo.get_latest(limit=limit)
+            result: list[dict] = []
+            for recommendation in recommendations:
+                if recommendation.confidence_score < min_confidence:
                     continue
-                stock = session.get(Stock, rec.stock_id)
-                signal = session.get(Signal, rec.signal_id)
-                current_price = ohlcv_repo.get_latest_close(rec.stock_id) if stock else None
-                if stock and signal:
-                    result.append(_rec_dict(rec, stock, signal, current_price))
+                result.append(_serialize_recommendation(recommendation))
             return result
+
+    return await loop.run_in_executor(None, _fetch)
+
+
+@router.get("/latest")
+async def get_latest_scan_snapshot():
+    loop = asyncio.get_running_loop()
+
+    def _fetch() -> dict:
+        with get_sync_session() as session:
+            repo = RecommendationRepository(session)
+            scan = repo.get_latest_scan()
+            if scan is None:
+                return {
+                    "scan": None,
+                    "recommendations": [],
+                }
+            recommendations = [_serialize_recommendation(rec) for rec in repo.get_by_scan(scan.id)]
+            return {
+                "scan": {
+                    "id": scan.id,
+                    "scan_date": str(scan.scan_date),
+                    "completed_at": scan.completed_at.isoformat() if scan.completed_at else None,
+                    "market_status": scan.market_status,
+                    "total_stocks": scan.total_stocks,
+                    "stocks_scanned": scan.stocks_scanned,
+                    "failed_stocks": scan.failed_stocks,
+                    "filter_summary": scan.filter_summary,
+                    "validation_summary": scan.validation_summary,
+                    "recommendations_created": scan.recommendations_created,
+                },
+                "recommendations": recommendations,
+            }
 
     return await loop.run_in_executor(None, _fetch)
 
 
 @router.get("/dates/available")
 async def get_available_scan_dates():
-    loop = asyncio.get_event_loop()
-
+    loop = asyncio.get_running_loop()
     def _fetch():
         with get_sync_session() as session:
-            repo = RecommendationRepository(session)
-            return [str(d) for d in repo.get_available_dates()]
-
-    dates = await loop.run_in_executor(None, _fetch)
-    return {"dates": dates}
+            return {"dates": [str(value) for value in RecommendationRepository(session).get_available_dates()]}
+    return await loop.run_in_executor(None, _fetch)
 
 
 @router.get("/{rec_id}")
 async def get_recommendation_detail(rec_id: str):
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
 
-    def _fetch():
+    def _fetch() -> dict | None:
         with get_sync_session() as session:
-            rec = session.get(Recommendation, rec_id)
-            if not rec:
-                return None
-            stock = session.get(Stock, rec.stock_id)
-            signal = session.get(Signal, rec.signal_id)
-            ohlcv_repo = OHLCVRepository(session)
-            current_price = ohlcv_repo.get_latest_close(rec.stock_id) if stock else None
-            return _rec_dict(rec, stock, signal, current_price=current_price, detailed=True)
+            recommendation = session.get(Recommendation, rec_id)
+            return _serialize_recommendation(recommendation, detailed=True) if recommendation else None
 
     result = await loop.run_in_executor(None, _fetch)
     if result is None:
@@ -80,30 +92,38 @@ async def get_recommendation_detail(rec_id: str):
     return result
 
 
-def _rec_dict(rec, stock, signal, current_price=None, detailed=False) -> dict:
-    base = {
-        "id": rec.id,
-        "rank": rec.rank,
-        "scan_date": str(rec.scan_date),
-        "confidence_score": rec.confidence_score,
-        "risk_level": rec.risk_level,
+def _serialize_recommendation(recommendation: Recommendation, detailed: bool = False) -> dict:
+    stock = recommendation.stock
+    signal = recommendation.signal
+    payload = {
+        "id": recommendation.id,
+        "recommendation_uuid": recommendation.recommendation_uuid,
+        "scan_job_id": recommendation.scan_job_id,
+        "scan_date": str(recommendation.scan_date),
+        "strategy_name": recommendation.strategy_name,
+        "strategy_version": recommendation.strategy_version,
+        "rank": recommendation.rank,
+        "action": recommendation.action,
+        "confidence_score": recommendation.confidence_score,
+        "risk_level": recommendation.risk_level,
         "symbol": stock.symbol,
+        "exchange": stock.exchange,
         "company_name": stock.name,
         "sector": stock.sector,
-        "strategy_name": signal.strategy_name,
-        "direction": signal.direction,
-        "entry_price": signal.entry_price,
-        "stop_loss": signal.stop_loss,
-        "target_1": signal.target_1,
-        "target_2": signal.target_2,
+        "entry_price": recommendation.entry_price,
+        "stop_loss": recommendation.stop_loss,
+        "target_1": recommendation.target_price,
         "risk_reward": signal.risk_reward,
         "holding_days": signal.holding_days,
         "quality": signal.quality,
         "reasons": signal.reasons,
-        "historical_win_rate": rec.historical_win_rate,
-        "summary": rec.summary,
-        "current_price": current_price,
+        "position_size": recommendation.position_size,
+        "portfolio_weight_pct": recommendation.portfolio_weight_pct,
+        "summary": recommendation.summary,
+        "explanation": recommendation.explanation,
+        "indicator_snapshot": signal.indicator_snapshot,
+        "generated_at": recommendation.generated_at.isoformat() if recommendation.generated_at else None,
     }
     if detailed:
-        base["metadata"] = signal.metadata_
-    return base
+        payload["metadata"] = signal.metadata_
+    return payload

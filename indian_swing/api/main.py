@@ -42,27 +42,10 @@ def _start_scheduler() -> None:
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
     from apscheduler.triggers.cron import CronTrigger
     from indian_swing.recommendations.scanner import RecommendationScanner
-    from indian_swing.core.universe import UniverseManager
-    from indian_swing.data.pipeline import DataPipeline
-    from datetime import date, timedelta
 
     scheduler = AsyncIOScheduler()
 
     async def _run_scan():
-        try:
-            logger.info("scheduler.run_scan.start_data_sync")
-            manager = UniverseManager()
-            await manager.sync_to_db()
-            syms = await manager.get_active_symbols()
-
-            pipeline = DataPipeline()
-            end_date = date.today()
-            start_date = end_date - timedelta(days=settings.pipeline.lookback_years * 365)
-            await pipeline.run_full(syms, start=start_date, end=end_date, force_refresh=False)
-            logger.info("scheduler.run_scan.data_sync_complete")
-        except Exception as e:
-            logger.error("scheduler.run_scan.data_sync_error", error=str(e))
-
         scanner = RecommendationScanner()
         await scanner.scan()
 

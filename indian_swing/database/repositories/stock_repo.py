@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 
+from indian_swing.config.settings import settings
 from indian_swing.database.models import Stock
 from indian_swing.database.repositories.base import BaseRepository
 
@@ -13,34 +14,72 @@ class StockRepository(BaseRepository[Stock]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, Stock)
 
-    def get_by_symbol(self, symbol: str) -> Stock | None:
+    def get_by_symbol(self, symbol: str, exchange: str = "NSE") -> Stock | None:
         return self._session.execute(
-            select(Stock).where(Stock.symbol == symbol)
+            select(Stock).where(
+                and_(
+                    Stock.environment == settings.app_env.upper(),
+                    Stock.exchange == exchange,
+                    Stock.symbol == symbol,
+                )
+            )
         ).scalar_one_or_none()
 
     def get_active(self) -> Sequence[Stock]:
         return self._session.execute(
-            select(Stock).where(Stock.is_active == True).order_by(Stock.symbol)
+            select(Stock)
+            .where(
+                and_(
+                    Stock.environment == settings.app_env.upper(),
+                    Stock.is_active == True,
+                )
+            )
+            .order_by(Stock.exchange, Stock.symbol)
         ).scalars().all()
 
-    def upsert(self, symbol: str, name: str, **kwargs) -> Stock:
-        stock = self.get_by_symbol(symbol)
+    def upsert(
+        self,
+        *,
+        symbol: str,
+        name: str,
+        exchange: str = "NSE",
+        instrument_type: str = "EQUITY",
+        **kwargs,
+    ) -> Stock:
+        stock = self.get_by_symbol(symbol, exchange=exchange)
         if stock is None:
-            stock = Stock(symbol=symbol, name=name, **kwargs)
+            stock = Stock(
+                environment=settings.app_env.upper(),
+                exchange=exchange,
+                symbol=symbol,
+                name=name,
+                instrument_type=instrument_type,
+                **kwargs,
+            )
             self.add(stock)
-        else:
-            stock.name = name
-            for k, v in kwargs.items():
-                setattr(stock, k, v)
-            self._session.flush()
+            return stock
+
+        stock.name = name
+        stock.instrument_type = instrument_type
+        for key, value in kwargs.items():
+            setattr(stock, key, value)
+        self._session.flush()
         return stock
 
     def bulk_upsert(self, records: list[dict]) -> int:
         count = 0
-        for rec in records:
-            rec = dict(rec)
-            symbol = rec.pop("symbol")
-            name = rec.pop("name")
-            self.upsert(symbol, name, **rec)
+        for record in records:
+            payload = dict(record)
+            symbol = payload.pop("symbol")
+            name = payload.pop("name")
+            exchange = payload.pop("exchange", "NSE")
+            instrument_type = payload.pop("instrument_type", "EQUITY")
+            self.upsert(
+                symbol=symbol,
+                name=name,
+                exchange=exchange,
+                instrument_type=instrument_type,
+                **payload,
+            )
             count += 1
         return count

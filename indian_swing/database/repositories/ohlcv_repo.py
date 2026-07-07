@@ -4,7 +4,8 @@ from datetime import date
 from typing import Sequence
 
 import pandas as pd
-from sqlalchemy import and_, delete, select, insert
+from sqlalchemy import and_, delete, func, select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from indian_swing.database.models import OHLCV
@@ -15,13 +16,7 @@ class OHLCVRepository(BaseRepository[OHLCV]):
     def __init__(self, session: Session) -> None:
         super().__init__(session, OHLCV)
 
-    def get_range(
-        self,
-        stock_id: int,
-        start: date,
-        end: date,
-        timeframe: str = "1d",
-    ) -> Sequence[OHLCV]:
+    def get_range(self, stock_id: str, start: date, end: date, timeframe: str = "1d") -> Sequence[OHLCV]:
         return self._session.execute(
             select(OHLCV)
             .where(
@@ -35,59 +30,86 @@ class OHLCVRepository(BaseRepository[OHLCV]):
             .order_by(OHLCV.date)
         ).scalars().all()
 
-    def get_latest_date(self, stock_id: int, timeframe: str = "1d") -> date | None:
-        result = self._session.execute(
+    def get_coverage(self, stock_id: str, timeframe: str = "1d") -> tuple[date | None, date | None, int]:
+        row = self._session.execute(
+            select(func.min(OHLCV.date), func.max(OHLCV.date), func.count())
+            .where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
+        ).one()
+        return row[0], row[1], int(row[2] or 0)
+
+    def get_latest_date(self, stock_id: str, timeframe: str = "1d") -> date | None:
+        return self._session.execute(
             select(OHLCV.date)
             .where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
             .order_by(OHLCV.date.desc())
             .limit(1)
         ).scalar_one_or_none()
-        return result
 
-    def get_latest_close(self, stock_id: int, timeframe: str = "1d") -> float | None:
-        result = self._session.execute(
+    def get_latest_close(self, stock_id: str, timeframe: str = "1d") -> float | None:
+        return self._session.execute(
             select(OHLCV.close)
             .where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
             .order_by(OHLCV.date.desc())
             .limit(1)
         ).scalar_one_or_none()
-        return result
 
-    def to_dataframe(
-        self,
-        stock_id: int,
-        start: date,
-        end: date,
-        timeframe: str = "1d",
-    ) -> pd.DataFrame:
+    def to_dataframe(self, stock_id: str, start: date, end: date, timeframe: str = "1d") -> pd.DataFrame:
         rows = self.get_range(stock_id, start, end, timeframe)
         if not rows:
             return pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
-        data = [
+        frame = pd.DataFrame(
             {
-                "date": r.date,
-                "open": r.open,
-                "high": r.high,
-                "low": r.low,
-                "close": r.close,
-                "volume": r.volume,
+                "date": row.date,
+                "open": row.open,
+                "high": row.high,
+                "low": row.low,
+                "close": row.close,
+                "volume": row.volume,
             }
-            for r in rows
-        ]
-        df = pd.DataFrame(data)
-        df["date"] = pd.to_datetime(df["date"])
-        df.set_index("date", inplace=True)
-        return df
+            for row in rows
+        )
+        frame["date"] = pd.to_datetime(frame["date"])
+        frame = frame.sort_values("date").set_index("date")
+        frame.index.name = "date"
+        return frame
 
     def bulk_insert_ignore(self, records: list[dict]) -> int:
         if not records:
             return 0
-        from sqlalchemy.dialects.postgresql import insert as pg_insert
-        # On conflict do nothing matching the unique index on (stock_id, date, timeframe)
-        stmt = pg_insert(OHLCV).values(records)
-        stmt = stmt.on_conflict_do_nothing(
-            index_elements=["stock_id", "date", "timeframe"]
+
+        dialect = self._session.bind.dialect.name
+        if dialect == "postgresql":
+            stmt = pg_insert(OHLCV).values(records)
+            stmt = stmt.on_conflict_do_nothing(index_elements=["stock_id", "date", "timeframe"])
+            result = self._session.execute(stmt)
+            self._session.flush()
+            return result.rowcount or 0
+
+        existing = set(
+            self._session.execute(
+                select(OHLCV.stock_id, OHLCV.date, OHLCV.timeframe).where(
+                    and_(
+                        OHLCV.stock_id.in_({record["stock_id"] for record in records}),
+                        OHLCV.timeframe.in_({record["timeframe"] for record in records}),
+                    )
+                )
+            ).all()
         )
-        result = self._session.execute(stmt)
+        inserted = 0
+        for record in records:
+            key = (record["stock_id"], record["date"], record["timeframe"])
+            if key in existing:
+                continue
+            self._session.add(OHLCV(**record))
+            existing.add(key)
+            inserted += 1
         self._session.flush()
-        return result.rowcount or 0
+        return inserted
+
+    def replace_timeframe(self, stock_id: str, timeframe: str, records: list[dict]) -> int:
+        self._session.execute(
+            delete(OHLCV).where(and_(OHLCV.stock_id == stock_id, OHLCV.timeframe == timeframe))
+        )
+        count = self.bulk_insert_ignore(records)
+        self._session.flush()
+        return count

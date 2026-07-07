@@ -1,142 +1,205 @@
+from __future__ import annotations
+
+from collections import OrderedDict
+
 import pandas as pd
-import numpy as np
-from datetime import date
-from typing import Any
 
-from indian_swing.core.types import (
-    RiskLevel,
-    Score,
-    SignalDirection,
-    SignalQuality,
-    Symbol,
+from indian_swing.core.types import RiskLevel, SignalDirection, SignalQuality
+from indian_swing.indicators.calculator import IndicatorCalculator
+from indian_swing.strategies.base import (
+    BaseStrategy,
+    IndicatorRequirement,
+    StrategyContext,
+    StrategyDataRequirements,
+    StrategySignal,
 )
-from indian_swing.strategies.base import BaseStrategy, StrategySignal
-from indian_swing.core.logging_setup import get_logger
 
-logger = get_logger(__name__)
 
 class InstitutionalVCP(BaseStrategy):
-    """
-    SIVCS institutional-grade strategy pipeline.
-    Executes in a strict short-circuiting order from cheapest to most expensive filters.
-    """
-
     @property
     def name(self) -> str:
         return "sivcs_vcp"
 
     @property
     def description(self) -> str:
-        return "Institutional VCP with strict short-circuiting filter pipeline."
+        return "Institutional swing strategy with Minervini trend, stage analysis, RS, VCP, breakout, and risk controls."
 
-    def generate_signals(
-        self,
-        symbol: Symbol,
-        df: pd.DataFrame,
-        as_of_date: date | None = None,
-    ) -> list[StrategySignal]:
-        
-        # We assume indicators are already calculated by the Engine/Scanner
-        last_row = df.iloc[-1]
-        
-        reasons = []
-        
-        # RULE 1: Liquidity & Market Cap (Cheapest)
-        # Assuming minimum 1cr volume (approx 1,00,00,000)
-        # Using 50 day avg volume
-        if 'vol_50' in last_row and not pd.isna(last_row['vol_50']):
-            if last_row['vol_50'] * last_row['close'] < 10_000_000:
-                # Fails liquidity
-                return []
-                
-        # RULE 2: Minervini Moving Average Trend (Medium cost)
-        # 1. Current Price > 150 SMA and 200 SMA
-        # 2. 150 SMA > 200 SMA
-        # 3. 200 SMA trending up for at least 1 month (20 days)
-        # 4. 50 SMA > 150 SMA and 200 SMA
-        # 5. Current Price > 50 SMA
-        # 6. Current Price is at least 30% above 52-week low
-        # 7. Current Price is within 25% of 52-week high
-        
-        try:
-            cond1 = last_row['close'] > last_row['sma_150'] and last_row['close'] > last_row['sma_200']
-            cond2 = last_row['sma_150'] > last_row['sma_200']
-            
-            sma200_20d_ago = df.iloc[-21]['sma_200']
-            cond3 = last_row['sma_200'] > sma200_20d_ago
-            
-            cond4 = last_row['sma_50'] > last_row['sma_150'] and last_row['sma_50'] > last_row['sma_200']
-            cond5 = last_row['close'] > last_row['sma_50']
-            
-            cond6 = last_row['close'] >= 1.30 * last_row['low_52w']
-            cond7 = last_row['close'] >= 0.75 * last_row['high_52w']
-            
-            is_minervini_trend = cond1 and cond2 and cond3 and cond4 and cond5 and cond6 and cond7
-            
-            if not is_minervini_trend:
-                return []
-                
-            reasons.append("Minervini Trend Template passed")
-            
-        except KeyError as e:
-            logger.error(f"Missing indicator for {symbol}: {e}")
-            return []
-            
-        # RULE 3: VCP Detection (More expensive)
-        # Look for contraction in volatility over last few weeks. 
-        # Simplified: recent daily range is smaller than average ATR, and volume is drying up
-        
-        recent_vol_avg = df.iloc[-5:]['volume'].mean()
-        if recent_vol_avg > last_row['vol_50']:
-             # Not contracting volume
-             return []
-             
-        recent_range = df.iloc[-5:]['high'].max() - df.iloc[-5:]['low'].min()
-        if recent_range > 3 * last_row['atr_14']:
-            # Still too volatile
-            return []
-            
-        reasons.append("VCP Volatility Contraction detected")
-            
-        # RULE 4: Breakout Confirmation (Trigger)
-        # Price crossing above recent resistance on above average volume
-        recent_high = df.iloc[-20:-1]['high'].max()
-        is_breakout = last_row['close'] > recent_high
-        is_high_volume = last_row['volume'] > 1.5 * last_row['vol_50']
-        
-        if not (is_breakout and is_high_volume):
-             return []
-             
-        reasons.append(f"Breakout above {recent_high:.2f} on {last_row['volume']/last_row['vol_50']:.1f}x volume")
+    @property
+    def version(self) -> str:
+        return "2.0.0"
 
-        # RISK VALIDATION & SIZING
-        atr = last_row['atr_14'] if not pd.isna(last_row['atr_14']) else last_row['close'] * 0.05
-        stop_mult = 2.5
-        stop_loss = last_row['close'] - (stop_mult * atr)
-        
-        # Validate stop is not too wide
-        risk_pct = (last_row['close'] - stop_loss) / last_row['close']
-        if risk_pct > 0.15:
-            # Stop too wide, reject
+    @property
+    def indicator_requirements(self) -> tuple[IndicatorRequirement, ...]:
+        return (
+            IndicatorRequirement("turnover_50", 50, "1d", 10),
+            IndicatorRequirement("sma_200", 200, "1d", 20),
+            IndicatorRequirement("high_252", 252, "1d"),
+            IndicatorRequirement("low_252", 252, "1d"),
+            IndicatorRequirement("atr_14", 14, "1d", 5),
+            IndicatorRequirement("sma_40w", 40, "1wk", 4),
+            IndicatorRequirement("high_13w", 13, "1wk", 4),
+        )
+
+    @property
+    def data_requirements(self) -> StrategyDataRequirements:
+        return StrategyDataRequirements(
+            daily_bars=252,
+            weekly_bars=40,
+            benchmark_bars=90,
+            benchmark_symbol="^NSEI",
+            warmup_bars=30,
+        )
+
+    def generate_signals(self, symbol: str, context: StrategyContext) -> list[StrategySignal]:
+        if not self.validate_context(context):
             return []
-        
-        risk = last_row['close'] - stop_loss
-        target_1 = last_row['close'] + (2.0 * risk) 
-        target_2 = last_row['close'] + (4.0 * risk) 
-        
+
+        daily = context.daily.copy()
+        weekly = context.weekly.copy()
+        required_daily_columns = [
+            "turnover_50",
+            "sma_50",
+            "sma_150",
+            "sma_200",
+            "low_252",
+            "high_252",
+            "atr_14",
+            "vol_50",
+            "rs_score",
+        ]
+        IndicatorCalculator.validate_required_columns(daily, required_daily_columns)
+        IndicatorCalculator.validate_required_columns(weekly, ["sma_30w", "sma_40w", "high_13w", "stage2", "weekly_uptrend"])
+
+        last_daily = daily.iloc[-1]
+        last_weekly = weekly.iloc[-1]
+        explanation: "OrderedDict[str, dict]" = OrderedDict()
+
+        if not self._record(
+            explanation,
+            "Liquidity",
+            bool(last_daily["turnover_50"] >= 10_000_000 and last_daily["vol_50"] >= 100_000),
+            turnover_50=round(float(last_daily["turnover_50"]), 2),
+            volume_50=round(float(last_daily["vol_50"]), 2),
+        ):
+            return []
+
+        trend_template = all(
+            [
+                last_daily["close"] > last_daily["sma_150"],
+                last_daily["close"] > last_daily["sma_200"],
+                last_daily["sma_150"] > last_daily["sma_200"],
+                last_daily["sma_50"] > last_daily["sma_150"],
+                last_daily["sma_50"] > last_daily["sma_200"],
+                last_daily["close"] > last_daily["sma_50"],
+                last_daily["sma_200_slope_20"] > 0,
+                last_daily["close"] >= 1.30 * last_daily["low_252"],
+                last_daily["close"] >= 0.75 * last_daily["high_252"],
+            ]
+        )
+        if not self._record(explanation, "Trend Template", trend_template):
+            return []
+
+        if not self._record(explanation, "Stage Analysis", bool(last_weekly["stage2"])):
+            return []
+
+        if not self._record(explanation, "Weekly Trend", bool(last_weekly["weekly_uptrend"] and last_weekly["close"] > last_weekly["sma_30w"])):
+            return []
+
+        if not self._record(explanation, "Relative Strength", bool(last_daily["rs_score"] > 1.0), rs_score=round(float(last_daily["rs_score"]), 3)):
+            return []
+
+        vcp_result = self._detect_vcp(daily)
+        if not self._record(explanation, "VCP", vcp_result["passed"], **vcp_result):
+            return []
+
+        breakout_pivot = min(float(daily.iloc[-20:-1]["high"].max()), float(last_weekly["high_13w"]))
+        breakout_pass = bool(last_daily["close"] > breakout_pivot and last_daily["volume"] >= 1.5 * last_daily["vol_50"])
+        if not self._record(
+            explanation,
+            "Breakout",
+            breakout_pass,
+            pivot=round(breakout_pivot, 2),
+            close=round(float(last_daily["close"]), 2),
+            volume_multiple=round(float(last_daily["volume"] / last_daily["vol_50"]), 2),
+        ):
+            return []
+
+        stop_loss = max(float(last_daily["low_20"]), float(last_daily["close"] - 2 * last_daily["atr_14"]))
+        risk_per_share = float(last_daily["close"] - stop_loss)
+        if risk_per_share <= 0:
+            return []
+        risk_pct = risk_per_share / float(last_daily["close"])
+        risk_pass = 0 < risk_pct <= 0.10
+        position_size = int(100000 * 0.01 / risk_per_share)
+        allocation_pct = (position_size * float(last_daily["close"])) / 100000 * 100 if position_size > 0 else 0.0
+        if not self._record(
+            explanation,
+            "Risk",
+            risk_pass and position_size > 0 and allocation_pct <= 10.0,
+            stop_loss=round(stop_loss, 2),
+            risk_per_share=round(risk_per_share, 2),
+            risk_pct=round(risk_pct * 100, 2),
+            position_size=position_size,
+            portfolio_weight_pct=round(allocation_pct, 2),
+        ):
+            return []
+
+        reasons = [f"{name}: PASS" for name, item in explanation.items() if item["status"] == "PASS"]
+        indicator_snapshot = {
+            "close": round(float(last_daily["close"]), 2),
+            "sma_50": round(float(last_daily["sma_50"]), 2),
+            "sma_150": round(float(last_daily["sma_150"]), 2),
+            "sma_200": round(float(last_daily["sma_200"]), 2),
+            "atr_14": round(float(last_daily["atr_14"]), 2),
+            "rs_score": round(float(last_daily["rs_score"]), 3),
+            "weekly_close": round(float(last_weekly["close"]), 2),
+        }
+
         return [
             StrategySignal(
                 symbol=symbol,
                 direction=SignalDirection.LONG,
-                entry_price=last_row['close'],
+                entry_price=float(last_daily["close"]),
                 stop_loss=stop_loss,
-                target_1=target_1,
-                target_2=target_2,
-                confidence_score=0.9,
+                target_1=float(last_daily["close"] + (2 * risk_per_share)),
+                target_2=float(last_daily["close"] + (3 * risk_per_share)),
+                confidence_score=0.92,
                 quality=SignalQuality.STRONG,
                 risk_level=RiskLevel.MEDIUM,
                 holding_days=45,
                 reasons=reasons,
-                metadata={"atr": atr}
+                explanation={name: item for name, item in explanation.items()},
+                indicator_snapshot=indicator_snapshot,
+                metadata={
+                    "position_size": position_size,
+                    "portfolio_weight_pct": round(allocation_pct, 2),
+                    "strategy_name": self.name,
+                    "strategy_version": self.version,
+                },
             )
         ]
+
+    @staticmethod
+    def _record(explanation: OrderedDict, name: str, passed: bool, **details) -> bool:
+        explanation[name] = {
+            "status": "PASS" if passed else "FAIL",
+            "details": details,
+        }
+        return passed
+
+    @staticmethod
+    def _detect_vcp(daily: pd.DataFrame) -> dict:
+        window = daily.iloc[-30:].copy()
+        contraction_windows = [30, 20, 10]
+        contractions: list[float] = []
+        for bars in contraction_windows:
+            segment = window.iloc[-bars:]
+            contraction = float((segment["high"].max() - segment["low"].min()) / segment["high"].max())
+            contractions.append(round(contraction, 4))
+        volume_dry_up = float(window.iloc[-10:]["volume"].mean() / window.iloc[-50:]["volume"].mean())
+        passed = contractions[0] > contractions[1] > contractions[2] and volume_dry_up < 0.8
+        return {
+            "passed": passed,
+            "contractions": contractions,
+            "volume_dry_up_ratio": round(volume_dry_up, 3),
+        }
