@@ -88,12 +88,14 @@ from indian_swing.api.routes import (  # noqa: E402
     recommendations,
     replay,
     scanner,
+    scans,
     stocks,
     strategies,
 )
 
 app.include_router(stocks.router, prefix="/api/stocks", tags=["Stocks"])
 app.include_router(recommendations.router, prefix="/api/recommendations", tags=["Recommendations"])
+app.include_router(scans.router, prefix="/api/scans", tags=["Scans"])
 app.include_router(backtest.router, prefix="/api/backtest", tags=["Backtesting"])
 app.include_router(replay.router, prefix="/api/replay", tags=["Replay"])
 app.include_router(scanner.router, prefix="/api/scanner", tags=["Scanner"])

@@ -60,23 +60,84 @@ function RecCard({ rec }) {
 }
 
 export default function Dashboard() {
-  const [snapshot, setSnapshot] = useState({ scan: null, recommendations: [] })
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [currentScan, setCurrentScan] = useState(null)
+  const [recommendations, setRecommendations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [scanning, setScanning] = useState(false)
   const [scanStatus, setScanStatus] = useState(null)
-  const [scanDate, setScanDate] = useState(new Date().toISOString().split('T')[0])
 
-  const loadSnapshot = async (silent = false) => {
-    if (!silent) setLoading(true)
+  function formatDuration(start, end) {
+    if (!start || !end) return null
+    const diffMs = new Date(end) - new Date(start)
+    const diffSec = Math.floor(diffMs / 1000)
+    if (diffSec < 60) return `${diffSec}s`
+    const mins = Math.floor(diffSec / 60)
+    const secs = diffSec % 60
+    return `${mins}m ${secs}s`
+  }
+
+  const loadLatest = async () => {
+    setLoading(true)
     setError(null)
     try {
-      const { data } = await axios.get('/api/recommendations/latest')
-      setSnapshot(data)
+      const scanRes = await axios.get('/api/scans/latest')
+      const scan = scanRes.data
+      setCurrentScan(scan)
+      setSelectedDate(scan.scan_date)
+      
+      const recsRes = await axios.get(`/api/recommendations/${scan.scan_uuid}`)
+      setRecommendations(recsRes.data)
+
+      setScanStatus({
+        status: 'completed',
+        total_stocks: scan.total_stocks,
+        completed: scan.stocks_scanned,
+        failed: scan.failed_stocks,
+        errors: scan.errors || []
+      })
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to load latest scan snapshot.')
+      if (err.response?.status === 404) {
+        setCurrentScan(null)
+        setRecommendations([])
+        setScanStatus(null)
+      } else {
+        setError(err.response?.data?.detail || 'Failed to load latest scan.')
+      }
     } finally {
-      if (!silent) setLoading(false)
+      setLoading(false)
+    }
+  }
+
+  const loadScanForDate = async (dateStr) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const scanRes = await axios.get(`/api/scans/date/${dateStr}`)
+      const scan = scanRes.data
+      setCurrentScan(scan)
+      
+      const recsRes = await axios.get(`/api/recommendations/${scan.scan_uuid}`)
+      setRecommendations(recsRes.data)
+
+      setScanStatus({
+        status: 'completed',
+        total_stocks: scan.total_stocks,
+        completed: scan.stocks_scanned,
+        failed: scan.failed_stocks,
+        errors: scan.errors || []
+      })
+    } catch (err) {
+      if (err.response?.status === 404) {
+        setCurrentScan(null)
+        setRecommendations([])
+        setScanStatus(null)
+      } else {
+        setError(err.response?.data?.detail || `Failed to load scan for ${dateStr}.`)
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -88,38 +149,46 @@ export default function Dashboard() {
       current_symbol: '',
       completed: 0,
       total_stocks: 0,
-      failed: 0
+      failed: 0,
+      errors: []
     })
     try {
-      const { data } = await axios.post(`/api/scanner/run?scan_date=${scanDate}`)
+      const { data } = await axios.post(`/api/scanner/run?scan_date=${selectedDate}`)
       if (data.status === 'completed') {
         setScanning(false)
-        setScanStatus(null)
-        loadSnapshot()
+        loadScanForDate(selectedDate)
         return
       }
+      pollProgress(data.scan_date)
     } catch (err) {
-      if (err.response?.status !== 409) {
+      if (err.response?.status === 409) {
+        pollProgress(selectedDate)
+      } else {
         setError(err.response?.data?.detail || 'Failed to start scan.')
         setScanning(false)
-        return
       }
     }
-    pollProgress()
   }
 
-  const pollProgress = async () => {
+  const pollProgress = async (dateStr) => {
     try {
       const { data } = await axios.get('/api/scanner/progress')
       setScanStatus(data)
       if (data.status === 'running') {
-        loadSnapshot(true)
-        setTimeout(pollProgress, 1000)
+        setTimeout(() => pollProgress(dateStr), 1000)
         return
       }
       setScanning(false)
       if (data.status === 'completed') {
-        loadSnapshot()
+        setSelectedDate(dateStr)
+        if (data.scan_uuid) {
+          const scanRes = await axios.get(`/api/scans/uuid/${data.scan_uuid}`)
+          setCurrentScan(scanRes.data)
+          const recsRes = await axios.get(`/api/recommendations/${data.scan_uuid}`)
+          setRecommendations(recsRes.data)
+        } else {
+          loadScanForDate(dateStr)
+        }
       }
     } catch (_err) {
       setScanning(false)
@@ -127,94 +196,114 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    loadSnapshot()
+    loadLatest()
     
-    // Hook into active background scan on mount/refresh
     const checkRunningScan = async () => {
       try {
         const { data } = await axios.get('/api/scanner/progress')
         if (data.status === 'running') {
           setScanning(true)
           setScanStatus(data)
-          setTimeout(pollProgress, 1000)
+          pollProgress(data.scan_date || selectedDate)
         }
       } catch (_err) {}
     }
     checkRunningScan()
   }, [])
 
-  const scan = snapshot.scan
-  const recommendations = snapshot.recommendations || []
+  const handleDateChange = (e) => {
+    const d = e.target.value
+    setSelectedDate(d)
+    loadScanForDate(d)
+  }
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Latest Completed Scan</h1>
-          <div className="page-subtitle">
-            {scan
-              ? `${scan.recommendations_created} recommendations from ${scan.stocks_scanned} scanned stocks`
-              : 'No completed scan is available yet'}
+          <h1 className="page-title">Trading Terminal</h1>
+          <div className="page-subtitle" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <span className={`badge badge-${scanning ? 'running' : currentScan ? 'completed' : 'pending'}`} style={{ textTransform: 'uppercase', fontWeight: 600 }}>
+              {scanning ? 'Scanning' : currentScan ? 'Completed' : 'No Scan Available'}
+            </span>
+            <span style={{ color: 'var(--text-secondary)' }}>
+              {scanning 
+                ? 'Processing stock universe...' 
+                : currentScan 
+                  ? `Viewing scan from ${new Date(currentScan.completed_at).toLocaleTimeString()} (v${currentScan.strategy_version})` 
+                  : `No scan session loaded for ${selectedDate}`
+              }
+            </span>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <input 
-            type="date" 
-            value={scanDate} 
-            onChange={e => setScanDate(e.target.value)} 
-            className="input-field" 
-            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)', outline: 'none' }}
-          />
-          <button className="btn btn-ghost" onClick={loadSnapshot}>Refresh</button>
-          <button className={`btn btn-primary ${scanning ? 'pulse' : ''}`} onClick={triggerScan} disabled={scanning}>
-            {scanning ? 'Scanning...' : 'Run Scan'}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, marginBottom: '2px' }}>Trading Date</span>
+            <input 
+              type="date" 
+              value={selectedDate} 
+              onChange={handleDateChange} 
+              className="input-field" 
+              style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)', outline: 'none' }}
+            />
+          </div>
+          <button className="btn btn-ghost" onClick={loadLatest} style={{ marginTop: '16px' }}>Reset to Latest</button>
+          <button 
+            className={`btn btn-primary ${scanning ? 'pulse' : ''}`} 
+            onClick={triggerScan} 
+            disabled={scanning}
+            style={{ marginTop: '16px' }}
+          >
+            {scanning ? 'Scanning...' : currentScan ? 'Run New Scan' : 'Run Scan'}
           </button>
         </div>
       </div>
 
-      {scan && (
+      {scanStatus && (
         <div style={{ margin: '0 32px 20px', padding: '16px', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            <div><strong>Scan Date:</strong> {scan.scan_date}</div>
-            <div><strong>Market:</strong> {scan.market_status}</div>
-            <div><strong>Scanned:</strong> {scan.stocks_scanned}/{scan.total_stocks}</div>
-            <div><strong>Failed:</strong> {scan.failed_stocks}</div>
-          </div>
-          <div style={{ marginTop: '12px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            <strong>Filter Summary:</strong> {Object.entries(scan.filter_summary || {}).map(([key, value]) => `${key} ${value}`).join(' • ') || 'No summary'}
-          </div>
-          {scan.errors && scan.errors.length > 0 && (
-            <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)', maxHeight: '150px', overflowY: 'auto' }}>
-              <div style={{ fontSize: '0.8rem', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '4px' }}>Failed Stocks ({scan.failed_stocks}):</div>
-              {scan.errors.map((err, idx) => (
-                <div key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>• {err}</div>
-              ))}
+          {scanStatus.status === 'running' ? (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <div style={{ color: 'var(--accent-blue-bright)', fontWeight: 600 }}>
+                  {scanStatus.current_stage} {scanStatus.current_symbol ? `- ${scanStatus.current_symbol}` : ''}
+                </div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                  {scanStatus.completed} / {scanStatus.total_stocks} ({scanStatus.total_stocks > 0 ? Math.round((scanStatus.completed / scanStatus.total_stocks) * 100) : 0}%)
+                </div>
+              </div>
+              <div style={{ width: '100%', height: '12px', background: 'var(--border)', borderRadius: '6px', overflow: 'hidden', display: 'flex' }}>
+                <div style={{ height: '100%', background: 'var(--accent-green)', width: `${((scanStatus.completed - (scanStatus.failed || 0)) / (scanStatus.total_stocks || 1)) * 100}%`, transition: 'width 0.3s ease' }} />
+                <div style={{ height: '100%', background: 'var(--accent-red)', width: `${((scanStatus.failed || 0) / (scanStatus.total_stocks || 1)) * 100}%`, transition: 'width 0.3s ease' }} />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '0.8rem' }}>
+                <span style={{ color: 'var(--accent-green)', fontWeight: 500 }}>Success: {scanStatus.completed - (scanStatus.failed || 0)}</span>
+                <span style={{ color: 'var(--accent-red)', fontWeight: 500 }}>Failed: {scanStatus.failed || 0}</span>
+              </div>
+            </>
+          ) : (
+            <div>
+              <div style={{ color: 'var(--accent-green)', fontWeight: 600, fontSize: '1.05rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-green)' }} />
+                Scan Completed
+              </div>
+              <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                <div><strong>Scanned:</strong> {scanStatus.total_stocks || (currentScan?.total_stocks)} Stocks</div>
+                <div><strong>Recommendations:</strong> {recommendations.length}</div>
+                {currentScan && (
+                  <>
+                    <div><strong>Completed At:</strong> {currentScan.completed_at ? new Date(currentScan.completed_at).toLocaleString() : 'N/A'}</div>
+                    {currentScan.started_at && currentScan.completed_at && (
+                      <div><strong>Duration:</strong> {formatDuration(currentScan.started_at, currentScan.completed_at)}</div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           )}
-        </div>
-      )}
 
-      {scanStatus?.status === 'running' && (
-        <div style={{ margin: '0 32px 20px', padding: '16px', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <div style={{ color: 'var(--accent-blue-bright)', fontWeight: 600 }}>
-              {scanStatus.current_stage} {scanStatus.current_symbol ? `- ${scanStatus.current_symbol}` : ''}
-            </div>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-              {scanStatus.completed} / {scanStatus.total_stocks} ({scanStatus.total_stocks > 0 ? Math.round((scanStatus.completed / scanStatus.total_stocks) * 100) : 0}%)
-            </div>
-          </div>
-          <div style={{ width: '100%', height: '12px', background: 'var(--border)', borderRadius: '6px', overflow: 'hidden', display: 'flex' }}>
-            <div style={{ height: '100%', background: 'var(--accent-green)', width: `${((scanStatus.completed - (scanStatus.failed || 0)) / (scanStatus.total_stocks || 1)) * 100}%`, transition: 'width 0.3s ease' }} />
-            <div style={{ height: '100%', background: 'var(--accent-red)', width: `${((scanStatus.failed || 0) / (scanStatus.total_stocks || 1)) * 100}%`, transition: 'width 0.3s ease' }} />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '0.8rem' }}>
-            <span style={{ color: 'var(--accent-green)', fontWeight: 500 }}>Success: {scanStatus.completed - (scanStatus.failed || 0)}</span>
-            <span style={{ color: 'var(--accent-red)', fontWeight: 500 }}>Failed: {scanStatus.failed || 0}</span>
-          </div>
           {scanStatus.errors && scanStatus.errors.length > 0 && (
-            <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)', maxHeight: '100px', overflowY: 'auto' }}>
-              <div style={{ fontSize: '0.8rem', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '4px' }}>Scan Errors:</div>
+            <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)', maxHeight: '120px', overflowY: 'auto' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '4px' }}>Scan Errors ({scanStatus.errors.length}):</div>
               {scanStatus.errors.map((err, idx) => (
                 <div key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>• {err}</div>
               ))}

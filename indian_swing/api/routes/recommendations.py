@@ -78,18 +78,28 @@ async def get_available_scan_dates():
     return await loop.run_in_executor(None, _fetch)
 
 
-@router.get("/{rec_id}")
-async def get_recommendation_detail(rec_id: str):
+@router.get("/{id_or_uuid}")
+async def get_recommendation_detail_or_scan_list(id_or_uuid: str):
     loop = asyncio.get_running_loop()
 
-    def _fetch() -> dict | None:
+    def _fetch() -> dict | list[dict] | None:
         with get_sync_session() as session:
-            recommendation = session.get(Recommendation, rec_id)
-            return _serialize_recommendation(recommendation, detailed=True) if recommendation else None
+            # First, check if it matches a Recommendation ID
+            rec = session.get(Recommendation, id_or_uuid)
+            if rec is not None:
+                return _serialize_recommendation(rec, detailed=True)
+            
+            # Second, check if it matches a Scan UUID
+            repo = RecommendationRepository(session)
+            recs = repo.get_by_scan(id_or_uuid)
+            if recs:
+                return [_serialize_recommendation(r) for r in recs]
+            
+            return None
 
     result = await loop.run_in_executor(None, _fetch)
     if result is None:
-        raise HTTPException(status_code=404, detail="Recommendation not found.")
+        raise HTTPException(status_code=404, detail="Recommendation or Scan UUID not found.")
     return result
 
 
