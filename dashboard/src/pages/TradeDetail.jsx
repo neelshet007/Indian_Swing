@@ -167,12 +167,21 @@ export default function TradeDetail() {
 
   useEffect(() => {
     setLoading(true)
+    setError(null)
     axios.get(`/api/recommendations/${id}`)
       .then(({ data }) => {
-        // If API returns an array (scan UUID fallback), take first
-        setRec(Array.isArray(data) ? data[0] : data)
+        // API may return a single object or an array (scan UUID fallback)
+        const result = Array.isArray(data) ? data[0] : data
+        if (!result) {
+          setError('Recommendation not found — the link may be stale.')
+        } else {
+          setRec(result)
+        }
       })
-      .catch(() => setError('Recommendation not found.'))
+      .catch((err) => {
+        const msg = err.response?.data?.detail || err.message || 'Failed to load recommendation.'
+        setError(`Error ${err.response?.status || ''}: ${msg}`)
+      })
       .finally(() => setLoading(false))
   }, [id])
 

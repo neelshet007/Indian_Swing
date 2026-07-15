@@ -83,18 +83,28 @@ async def get_recommendation_detail_or_scan_list(id_or_uuid: str):
     loop = asyncio.get_running_loop()
 
     def _fetch() -> dict | list[dict] | None:
+        from sqlalchemy import select
+        from sqlalchemy.orm import joinedload
         with get_sync_session() as session:
-            # First, check if it matches a Recommendation ID
-            rec = session.get(Recommendation, id_or_uuid)
+            # First, check if it matches a Recommendation ID — use joinedload to
+            # eagerly load stock and signal so they're accessible in the serializer.
+            rec = session.execute(
+                select(Recommendation)
+                .where(Recommendation.id == id_or_uuid)
+                .options(
+                    joinedload(Recommendation.stock),
+                    joinedload(Recommendation.signal),
+                )
+            ).scalar_one_or_none()
             if rec is not None:
                 return _serialize_recommendation(rec, detailed=True)
-            
+
             # Second, check if it matches a Scan UUID
             repo = RecommendationRepository(session)
             recs = repo.get_by_scan(id_or_uuid)
             if recs:
                 return [_serialize_recommendation(r) for r in recs]
-            
+
             return None
 
     result = await loop.run_in_executor(None, _fetch)
