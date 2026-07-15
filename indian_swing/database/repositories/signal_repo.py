@@ -36,9 +36,20 @@ class RecommendationRepository(BaseRepository[Recommendation]):
         ).scalars().all()
 
     def get_by_date(self, scan_date: date) -> Sequence[Recommendation]:
+        from datetime import datetime, timedelta
+        from sqlalchemy import and_
+        stale_cutoff = datetime.utcnow() - timedelta(hours=2)
+        # A 'running' job is only considered live if it started within the last 2 hours.
+        # Stale orphans (server killed) must not shadow completed scans.
         latest_scan = self._session.execute(
             select(ScanJob.scan_uuid)
-            .where(and_(ScanJob.scan_date == scan_date, ScanJob.status.in_(["running", "completed"])))
+            .where(
+                ScanJob.scan_date == scan_date,
+                (
+                    (ScanJob.status == "completed") |
+                    ((ScanJob.status == "running") & (ScanJob.started_at >= stale_cutoff))
+                ),
+            )
             .order_by(
                 case((ScanJob.status == "running", 1), (ScanJob.status == "completed", 2), else_=3).asc(),
                 ScanJob.created_at.desc(),
@@ -50,9 +61,14 @@ class RecommendationRepository(BaseRepository[Recommendation]):
         return self.get_by_scan(latest_scan)
 
     def get_latest(self, limit: int = 50) -> Sequence[Recommendation]:
+        from datetime import datetime, timedelta
+        stale_cutoff = datetime.utcnow() - timedelta(hours=2)
         latest_scan = self._session.execute(
             select(ScanJob.scan_uuid)
-            .where(ScanJob.status.in_(["running", "completed"]))
+            .where(
+                (ScanJob.status == "completed") |
+                ((ScanJob.status == "running") & (ScanJob.started_at >= stale_cutoff))
+            )
             .order_by(
                 case((ScanJob.status == "running", 1), (ScanJob.status == "completed", 2), else_=3).asc(),
                 ScanJob.created_at.desc(),
@@ -70,9 +86,14 @@ class RecommendationRepository(BaseRepository[Recommendation]):
         ).scalars().all()
 
     def get_latest_scan(self) -> ScanJob | None:
+        from datetime import datetime, timedelta
+        stale_cutoff = datetime.utcnow() - timedelta(hours=2)
         return self._session.execute(
             select(ScanJob)
-            .where(ScanJob.status.in_(["running", "completed"]))
+            .where(
+                (ScanJob.status == "completed") |
+                ((ScanJob.status == "running") & (ScanJob.started_at >= stale_cutoff))
+            )
             .order_by(
                 case((ScanJob.status == "running", 1), (ScanJob.status == "completed", 2), else_=3).asc(),
                 ScanJob.created_at.desc(),

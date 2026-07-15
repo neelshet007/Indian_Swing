@@ -77,11 +77,24 @@ async def get_scan_by_date(scan_date_val: date):
     loop = asyncio.get_running_loop()
 
     def _fetch() -> dict | None:
+        from datetime import datetime, timedelta
+        stale_cutoff = datetime.utcnow() - timedelta(hours=2)
         with get_sync_session() as session:
+            # Prefer completed scans; only accept running if started within last 2 hours
+            from sqlalchemy import case as sa_case
             job = session.execute(
                 select(ScanJob)
-                .where(ScanJob.scan_date == scan_date_val)
-                .order_by(ScanJob.created_at.desc())
+                .where(
+                    ScanJob.scan_date == scan_date_val,
+                    (
+                        (ScanJob.status == "completed") |
+                        ((ScanJob.status == "running") & (ScanJob.started_at >= stale_cutoff))
+                    ),
+                )
+                .order_by(
+                    sa_case((ScanJob.status == "completed", 1), (ScanJob.status == "running", 2), else_=3).asc(),
+                    ScanJob.created_at.desc(),
+                )
                 .limit(1)
             ).scalar_one_or_none()
             return _serialize_scan(job) if job else None

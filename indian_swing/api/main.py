@@ -23,6 +23,9 @@ async def lifespan(app: FastAPI):
     logger.info("app.startup", env=settings.app_env)
     await init_db()
 
+    # Heal any orphaned 'running' scan jobs left from a crashed server
+    _heal_stale_scan_jobs()
+
     # Auto-discover strategies
     from indian_swing.strategies.registry import strategy_registry
     strategy_registry.discover()
@@ -36,6 +39,34 @@ async def lifespan(app: FastAPI):
 
     logger.info("app.shutdown")
     await dispose_engine()
+
+
+def _heal_stale_scan_jobs() -> None:
+    """Mark any ScanJob still in 'running' status after 2+ hours as 'failed'.
+    These are orphans from a crashed or killed server process.
+    Without this fix they permanently shadow completed scans in every API query.
+    """
+    from datetime import datetime, timedelta
+    from sqlalchemy import select
+    from indian_swing.database.connection import get_sync_session
+    from indian_swing.database.models import ScanJob
+
+    cutoff = datetime.utcnow() - timedelta(hours=2)
+    with get_sync_session() as session:
+        stale = session.execute(
+            select(ScanJob).where(
+                ScanJob.status == "running",
+                ScanJob.started_at < cutoff,
+            )
+        ).scalars().all()
+        if stale:
+            for job in stale:
+                job.status = "failed"
+                job.error = "Orphaned: server crashed or was stopped mid-scan"
+                job.completed_at = datetime.utcnow()
+            logger.warning("startup.healed_orphan_jobs", count=len(stale))
+        else:
+            logger.info("startup.no_orphan_jobs")
 
 
 def _start_scheduler() -> None:
