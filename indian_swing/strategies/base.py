@@ -80,6 +80,8 @@ class StrategySignal:
 
 
 class BaseStrategy(ABC):
+    _last_audit_explanation: dict[str, Any] = {}
+
     @property
     @abstractmethod
     def name(self) -> str:

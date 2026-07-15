@@ -6,9 +6,11 @@ import TradeDetail from './pages/TradeDetail'
 import Backtesting from './pages/Backtesting'
 import ReplayPage from './pages/ReplayPage'
 import Stocks from './pages/Stocks'
+import ScanAnalytics from './pages/ScanAnalytics'
 
 const NAV = [
   { to: '/', label: 'Recommendations', icon: '◈', section: 'ANALYSIS' },
+  { to: '/analytics', label: 'Scanner Analytics', icon: '📊', section: 'ANALYSIS' },
   { to: '/stocks', label: 'Universe', icon: '⊞', section: 'ANALYSIS' },
   { to: '/backtesting', label: 'Backtesting', icon: '⟳', section: 'RESEARCH' },
   { to: '/replay', label: 'Replay', icon: '▶', section: 'RESEARCH' },
@@ -83,6 +85,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/recommendation/:id" element={<TradeDetail />} />
+            <Route path="/analytics" element={<ScanAnalytics />} />
+            <Route path="/analytics/:uuid" element={<ScanAnalytics />} />
             <Route path="/stocks" element={<Stocks />} />
             <Route path="/backtesting" element={<Backtesting />} />
             <Route path="/replay" element={<ReplayPage />} />

@@ -74,6 +74,7 @@ class InstitutionalVCP(BaseStrategy):
         last_daily = daily.iloc[-1]
         last_weekly = weekly.iloc[-1]
         explanation: "OrderedDict[str, dict]" = OrderedDict()
+        self._last_audit_explanation = explanation
 
         if not self._record(explanation, "Market Filter", True, reason="Assuming favorable market conditions"):
             return []

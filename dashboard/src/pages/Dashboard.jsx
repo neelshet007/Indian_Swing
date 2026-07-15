@@ -60,6 +60,7 @@ function RecCard({ rec }) {
 }
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [currentScan, setCurrentScan] = useState(null)
   const [recommendations, setRecommendations] = useState([])
@@ -314,6 +315,17 @@ export default function Dashboard() {
                   </>
                 )}
               </div>
+              {currentScan && currentScan.scan_uuid && (
+                <div style={{ marginTop: '16px' }}>
+                  <button 
+                    className="btn btn-ghost" 
+                    onClick={() => navigate(`/analytics/${currentScan.scan_uuid}`)}
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}
+                  >
+                    View Full Analytics →
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

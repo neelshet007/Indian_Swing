@@ -4,6 +4,7 @@ import asyncio
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
+from typing import Any
 
 from sqlalchemy import delete, select
 
@@ -35,6 +36,7 @@ class ScanResult:
     filter_summary: dict[str, int] = field(default_factory=dict)
     validation_summary: dict[str, int] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
+    analytics: dict[str, Any] = field(default_factory=dict)
 
 
 class RecommendationScanner:
@@ -151,6 +153,12 @@ class RecommendationScanner:
             validation_counter: Counter[str] = Counter()
             persisted: list[tuple[Stock, StrategyContext, StrategySignal]] = []
 
+            # Analytics state
+            funnel_pass: Counter[str] = Counter()
+            funnel_fail: Counter[str] = Counter()
+            failure_reasons: dict[str, Counter[str]] = {}
+            stock_journeys: dict[str, dict] = {}
+
             # Load benchmark once before loop to avoid duplicate queries
             benchmark_stock = None
             benchmark_daily = None
@@ -179,6 +187,24 @@ class RecommendationScanner:
                     )
                     self.progress_state["current_stage"] = "Running Strategy"
                     signals = self.strategy.generate_signals(stock.symbol, context)
+
+                    audit = getattr(self.strategy, "_last_audit_explanation", {})
+                    journey = {"failed_at": None, "stages": {}}
+                    for stage_name, stage_data in audit.items():
+                        status = stage_data.get("status")
+                        journey["stages"][stage_name] = status
+                        if status == "PASS":
+                            funnel_pass[stage_name] += 1
+                        elif status == "FAIL":
+                            funnel_fail[stage_name] += 1
+                            journey["failed_at"] = stage_name
+                            reason = str(stage_data.get("details", {}).get("reason") or "Failed condition")
+                            if stage_name not in failure_reasons:
+                                failure_reasons[stage_name] = Counter()
+                            failure_reasons[stage_name][reason] += 1
+                            break
+                    stock_journeys[stock.symbol] = journey
+
                     if not signals:
                         filter_counter["Rejected"] += 1
                         result.stocks_scanned += 1
@@ -210,6 +236,12 @@ class RecommendationScanner:
                             continue
                         existing_signal_keys.add((stock.stock_uuid, signal.metadata.get("strategy_name", ""), latest_daily_date))
                         filter_counter["BUY"] += 1
+                        
+                        # Add BUY to journey
+                        if stock.symbol in stock_journeys:
+                            stock_journeys[stock.symbol]["stages"]["BUY"] = "PASS"
+                        funnel_pass["BUY"] += 1
+
                         persisted.append((stock, context, signal))
 
                         # Save immediately to the database
@@ -262,6 +294,26 @@ class RecommendationScanner:
             result.recommendations_saved = len(persisted)
             result.filter_summary = dict(filter_counter)
             result.validation_summary = dict(validation_counter)
+            
+            result.analytics = {
+                "funnel": {
+                    "Universe": {"pass": len(stocks), "fail": 0},
+                    **{
+                        stage: {"pass": funnel_pass[stage], "fail": funnel_fail[stage]}
+                        for stage in set(funnel_pass.keys()).union(funnel_fail.keys())
+                    }
+                },
+                "failure_reasons": {
+                    stage: dict(counts) for stage, counts in failure_reasons.items()
+                },
+                "stock_journeys": stock_journeys,
+                "pipeline_health": {
+                    "total_stocks": len(stocks),
+                    "failed_data_load": result.failed_stocks,
+                    "errors": result.errors
+                }
+            }
+
             await asyncio.get_running_loop().run_in_executor(None, self._complete_scan_job, result)
             self.progress_state["status"] = "completed"
             self.progress_state["current_stage"] = "Completed"
@@ -501,7 +553,10 @@ class RecommendationScanner:
             job.failed_stocks = result.failed_stocks
             job.filter_summary = result.filter_summary
             job.validation_summary = result.validation_summary
-            job.notes = {"errors": result.errors}
+            notes = dict(job.notes) if isinstance(job.notes, dict) else {}
+            notes["errors"] = result.errors
+            notes["analytics"] = getattr(result, "analytics", {})
+            job.notes = notes
             job.completed_at = datetime.utcnow()
 
     def _fail_scan_job(self, scan_uuid: str, error: str) -> None:

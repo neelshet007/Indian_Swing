@@ -118,3 +118,47 @@ async def get_scan_by_uuid(scan_uuid: str):
     if result is None:
         raise HTTPException(status_code=404, detail=f"Scan job not found for UUID {scan_uuid}")
     return result
+
+@router.get("/history/summary")
+async def get_scan_history_summary(limit: int = 30):
+    loop = asyncio.get_running_loop()
+
+    def _fetch() -> list[dict]:
+        with get_sync_session() as session:
+            jobs = session.execute(
+                select(ScanJob)
+                .where(ScanJob.status == "completed")
+                .order_by(ScanJob.scan_date.desc(), ScanJob.created_at.desc())
+                .limit(limit)
+            ).scalars().all()
+            
+            return [{
+                "scan_date": str(job.scan_date),
+                "scan_uuid": job.scan_uuid,
+                "recommendations": job.recommendations_created,
+                "funnel": job.notes.get("analytics", {}).get("funnel", {}) if isinstance(job.notes, dict) else {}
+            } for job in jobs]
+
+    return await loop.run_in_executor(None, _fetch)
+
+
+@router.get("/{scan_uuid}/analytics")
+async def get_scan_analytics(scan_uuid: str):
+    loop = asyncio.get_running_loop()
+
+    def _fetch() -> dict | None:
+        with get_sync_session() as session:
+            job = session.get(ScanJob, scan_uuid)
+            if job is None:
+                return None
+            
+            if not isinstance(job.notes, dict) or "analytics" not in job.notes:
+                # Analytics wasn't collected for this scan
+                return {"error": "Analytics not available — rescan required."}
+                
+            return job.notes["analytics"]
+
+    result = await loop.run_in_executor(None, _fetch)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Scan not found")
+    return result
