@@ -247,6 +247,7 @@ export default function Dashboard() {
             <input 
               type="date" 
               value={selectedDate} 
+              max={new Date().toISOString().split('T')[0]}
               onChange={handleDateChange} 
               className="input-field" 
               style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)', outline: 'none' }}

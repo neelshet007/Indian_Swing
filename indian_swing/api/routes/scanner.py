@@ -28,6 +28,8 @@ async def trigger_scan(scan_date: Optional[date] = None, force_refresh: bool = F
         raise HTTPException(status_code=409, detail="A scan is already running")
 
     target_date = scan_date or date.today()
+    if target_date > date.today():
+        raise HTTPException(status_code=400, detail="Cannot run scans for future dates")
 
     if not force_refresh:
         loop = asyncio.get_running_loop()

@@ -9,7 +9,7 @@
       "source_file": "C:\\Indian_Swing\\check_rules_stats.py",
       "source_location": "L1",
       "id": "c_indian_swing_check_rules_stats_py",
-      "community": 11,
+      "community": 7,
       "norm_label": "check_rules_stats.py"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "C:\\Indian_Swing\\check_rules_stats.py",
       "source_location": "L8",
       "id": "check_rules_stats_check_rules",
-      "community": 11,
+      "community": 7,
       "norm_label": "check_rules()"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\vite.config.js",
       "source_location": "L1",
       "id": "c_indian_swing_dashboard_vite_config_js",
-      "community": 20,
+      "community": 19,
       "norm_label": "vite.config.js"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\App.jsx",
       "source_location": "L1",
       "id": "c_indian_swing_dashboard_src_app_jsx",
-      "community": 17,
+      "community": 15,
       "norm_label": "app.jsx"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\App.jsx",
       "source_location": "L17",
       "id": "app_sidebar",
-      "community": 17,
+      "community": 15,
       "norm_label": "sidebar()"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\App.jsx",
       "source_location": "L77",
       "id": "app_app",
-      "community": 17,
+      "community": 15,
       "norm_label": "app()"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\main.jsx",
       "source_location": "L1",
       "id": "c_indian_swing_dashboard_src_main_jsx",
-      "community": 21,
+      "community": 20,
       "norm_label": "main.jsx"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Backtesting.jsx",
       "source_location": "L1",
       "id": "c_indian_swing_dashboard_src_pages_backtesting_jsx",
-      "community": 18,
+      "community": 16,
       "norm_label": "backtesting.jsx"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Backtesting.jsx",
       "source_location": "L6",
       "id": "backtesting_metriccard",
-      "community": 18,
+      "community": 16,
       "norm_label": "metriccard()"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Backtesting.jsx",
       "source_location": "L16",
       "id": "backtesting_backtesting",
-      "community": 18,
+      "community": 16,
       "norm_label": "backtesting()"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
       "source_location": "L1",
       "id": "c_indian_swing_dashboard_src_pages_dashboard_jsx",
-      "community": 16,
+      "community": 14,
       "norm_label": "dashboard.jsx"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
       "source_location": "L5",
       "id": "dashboard_getconvictionclass",
-      "community": 16,
+      "community": 14,
       "norm_label": "getconvictionclass()"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
       "source_location": "L11",
       "id": "dashboard_reccard",
-      "community": 16,
+      "community": 14,
       "norm_label": "reccard()"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
       "source_location": "L62",
       "id": "dashboard_dashboard",
-      "community": 16,
+      "community": 14,
       "norm_label": "dashboard()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ReplayPage.jsx",
       "source_location": "L1",
       "id": "c_indian_swing_dashboard_src_pages_replaypage_jsx",
-      "community": 9,
+      "community": 2,
       "norm_label": "replaypage.jsx"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ReplayPage.jsx",
       "source_location": "L6",
       "id": "replaypage_replaychart",
-      "community": 9,
+      "community": 2,
       "norm_label": "replaychart()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ReplayPage.jsx",
       "source_location": "L56",
       "id": "replaypage_replaypage",
-      "community": 9,
+      "community": 2,
       "norm_label": "replaypage()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Stocks.jsx",
       "source_location": "L1",
       "id": "c_indian_swing_dashboard_src_pages_stocks_jsx",
-      "community": 19,
+      "community": 18,
       "norm_label": "stocks.jsx"
     },
     {
@@ -171,7 +171,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Stocks.jsx",
       "source_location": "L4",
       "id": "stocks_stocks",
-      "community": 19,
+      "community": 18,
       "norm_label": "stocks()"
     },
     {
@@ -180,7 +180,7 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
       "source_location": "L1",
       "id": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
-      "community": 15,
+      "community": 17,
       "norm_label": "tradedetail.jsx"
     },
     {
@@ -189,35 +189,17 @@
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
       "source_location": "L6",
       "id": "tradedetail_candlestickchart",
-      "community": 15,
+      "community": 17,
       "norm_label": "candlestickchart()"
-    },
-    {
-      "label": "RiskMeter()",
-      "file_type": "code",
-      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
-      "source_location": "L71",
-      "id": "tradedetail_riskmeter",
-      "community": 15,
-      "norm_label": "riskmeter()"
     },
     {
       "label": "TradeDetail()",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
-      "source_location": "L84",
+      "source_location": "L69",
       "id": "tradedetail_tradedetail",
-      "community": 15,
+      "community": 17,
       "norm_label": "tradedetail()"
-    },
-    {
-      "label": "PositionCalc()",
-      "file_type": "code",
-      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
-      "source_location": "L252",
-      "id": "tradedetail_positioncalc",
-      "community": 15,
-      "norm_label": "positioncalc()"
     },
     {
       "label": "__init__.py",
@@ -225,7 +207,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_init_py",
-      "community": 22,
+      "community": 21,
       "norm_label": "__init__.py"
     },
     {
@@ -269,7 +251,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\main.py",
       "source_location": "L1",
-      "community": 1,
+      "community": 0,
       "norm_label": "fastapi application entry point. mounts all routers, configures cors, lifespan e",
       "id": "main_rationale_1"
     },
@@ -279,7 +261,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_init_py",
-      "community": 23,
+      "community": 22,
       "norm_label": "__init__.py"
     },
     {
@@ -288,7 +270,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\backtest.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_routes_backtest_py",
-      "community": 4,
+      "community": 3,
       "norm_label": "backtest.py"
     },
     {
@@ -297,7 +279,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\backtest.py",
       "source_location": "L14",
       "id": "backtest_backtestrequest",
-      "community": 4,
+      "community": 3,
       "norm_label": "backtestrequest"
     },
     {
@@ -306,7 +288,7 @@
       "source_file": "",
       "source_location": "",
       "id": "basemodel",
-      "community": 2,
+      "community": 5,
       "norm_label": "basemodel"
     },
     {
@@ -315,7 +297,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\backtest.py",
       "source_location": "L26",
       "id": "backtest_run_backtest",
-      "community": 4,
+      "community": 3,
       "norm_label": "run_backtest()"
     },
     {
@@ -324,7 +306,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\backtest.py",
       "source_location": "L51",
       "id": "backtest_list_saved_results",
-      "community": 4,
+      "community": 8,
       "norm_label": "list_saved_results()"
     },
     {
@@ -333,7 +315,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\recommendations.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_routes_recommendations_py",
-      "community": 14,
+      "community": 8,
       "norm_label": "recommendations.py"
     },
     {
@@ -342,7 +324,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\recommendations.py",
       "source_location": "L17",
       "id": "recommendations_get_recommendations",
-      "community": 14,
+      "community": 8,
       "norm_label": "get_recommendations()"
     },
     {
@@ -351,7 +333,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\recommendations.py",
       "source_location": "L39",
       "id": "recommendations_get_latest_scan_snapshot",
-      "community": 14,
+      "community": 8,
       "norm_label": "get_latest_scan_snapshot()"
     },
     {
@@ -360,7 +342,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\recommendations.py",
       "source_location": "L73",
       "id": "recommendations_get_available_scan_dates",
-      "community": 14,
+      "community": 8,
       "norm_label": "get_available_scan_dates()"
     },
     {
@@ -369,7 +351,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\recommendations.py",
       "source_location": "L82",
       "id": "recommendations_get_recommendation_detail_or_scan_list",
-      "community": 14,
+      "community": 8,
       "norm_label": "get_recommendation_detail_or_scan_list()"
     },
     {
@@ -378,7 +360,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\recommendations.py",
       "source_location": "L106",
       "id": "recommendations_serialize_recommendation",
-      "community": 14,
+      "community": 8,
       "norm_label": "_serialize_recommendation()"
     },
     {
@@ -387,7 +369,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_routes_replay_py",
-      "community": 2,
+      "community": 8,
       "norm_label": "replay.py"
     },
     {
@@ -396,7 +378,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L14",
       "id": "replay_createreplayrequest",
-      "community": 2,
+      "community": 5,
       "norm_label": "createreplayrequest"
     },
     {
@@ -405,7 +387,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L22",
       "id": "replay_create_replay_session",
-      "community": 2,
+      "community": 8,
       "norm_label": "create_replay_session()"
     },
     {
@@ -414,7 +396,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L38",
       "id": "replay_get_replay_state",
-      "community": 2,
+      "community": 8,
       "norm_label": "get_replay_state()"
     },
     {
@@ -423,7 +405,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L47",
       "id": "replay_step_forward",
-      "community": 2,
+      "community": 8,
       "norm_label": "step_forward()"
     },
     {
@@ -432,7 +414,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L56",
       "id": "replay_step_backward",
-      "community": 2,
+      "community": 8,
       "norm_label": "step_backward()"
     },
     {
@@ -441,7 +423,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L65",
       "id": "replay_restart_session",
-      "community": 2,
+      "community": 8,
       "norm_label": "restart_session()"
     },
     {
@@ -450,7 +432,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L74",
       "id": "replay_jump_to_date",
-      "community": 2,
+      "community": 8,
       "norm_label": "jump_to_date()"
     },
     {
@@ -459,7 +441,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L83",
       "id": "replay_destroy_session",
-      "community": 2,
+      "community": 8,
       "norm_label": "destroy_session()"
     },
     {
@@ -468,7 +450,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L89",
       "id": "replay_replay_websocket",
-      "community": 2,
+      "community": 8,
       "norm_label": "replay_websocket()"
     },
     {
@@ -477,7 +459,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L126",
       "id": "replay_state_dict",
-      "community": 2,
+      "community": 8,
       "norm_label": "_state_dict()"
     },
     {
@@ -485,7 +467,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\replay.py",
       "source_location": "L90",
-      "community": 2,
+      "community": 5,
       "norm_label": "websocket for real-time replay playback.     client sends: {\"action\": \"forward\"|",
       "id": "replay_rationale_90"
     },
@@ -495,7 +477,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_routes_scanner_py",
-      "community": 4,
+      "community": 8,
       "norm_label": "scanner.py"
     },
     {
@@ -504,7 +486,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
       "source_location": "L20",
       "id": "scanner_get_progress",
-      "community": 4,
+      "community": 8,
       "norm_label": "get_progress()"
     },
     {
@@ -513,16 +495,16 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
       "source_location": "L25",
       "id": "scanner_trigger_scan",
-      "community": 4,
+      "community": 8,
       "norm_label": "trigger_scan()"
     },
     {
       "label": "list_scan_jobs()",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
-      "source_location": "L51",
+      "source_location": "L53",
       "id": "scanner_list_scan_jobs",
-      "community": 4,
+      "community": 8,
       "norm_label": "list_scan_jobs()"
     },
     {
@@ -531,7 +513,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scans.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_routes_scans_py",
-      "community": 9,
+      "community": 2,
       "norm_label": "scans.py"
     },
     {
@@ -540,7 +522,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scans.py",
       "source_location": "L16",
       "id": "scans_serialize_scan",
-      "community": 9,
+      "community": 2,
       "norm_label": "_serialize_scan()"
     },
     {
@@ -549,7 +531,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scans.py",
       "source_location": "L39",
       "id": "scans_get_latest_scan",
-      "community": 9,
+      "community": 2,
       "norm_label": "get_latest_scan()"
     },
     {
@@ -558,7 +540,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scans.py",
       "source_location": "L59",
       "id": "scans_get_scan_history",
-      "community": 9,
+      "community": 2,
       "norm_label": "get_scan_history()"
     },
     {
@@ -567,7 +549,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scans.py",
       "source_location": "L76",
       "id": "scans_get_scan_by_date",
-      "community": 9,
+      "community": 2,
       "norm_label": "get_scan_by_date()"
     },
     {
@@ -576,7 +558,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scans.py",
       "source_location": "L96",
       "id": "scans_get_scan_by_uuid",
-      "community": 9,
+      "community": 2,
       "norm_label": "get_scan_by_uuid()"
     },
     {
@@ -585,7 +567,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\stocks.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_routes_stocks_py",
-      "community": 4,
+      "community": 8,
       "norm_label": "stocks.py"
     },
     {
@@ -594,7 +576,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\stocks.py",
       "source_location": "L18",
       "id": "stocks_list_stocks",
-      "community": 4,
+      "community": 8,
       "norm_label": "list_stocks()"
     },
     {
@@ -603,7 +585,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\stocks.py",
       "source_location": "L43",
       "id": "stocks_get_stock",
-      "community": 4,
+      "community": 8,
       "norm_label": "get_stock()"
     },
     {
@@ -612,7 +594,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\stocks.py",
       "source_location": "L62",
       "id": "stocks_get_ohlcv",
-      "community": 4,
+      "community": 8,
       "norm_label": "get_ohlcv()"
     },
     {
@@ -621,7 +603,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\stocks.py",
       "source_location": "L91",
       "id": "stocks_stock_dict",
-      "community": 4,
+      "community": 8,
       "norm_label": "_stock_dict()"
     },
     {
@@ -630,7 +612,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\strategies.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_routes_strategies_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "strategies.py"
     },
     {
@@ -639,7 +621,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\strategies.py",
       "source_location": "L11",
       "id": "strategies_list_strategies",
-      "community": 3,
+      "community": 2,
       "norm_label": "list_strategies()"
     },
     {
@@ -648,7 +630,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_api_routes_init_py",
-      "community": 24,
+      "community": 23,
       "norm_label": "__init__.py"
     },
     {
@@ -657,7 +639,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_backtesting_metrics_py",
-      "community": 4,
+      "community": 3,
       "norm_label": "metrics.py"
     },
     {
@@ -666,7 +648,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L17",
       "id": "metrics_compute_metrics",
-      "community": 4,
+      "community": 3,
       "norm_label": "compute_metrics()"
     },
     {
@@ -675,7 +657,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L75",
       "id": "metrics_compute_monthly_returns",
-      "community": 4,
+      "community": 3,
       "norm_label": "compute_monthly_returns()"
     },
     {
@@ -684,7 +666,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L85",
       "id": "metrics_equity_series",
-      "community": 4,
+      "community": 3,
       "norm_label": "_equity_series()"
     },
     {
@@ -693,7 +675,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L92",
       "id": "metrics_sharpe",
-      "community": 4,
+      "community": 3,
       "norm_label": "_sharpe()"
     },
     {
@@ -702,7 +684,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L99",
       "id": "metrics_sortino",
-      "community": 4,
+      "community": 3,
       "norm_label": "_sortino()"
     },
     {
@@ -711,7 +693,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L107",
       "id": "metrics_max_drawdown",
-      "community": 4,
+      "community": 3,
       "norm_label": "_max_drawdown()"
     },
     {
@@ -720,7 +702,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L115",
       "id": "metrics_profit_factor",
-      "community": 4,
+      "community": 3,
       "norm_label": "_profit_factor()"
     },
     {
@@ -729,7 +711,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L121",
       "id": "metrics_empty_metrics",
-      "community": 4,
+      "community": 3,
       "norm_label": "_empty_metrics()"
     },
     {
@@ -737,7 +719,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L1",
-      "community": 4,
+      "community": 3,
       "norm_label": "performance metrics engine. all institutional-grade metrics: cagr, sharpe, sorti",
       "id": "metrics_rationale_1"
     },
@@ -746,7 +728,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L24",
-      "community": 4,
+      "community": 3,
       "norm_label": "compute all backtest performance metrics from trade list and equity curve.",
       "id": "metrics_rationale_24"
     },
@@ -755,7 +737,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\metrics.py",
       "source_location": "L76",
-      "community": 4,
+      "community": 3,
       "norm_label": "returns {yyyy-mm: return_pct} for each month.",
       "id": "metrics_rationale_76"
     },
@@ -765,7 +747,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_backtesting_runner_py",
-      "community": 4,
+      "community": 3,
       "norm_label": "runner.py"
     },
     {
@@ -774,7 +756,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L30",
       "id": "runner_backtestconfig",
-      "community": 4,
+      "community": 3,
       "norm_label": "backtestconfig"
     },
     {
@@ -783,7 +765,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L47",
       "id": "runner_backtestrunresult",
-      "community": 4,
+      "community": 3,
       "norm_label": "backtestrunresult"
     },
     {
@@ -792,7 +774,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L56",
       "id": "runner_backtestrunner",
-      "community": 4,
+      "community": 3,
       "norm_label": "backtestrunner"
     },
     {
@@ -801,7 +783,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L57",
       "id": "runner_backtestrunner_init",
-      "community": 4,
+      "community": 3,
       "norm_label": ".__init__()"
     },
     {
@@ -810,7 +792,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L61",
       "id": "runner_backtestrunner_run",
-      "community": 4,
+      "community": 3,
       "norm_label": ".run()"
     },
     {
@@ -828,7 +810,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L144",
       "id": "runner_backtestrunner_get_trading_dates",
-      "community": 4,
+      "community": 3,
       "norm_label": "._get_trading_dates()"
     },
     {
@@ -837,7 +819,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L152",
       "id": "runner_backtestrunner_process_exits",
-      "community": 4,
+      "community": 3,
       "norm_label": "._process_exits()"
     },
     {
@@ -846,7 +828,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L216",
       "id": "runner_backtestrunner_expire_old_trades",
-      "community": 4,
+      "community": 3,
       "norm_label": "._expire_old_trades()"
     },
     {
@@ -855,7 +837,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L232",
       "id": "runner_backtestrunner_close_trade",
-      "community": 4,
+      "community": 3,
       "norm_label": "._close_trade()"
     },
     {
@@ -864,7 +846,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L248",
       "id": "runner_backtestrunner_generate_entries",
-      "community": 4,
+      "community": 3,
       "norm_label": "._generate_entries()"
     },
     {
@@ -873,7 +855,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L279",
       "id": "runner_backtestrunner_enter_trades",
-      "community": 4,
+      "community": 3,
       "norm_label": "._enter_trades()"
     },
     {
@@ -882,7 +864,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L317",
       "id": "runner_backtestrunner_mark_to_market",
-      "community": 4,
+      "community": 3,
       "norm_label": "._mark_to_market()"
     },
     {
@@ -891,7 +873,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L334",
       "id": "runner_backtestrunner_compute_costs",
-      "community": 4,
+      "community": 3,
       "norm_label": "._compute_costs()"
     },
     {
@@ -900,7 +882,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L341",
       "id": "runner_backtestrunner_strategy_breakdown",
-      "community": 4,
+      "community": 3,
       "norm_label": "._strategy_breakdown()"
     },
     {
@@ -908,7 +890,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L1",
-      "community": 4,
+      "community": 3,
       "norm_label": "portfolio-level backtesting runner. supports: multiple strategies \u00d7 multiple sto",
       "id": "runner_rationale_1"
     },
@@ -917,7 +899,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L62",
-      "community": 4,
+      "community": 3,
       "norm_label": "execute full backtest and return results.",
       "id": "runner_rationale_62"
     },
@@ -926,7 +908,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\runner.py",
       "source_location": "L128",
-      "community": 4,
+      "community": 3,
       "norm_label": "load ohlcv for all symbols from db.",
       "id": "runner_rationale_128"
     },
@@ -936,7 +918,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_backtesting_trade_py",
-      "community": 4,
+      "community": 3,
       "norm_label": "trade.py"
     },
     {
@@ -945,7 +927,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L12",
       "id": "trade_tradestatus",
-      "community": 4,
+      "community": 3,
       "norm_label": "tradestatus"
     },
     {
@@ -954,7 +936,7 @@
       "source_file": "",
       "source_location": "",
       "id": "str",
-      "community": 4,
+      "community": 8,
       "norm_label": "str"
     },
     {
@@ -963,7 +945,7 @@
       "source_file": "",
       "source_location": "",
       "id": "enum",
-      "community": 0,
+      "community": 1,
       "norm_label": "enum"
     },
     {
@@ -972,7 +954,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L21",
       "id": "trade_trade",
-      "community": 4,
+      "community": 3,
       "norm_label": "trade"
     },
     {
@@ -981,7 +963,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L46",
       "id": "trade_gross_pnl",
-      "community": 4,
+      "community": 3,
       "norm_label": "gross_pnl()"
     },
     {
@@ -990,7 +972,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L54",
       "id": "trade_net_pnl",
-      "community": 4,
+      "community": 3,
       "norm_label": "net_pnl()"
     },
     {
@@ -999,7 +981,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L58",
       "id": "trade_return_pct",
-      "community": 4,
+      "community": 3,
       "norm_label": "return_pct()"
     },
     {
@@ -1008,7 +990,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L64",
       "id": "trade_is_winner",
-      "community": 4,
+      "community": 3,
       "norm_label": "is_winner()"
     },
     {
@@ -1017,7 +999,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L68",
       "id": "trade_holding_days",
-      "community": 4,
+      "community": 3,
       "norm_label": "holding_days()"
     },
     {
@@ -1026,7 +1008,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L74",
       "id": "trade_risk_reward_achieved",
-      "community": 4,
+      "community": 3,
       "norm_label": "risk_reward_achieved()"
     },
     {
@@ -1035,7 +1017,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L81",
       "id": "trade_trade_to_dict",
-      "community": 4,
+      "community": 3,
       "norm_label": ".to_dict()"
     },
     {
@@ -1043,7 +1025,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\trade.py",
       "source_location": "L1",
-      "community": 4,
+      "community": 3,
       "norm_label": "trade domain model for backtesting.",
       "id": "trade_rationale_1"
     },
@@ -1053,7 +1035,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\backtesting\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_backtesting_init_py",
-      "community": 25,
+      "community": 24,
       "norm_label": "__init__.py"
     },
     {
@@ -1062,7 +1044,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_config_settings_py",
-      "community": 10,
+      "community": 11,
       "norm_label": "settings.py"
     },
     {
@@ -1071,7 +1053,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L21",
       "id": "settings_load_yaml",
-      "community": 10,
+      "community": 11,
       "norm_label": "_load_yaml()"
     },
     {
@@ -1080,7 +1062,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L28",
       "id": "settings_databasesettings",
-      "community": 10,
+      "community": 11,
       "norm_label": "databasesettings"
     },
     {
@@ -1089,7 +1071,7 @@
       "source_file": "",
       "source_location": "",
       "id": "basesettings",
-      "community": 10,
+      "community": 11,
       "norm_label": "basesettings"
     },
     {
@@ -1098,7 +1080,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L42",
       "id": "settings_providersettings",
-      "community": 10,
+      "community": 11,
       "norm_label": "providersettings"
     },
     {
@@ -1107,7 +1089,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L49",
       "id": "settings_pipelinesettings",
-      "community": 10,
+      "community": 11,
       "norm_label": "pipelinesettings"
     },
     {
@@ -1116,7 +1098,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L58",
       "id": "settings_scannersettings",
-      "community": 10,
+      "community": 11,
       "norm_label": "scannersettings"
     },
     {
@@ -1125,7 +1107,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L70",
       "id": "settings_backtestsettings",
-      "community": 10,
+      "community": 11,
       "norm_label": "backtestsettings"
     },
     {
@@ -1134,7 +1116,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L79",
       "id": "settings_apisettings",
-      "community": 10,
+      "community": 11,
       "norm_label": "apisettings"
     },
     {
@@ -1143,7 +1125,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L87",
       "id": "settings_settings",
-      "community": 10,
+      "community": 11,
       "norm_label": "settings"
     },
     {
@@ -1152,7 +1134,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L113",
       "id": "settings_coerce_path",
-      "community": 10,
+      "community": 11,
       "norm_label": "coerce_path()"
     },
     {
@@ -1161,7 +1143,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L117",
       "id": "settings_is_development",
-      "community": 10,
+      "community": 11,
       "norm_label": "is_development()"
     },
     {
@@ -1170,7 +1152,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L121",
       "id": "settings_is_production",
-      "community": 10,
+      "community": 11,
       "norm_label": "is_production()"
     },
     {
@@ -1179,7 +1161,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L125",
       "id": "settings_environment_name",
-      "community": 10,
+      "community": 11,
       "norm_label": "environment_name()"
     },
     {
@@ -1188,7 +1170,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L128",
       "id": "settings_settings_ensure_dirs",
-      "community": 10,
+      "community": 11,
       "norm_label": ".ensure_dirs()"
     },
     {
@@ -1197,7 +1179,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L133",
       "id": "settings_merge_yaml_into_env",
-      "community": 10,
+      "community": 11,
       "norm_label": "_merge_yaml_into_env()"
     },
     {
@@ -1206,7 +1188,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L155",
       "id": "settings_get_settings",
-      "community": 10,
+      "community": 11,
       "norm_label": "get_settings()"
     },
     {
@@ -1214,7 +1196,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L1",
-      "community": 10,
+      "community": 11,
       "norm_label": "pydantic-settings based configuration management. loads from config.yaml, then o",
       "id": "settings_rationale_1"
     },
@@ -1223,7 +1205,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L134",
-      "community": 10,
+      "community": 11,
       "norm_label": "inject yaml values as env vars if not already set (env vars take priority).",
       "id": "settings_rationale_134"
     },
@@ -1233,7 +1215,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_config_init_py",
-      "community": 26,
+      "community": 25,
       "norm_label": "__init__.py"
     },
     {
@@ -1242,7 +1224,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_core_exceptions_py",
-      "community": 2,
+      "community": 5,
       "norm_label": "exceptions.py"
     },
     {
@@ -1251,7 +1233,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L8",
       "id": "exceptions_swingbaseerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "swingbaseerror"
     },
     {
@@ -1260,7 +1242,7 @@
       "source_file": "",
       "source_location": "",
       "id": "exception",
-      "community": 2,
+      "community": 5,
       "norm_label": "exception"
     },
     {
@@ -1269,7 +1251,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L11",
       "id": "exceptions_swingbaseerror_init",
-      "community": 2,
+      "community": 5,
       "norm_label": ".__init__()"
     },
     {
@@ -1278,7 +1260,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L16",
       "id": "exceptions_swingbaseerror_repr",
-      "community": 2,
+      "community": 5,
       "norm_label": ".__repr__()"
     },
     {
@@ -1287,7 +1269,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L22",
       "id": "exceptions_dataerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "dataerror"
     },
     {
@@ -1296,7 +1278,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L26",
       "id": "exceptions_dataprovidererror",
-      "community": 8,
+      "community": 9,
       "norm_label": "dataprovidererror"
     },
     {
@@ -1305,7 +1287,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L30",
       "id": "exceptions_datavalidationerror",
-      "community": 7,
+      "community": 6,
       "norm_label": "datavalidationerror"
     },
     {
@@ -1314,7 +1296,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L34",
       "id": "exceptions_datanotfounderror",
-      "community": 2,
+      "community": 5,
       "norm_label": "datanotfounderror"
     },
     {
@@ -1323,7 +1305,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L38",
       "id": "exceptions_insufficientdataerror",
-      "community": 11,
+      "community": 7,
       "norm_label": "insufficientdataerror"
     },
     {
@@ -1332,7 +1314,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L44",
       "id": "exceptions_databaseerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "databaseerror"
     },
     {
@@ -1341,7 +1323,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L48",
       "id": "exceptions_recordnotfounderror",
-      "community": 2,
+      "community": 5,
       "norm_label": "recordnotfounderror"
     },
     {
@@ -1350,7 +1332,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L52",
       "id": "exceptions_duplicaterecorderror",
-      "community": 2,
+      "community": 5,
       "norm_label": "duplicaterecorderror"
     },
     {
@@ -1359,7 +1341,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L58",
       "id": "exceptions_strategyerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "strategyerror"
     },
     {
@@ -1368,7 +1350,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L62",
       "id": "exceptions_strategynotfounderror",
-      "community": 9,
+      "community": 2,
       "norm_label": "strategynotfounderror"
     },
     {
@@ -1377,7 +1359,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L66",
       "id": "exceptions_strategyconfigerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "strategyconfigerror"
     },
     {
@@ -1386,7 +1368,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L70",
       "id": "exceptions_indicatorerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "indicatorerror"
     },
     {
@@ -1395,7 +1377,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L76",
       "id": "exceptions_engineerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "engineerror"
     },
     {
@@ -1404,7 +1386,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L80",
       "id": "exceptions_scanerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "scanerror"
     },
     {
@@ -1413,7 +1395,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L86",
       "id": "exceptions_backtesterror",
-      "community": 2,
+      "community": 5,
       "norm_label": "backtesterror"
     },
     {
@@ -1422,7 +1404,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L92",
       "id": "exceptions_replayerror",
-      "community": 2,
+      "community": 5,
       "norm_label": "replayerror"
     },
     {
@@ -1431,7 +1413,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L96",
       "id": "exceptions_replaysessionnotfounderror",
-      "community": 2,
+      "community": 5,
       "norm_label": "replaysessionnotfounderror"
     },
     {
@@ -1440,7 +1422,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L102",
       "id": "exceptions_configurationerror",
-      "community": 8,
+      "community": 9,
       "norm_label": "configurationerror"
     },
     {
@@ -1448,7 +1430,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L1",
-      "community": 2,
+      "community": 5,
       "norm_label": "domain exception hierarchy. all platform exceptions flow from swingbaseerror so",
       "id": "exceptions_rationale_1"
     },
@@ -1457,7 +1439,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L9",
-      "community": 2,
+      "community": 5,
       "norm_label": "root exception for the entire platform.",
       "id": "exceptions_rationale_9"
     },
@@ -1466,7 +1448,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L23",
-      "community": 2,
+      "community": 5,
       "norm_label": "base for data layer errors.",
       "id": "exceptions_rationale_23"
     },
@@ -1475,7 +1457,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L27",
-      "community": 8,
+      "community": 9,
       "norm_label": "external data provider failed to return data.",
       "id": "exceptions_rationale_27"
     },
@@ -1484,7 +1466,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L31",
-      "community": 7,
+      "community": 6,
       "norm_label": "downloaded or stored data failed validation.",
       "id": "exceptions_rationale_31"
     },
@@ -1493,7 +1475,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L35",
-      "community": 2,
+      "community": 5,
       "norm_label": "requested data does not exist.",
       "id": "exceptions_rationale_35"
     },
@@ -1502,7 +1484,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L39",
-      "community": 11,
+      "community": 7,
       "norm_label": "not enough data points to compute indicators or run strategy.",
       "id": "exceptions_rationale_39"
     },
@@ -1511,7 +1493,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L45",
-      "community": 2,
+      "community": 5,
       "norm_label": "base for database layer errors.",
       "id": "exceptions_rationale_45"
     },
@@ -1520,7 +1502,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L49",
-      "community": 2,
+      "community": 5,
       "norm_label": "queried record does not exist.",
       "id": "exceptions_rationale_49"
     },
@@ -1529,7 +1511,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L53",
-      "community": 2,
+      "community": 5,
       "norm_label": "insert would violate uniqueness constraint.",
       "id": "exceptions_rationale_53"
     },
@@ -1538,7 +1520,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L59",
-      "community": 2,
+      "community": 5,
       "norm_label": "base for strategy errors.",
       "id": "exceptions_rationale_59"
     },
@@ -1547,7 +1529,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L63",
-      "community": 9,
+      "community": 2,
       "norm_label": "requested strategy is not registered.",
       "id": "exceptions_rationale_63"
     },
@@ -1556,7 +1538,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L67",
-      "community": 2,
+      "community": 5,
       "norm_label": "strategy received invalid configuration.",
       "id": "exceptions_rationale_67"
     },
@@ -1565,7 +1547,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L71",
-      "community": 2,
+      "community": 5,
       "norm_label": "indicator computation failed.",
       "id": "exceptions_rationale_71"
     },
@@ -1574,7 +1556,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L77",
-      "community": 2,
+      "community": 5,
       "norm_label": "core engine encountered an unrecoverable error.",
       "id": "exceptions_rationale_77"
     },
@@ -1583,7 +1565,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L81",
-      "community": 2,
+      "community": 5,
       "norm_label": "market scan failed for a stock or globally.",
       "id": "exceptions_rationale_81"
     },
@@ -1592,7 +1574,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L87",
-      "community": 2,
+      "community": 5,
       "norm_label": "backtesting engine error.",
       "id": "exceptions_rationale_87"
     },
@@ -1601,7 +1583,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L97",
-      "community": 2,
+      "community": 5,
       "norm_label": "requested replay session does not exist.",
       "id": "exceptions_rationale_97"
     },
@@ -1610,7 +1592,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\exceptions.py",
       "source_location": "L103",
-      "community": 8,
+      "community": 9,
       "norm_label": "platform misconfiguration detected.",
       "id": "exceptions_rationale_103"
     },
@@ -1674,7 +1656,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\lookback_engine.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_core_lookback_engine_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "lookback_engine.py"
     },
     {
@@ -1683,7 +1665,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\lookback_engine.py",
       "source_location": "L9",
       "id": "lookback_engine_dynamiclookbackengine",
-      "community": 0,
+      "community": 1,
       "norm_label": "dynamiclookbackengine"
     },
     {
@@ -1692,7 +1674,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\lookback_engine.py",
       "source_location": "L11",
       "id": "lookback_engine_get_required_lookback",
-      "community": 0,
+      "community": 1,
       "norm_label": "get_required_lookback()"
     },
     {
@@ -1701,7 +1683,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\scanner.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_core_scanner_py",
-      "community": 6,
+      "community": 7,
       "norm_label": "scanner.py"
     },
     {
@@ -1710,7 +1692,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\scanner.py",
       "source_location": "L18",
       "id": "scanner_sivcsscanner",
-      "community": 6,
+      "community": 7,
       "norm_label": "sivcsscanner"
     },
     {
@@ -1719,7 +1701,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\scanner.py",
       "source_location": "L19",
       "id": "scanner_sivcsscanner_init",
-      "community": 6,
+      "community": 10,
       "norm_label": ".__init__()"
     },
     {
@@ -1728,7 +1710,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\scanner.py",
       "source_location": "L23",
       "id": "scanner_sivcsscanner_run_scan",
-      "community": 6,
+      "community": 7,
       "norm_label": ".run_scan()"
     },
     {
@@ -1737,7 +1719,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_core_symbols_py",
-      "community": 6,
+      "community": 10,
       "norm_label": "symbols.py"
     },
     {
@@ -1746,7 +1728,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L4",
       "id": "symbols_provideradapter",
-      "community": 6,
+      "community": 10,
       "norm_label": "provideradapter"
     },
     {
@@ -1755,7 +1737,7 @@
       "source_file": "",
       "source_location": "",
       "id": "abc",
-      "community": 6,
+      "community": 10,
       "norm_label": "abc"
     },
     {
@@ -1764,7 +1746,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L6",
       "id": "symbols_format_symbol",
-      "community": 6,
+      "community": 10,
       "norm_label": "format_symbol()"
     },
     {
@@ -1773,7 +1755,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L12",
       "id": "symbols_name",
-      "community": 6,
+      "community": 10,
       "norm_label": "name()"
     },
     {
@@ -1782,7 +1764,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L16",
       "id": "symbols_yahooadapter",
-      "community": 6,
+      "community": 10,
       "norm_label": "yahooadapter"
     },
     {
@@ -1791,7 +1773,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L21",
       "id": "symbols_yahooadapter_format_symbol",
-      "community": 6,
+      "community": 10,
       "norm_label": ".format_symbol()"
     },
     {
@@ -1800,7 +1782,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L29",
       "id": "symbols_symbolmanager",
-      "community": 6,
+      "community": 10,
       "norm_label": "symbolmanager"
     },
     {
@@ -1809,7 +1791,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L37",
       "id": "symbols_normalize_internal_symbol",
-      "community": 6,
+      "community": 10,
       "norm_label": "normalize_internal_symbol()"
     },
     {
@@ -1818,7 +1800,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L57",
       "id": "symbols_get_provider_symbol",
-      "community": 6,
+      "community": 10,
       "norm_label": "get_provider_symbol()"
     },
     {
@@ -1826,7 +1808,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L7",
-      "community": 27,
+      "community": 26,
       "norm_label": "convert a canonical internal symbol to the provider's specific format.",
       "id": "symbols_rationale_7"
     },
@@ -1835,7 +1817,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L13",
-      "community": 28,
+      "community": 27,
       "norm_label": "name of the provider (e.g., 'yahoo', 'groww').",
       "id": "symbols_rationale_13"
     },
@@ -1844,7 +1826,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L30",
-      "community": 6,
+      "community": 10,
       "norm_label": "centralized symbol management layer.     ensures internal symbols are canonical,",
       "id": "symbols_rationale_30"
     },
@@ -1853,7 +1835,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L38",
-      "community": 29,
+      "community": 28,
       "norm_label": "cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)",
       "id": "symbols_rationale_38"
     },
@@ -1862,7 +1844,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L58",
-      "community": 30,
+      "community": 29,
       "norm_label": "gets the provider-specific symbol, utilizing caching to prevent redundant format",
       "id": "symbols_rationale_58"
     },
@@ -1872,7 +1854,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_core_types_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "types.py"
     },
     {
@@ -1881,7 +1863,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L43",
       "id": "types_signaldirection",
-      "community": 0,
+      "community": 1,
       "norm_label": "signaldirection"
     },
     {
@@ -1890,7 +1872,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L49",
       "id": "types_timeframeenum",
-      "community": 0,
+      "community": 1,
       "norm_label": "timeframeenum"
     },
     {
@@ -1899,7 +1881,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L57",
       "id": "types_risklevel",
-      "community": 0,
+      "community": 1,
       "norm_label": "risklevel"
     },
     {
@@ -1908,7 +1890,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L64",
       "id": "types_signalquality",
-      "community": 0,
+      "community": 1,
       "norm_label": "signalquality"
     },
     {
@@ -1917,7 +1899,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L76",
       "id": "types_pricelevel",
-      "community": 0,
+      "community": 1,
       "norm_label": "pricelevel"
     },
     {
@@ -1926,7 +1908,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L82",
       "id": "types_tradesetup",
-      "community": 0,
+      "community": 1,
       "norm_label": "tradesetup"
     },
     {
@@ -1935,7 +1917,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L91",
       "id": "types_tradesetup_post_init",
-      "community": 0,
+      "community": 1,
       "norm_label": ".__post_init__()"
     },
     {
@@ -1944,7 +1926,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L99",
       "id": "types_metadata",
-      "community": 0,
+      "community": 1,
       "norm_label": "metadata"
     },
     {
@@ -1953,7 +1935,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L103",
       "id": "types_metadata_get",
-      "community": 0,
+      "community": 1,
       "norm_label": ".get()"
     },
     {
@@ -1962,7 +1944,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L106",
       "id": "types_metadata_set",
-      "community": 0,
+      "community": 1,
       "norm_label": ".set()"
     },
     {
@@ -1970,7 +1952,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L1",
-      "community": 0,
+      "community": 1,
       "norm_label": "shared type aliases and domain primitives. keep this file import-free from inter",
       "id": "types_rationale_1"
     },
@@ -1979,7 +1961,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\types.py",
       "source_location": "L100",
-      "community": 0,
+      "community": 1,
       "norm_label": "arbitrary key-value bag attached to signals and recommendations.",
       "id": "types_rationale_100"
     },
@@ -1989,7 +1971,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_core_universe_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "universe.py"
     },
     {
@@ -1998,7 +1980,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L31",
       "id": "universe_universestock",
-      "community": 1,
+      "community": 0,
       "norm_label": "universestock"
     },
     {
@@ -2007,7 +1989,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L39",
       "id": "universe_universemanager",
-      "community": 1,
+      "community": 0,
       "norm_label": "universemanager"
     },
     {
@@ -2016,7 +1998,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L40",
       "id": "universe_universemanager_load",
-      "community": 1,
+      "community": 0,
       "norm_label": ".load()"
     },
     {
@@ -2025,7 +2007,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L47",
       "id": "universe_universemanager_sync_to_db",
-      "community": 1,
+      "community": 0,
       "norm_label": ".sync_to_db()"
     },
     {
@@ -2034,7 +2016,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L71",
       "id": "universe_universemanager_get_active_symbols",
-      "community": 1,
+      "community": 0,
       "norm_label": ".get_active_symbols()"
     },
     {
@@ -2043,7 +2025,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L82",
       "id": "universe_universemanager_load_from_csv",
-      "community": 1,
+      "community": 0,
       "norm_label": "._load_from_csv()"
     },
     {
@@ -2052,7 +2034,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L104",
       "id": "universe_universemanager_builtin",
-      "community": 1,
+      "community": 0,
       "norm_label": "._builtin()"
     },
     {
@@ -2060,7 +2042,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\universe.py",
       "source_location": "L1",
-      "community": 1,
+      "community": 0,
       "norm_label": "stock universe management \u2014 sync db version.",
       "id": "universe_rationale_1"
     },
@@ -2070,7 +2052,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_core_init_py",
-      "community": 31,
+      "community": 30,
       "norm_label": "__init__.py"
     },
     {
@@ -2079,7 +2061,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\aggregator.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_aggregator_py",
-      "community": 6,
+      "community": 7,
       "norm_label": "aggregator.py"
     },
     {
@@ -2088,7 +2070,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\aggregator.py",
       "source_location": "L4",
       "id": "aggregator_dataaggregator",
-      "community": 6,
+      "community": 7,
       "norm_label": "dataaggregator"
     },
     {
@@ -2097,7 +2079,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\aggregator.py",
       "source_location": "L6",
       "id": "aggregator_aggregate_weekly",
-      "community": 6,
+      "community": 7,
       "norm_label": "aggregate_weekly()"
     },
     {
@@ -2106,7 +2088,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\aggregator.py",
       "source_location": "L38",
       "id": "aggregator_aggregate_monthly",
-      "community": 6,
+      "community": 7,
       "norm_label": "aggregate_monthly()"
     },
     {
@@ -2114,7 +2096,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\aggregator.py",
       "source_location": "L7",
-      "community": 32,
+      "community": 31,
       "norm_label": "converts daily ohlcv dataframe to weekly.",
       "id": "aggregator_rationale_7"
     },
@@ -2123,7 +2105,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\aggregator.py",
       "source_location": "L39",
-      "community": 33,
+      "community": 32,
       "norm_label": "converts daily ohlcv dataframe to monthly.",
       "id": "aggregator_rationale_39"
     },
@@ -2133,7 +2115,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_cleaner_py",
-      "community": 7,
+      "community": 6,
       "norm_label": "cleaner.py"
     },
     {
@@ -2142,7 +2124,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L11",
       "id": "cleaner_ohlcvcleaner",
-      "community": 7,
+      "community": 6,
       "norm_label": "ohlcvcleaner"
     },
     {
@@ -2151,7 +2133,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L14",
       "id": "cleaner_ohlcvcleaner_clean",
-      "community": 7,
+      "community": 6,
       "norm_label": ".clean()"
     },
     {
@@ -2160,7 +2142,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L20",
       "id": "cleaner_ohlcvcleaner_forward_fill_missing_days",
-      "community": 7,
+      "community": 6,
       "norm_label": "._forward_fill_missing_days()"
     },
     {
@@ -2169,7 +2151,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L29",
       "id": "cleaner_ohlcvcleaner_clip_volume",
-      "community": 7,
+      "community": 6,
       "norm_label": "._clip_volume()"
     },
     {
@@ -2178,7 +2160,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L36",
       "id": "cleaner_ohlcvresampler",
-      "community": 7,
+      "community": 6,
       "norm_label": "ohlcvresampler"
     },
     {
@@ -2187,7 +2169,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L49",
       "id": "cleaner_ohlcvresampler_resample",
-      "community": 6,
+      "community": 7,
       "norm_label": ".resample()"
     },
     {
@@ -2204,7 +2186,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L1",
-      "community": 7,
+      "community": 6,
       "norm_label": "data cleaning and corporate action adjustment. all timeframes are derived intern",
       "id": "cleaner_rationale_1"
     },
@@ -2213,7 +2195,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L12",
-      "community": 7,
+      "community": 6,
       "norm_label": "clean and adjust raw ohlcv data.",
       "id": "cleaner_rationale_12"
     },
@@ -2222,7 +2204,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L21",
-      "community": 7,
+      "community": 6,
       "norm_label": "fill gaps in trading days (holidays etc.) using forward fill \u2014 max 3 days.",
       "id": "cleaner_rationale_21"
     },
@@ -2231,7 +2213,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L30",
-      "community": 7,
+      "community": 6,
       "norm_label": "replace negative or zero volume with nan then ffill.",
       "id": "cleaner_rationale_30"
     },
@@ -2240,7 +2222,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\cleaner.py",
       "source_location": "L37",
-      "community": 7,
+      "community": 6,
       "norm_label": "derive weekly, monthly, quarterly, yearly candles from daily data.     never cal",
       "id": "cleaner_rationale_37"
     },
@@ -2250,7 +2232,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\fetcher.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_fetcher_py",
-      "community": 6,
+      "community": 10,
       "norm_label": "fetcher.py"
     },
     {
@@ -2259,7 +2241,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\fetcher.py",
       "source_location": "L12",
       "id": "fetcher_datafetcher",
-      "community": 6,
+      "community": 10,
       "norm_label": "datafetcher"
     },
     {
@@ -2268,7 +2250,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\fetcher.py",
       "source_location": "L13",
       "id": "fetcher_datafetcher_init",
-      "community": 6,
+      "community": 10,
       "norm_label": ".__init__()"
     },
     {
@@ -2277,7 +2259,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\fetcher.py",
       "source_location": "L17",
       "id": "fetcher_datafetcher_fetch_missing_data",
-      "community": 6,
+      "community": 10,
       "norm_label": ".fetch_missing_data()"
     },
     {
@@ -2285,7 +2267,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\fetcher.py",
       "source_location": "L18",
-      "community": 6,
+      "community": 10,
       "norm_label": "fetches only missing daily data from yahoo finance.         handles provider-spe",
       "id": "fetcher_rationale_18"
     },
@@ -2295,7 +2277,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_pipeline_py",
-      "community": 7,
+      "community": 6,
       "norm_label": "pipeline.py"
     },
     {
@@ -2304,7 +2286,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L23",
       "id": "pipeline_pipelineresult",
-      "community": 7,
+      "community": 6,
       "norm_label": "pipelineresult"
     },
     {
@@ -2313,7 +2295,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L31",
       "id": "pipeline_pipelinesummary",
-      "community": 7,
+      "community": 6,
       "norm_label": "pipelinesummary"
     },
     {
@@ -2322,7 +2304,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L39",
       "id": "pipeline_datapipeline",
-      "community": 1,
+      "community": 0,
       "norm_label": "datapipeline"
     },
     {
@@ -2331,7 +2313,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L40",
       "id": "pipeline_datapipeline_init",
-      "community": 7,
+      "community": 6,
       "norm_label": ".__init__()"
     },
     {
@@ -2340,7 +2322,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L47",
       "id": "pipeline_datapipeline_run_incremental",
-      "community": 1,
+      "community": 0,
       "norm_label": ".run_incremental()"
     },
     {
@@ -2349,7 +2331,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L64",
       "id": "pipeline_datapipeline_run_full",
-      "community": 1,
+      "community": 0,
       "norm_label": ".run_full()"
     },
     {
@@ -2358,7 +2340,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L160",
       "id": "pipeline_datapipeline_process_symbol",
-      "community": 7,
+      "community": 6,
       "norm_label": "._process_symbol()"
     },
     {
@@ -2367,7 +2349,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L282",
       "id": "pipeline_df_to_records",
-      "community": 3,
+      "community": 0,
       "norm_label": "_df_to_records()"
     },
     {
@@ -2376,7 +2358,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\provider_factory.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_provider_factory_py",
-      "community": 8,
+      "community": 9,
       "norm_label": "provider_factory.py"
     },
     {
@@ -2385,7 +2367,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\provider_factory.py",
       "source_location": "L14",
       "id": "provider_factory_get_provider",
-      "community": 8,
+      "community": 9,
       "norm_label": "get_provider()"
     },
     {
@@ -2393,7 +2375,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\provider_factory.py",
       "source_location": "L1",
-      "community": 8,
+      "community": 9,
       "norm_label": "provider factory. the rest of the application uses get_provider() \u2014 never import",
       "id": "provider_factory_rationale_1"
     },
@@ -2402,7 +2384,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\provider_factory.py",
       "source_location": "L15",
-      "community": 8,
+      "community": 9,
       "norm_label": "return the configured data provider singleton.",
       "id": "provider_factory_rationale_15"
     },
@@ -2412,7 +2394,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\universe.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_universe_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "universe.py"
     },
     {
@@ -2421,7 +2403,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\universe.py",
       "source_location": "L16",
       "id": "universe_universeloader",
-      "community": 1,
+      "community": 0,
       "norm_label": "universeloader"
     },
     {
@@ -2430,7 +2412,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\universe.py",
       "source_location": "L17",
       "id": "universe_universeloader_init",
-      "community": 1,
+      "community": 0,
       "norm_label": ".__init__()"
     },
     {
@@ -2439,7 +2421,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\universe.py",
       "source_location": "L21",
       "id": "universe_universeloader_load_universe",
-      "community": 1,
+      "community": 0,
       "norm_label": ".load_universe()"
     },
     {
@@ -2448,7 +2430,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\universe.py",
       "source_location": "L55",
       "id": "universe_universeloader_ensure_benchmark",
-      "community": 1,
+      "community": 0,
       "norm_label": "._ensure_benchmark()"
     },
     {
@@ -2457,7 +2439,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_validator_py",
-      "community": 7,
+      "community": 6,
       "norm_label": "validator.py"
     },
     {
@@ -2466,7 +2448,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L19",
       "id": "validator_ohlcvvalidator",
-      "community": 7,
+      "community": 6,
       "norm_label": "ohlcvvalidator"
     },
     {
@@ -2475,7 +2457,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L20",
       "id": "validator_ohlcvvalidator_init",
-      "community": 7,
+      "community": 6,
       "norm_label": ".__init__()"
     },
     {
@@ -2484,7 +2466,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L23",
       "id": "validator_ohlcvvalidator_validate",
-      "community": 7,
+      "community": 6,
       "norm_label": ".validate()"
     },
     {
@@ -2493,7 +2475,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L47",
       "id": "validator_ohlcvvalidator_remove_duplicate_dates",
-      "community": 7,
+      "community": 6,
       "norm_label": "._remove_duplicate_dates()"
     },
     {
@@ -2502,7 +2484,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L54",
       "id": "validator_ohlcvvalidator_remove_zero_price_rows",
-      "community": 7,
+      "community": 6,
       "norm_label": "._remove_zero_price_rows()"
     },
     {
@@ -2511,7 +2493,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L61",
       "id": "validator_ohlcvvalidator_remove_ohlc_inconsistencies",
-      "community": 7,
+      "community": 6,
       "norm_label": "._remove_ohlc_inconsistencies()"
     },
     {
@@ -2520,7 +2502,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L69",
       "id": "validator_ohlcvvalidator_remove_extreme_gaps",
-      "community": 7,
+      "community": 6,
       "norm_label": "._remove_extreme_gaps()"
     },
     {
@@ -2529,7 +2511,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L83",
       "id": "validator_ohlcvvalidator_enforce_min_records",
-      "community": 7,
+      "community": 6,
       "norm_label": "._enforce_min_records()"
     },
     {
@@ -2537,7 +2519,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L1",
-      "community": 7,
+      "community": 6,
       "norm_label": "data validation layer. checks ohlcv dataframes before they enter the database.",
       "id": "validator_rationale_1"
     },
@@ -2546,7 +2528,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L24",
-      "community": 7,
+      "community": 6,
       "norm_label": "run all validation checks. raises datavalidationerror on hard failures.",
       "id": "validator_rationale_24"
     },
@@ -2555,7 +2537,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L62",
-      "community": 7,
+      "community": 6,
       "norm_label": "remove rows where high < low or close is outside [low, high].",
       "id": "validator_rationale_62"
     },
@@ -2564,7 +2546,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L70",
-      "community": 7,
+      "community": 6,
       "norm_label": "remove rows with price changes > max_gap_pct (likely data errors).",
       "id": "validator_rationale_70"
     },
@@ -2574,7 +2556,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_init_py",
-      "community": 34,
+      "community": 33,
       "norm_label": "__init__.py"
     },
     {
@@ -2583,7 +2565,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_providers_base_py",
-      "community": 6,
+      "community": 10,
       "norm_label": "base.py"
     },
     {
@@ -2592,7 +2574,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L13",
       "id": "base_dataprovider",
-      "community": 8,
+      "community": 9,
       "norm_label": "dataprovider"
     },
     {
@@ -2601,7 +2583,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L85",
       "id": "base_name",
-      "community": 6,
+      "community": 10,
       "norm_label": "name()"
     },
     {
@@ -2610,7 +2592,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L26",
       "id": "base_fetch_ohlcv",
-      "community": 6,
+      "community": 10,
       "norm_label": "fetch_ohlcv()"
     },
     {
@@ -2619,7 +2601,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L43",
       "id": "base_fetch_bulk_ohlcv",
-      "community": 6,
+      "community": 10,
       "norm_label": "fetch_bulk_ohlcv()"
     },
     {
@@ -2628,7 +2610,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L59",
       "id": "base_fetch_metadata",
-      "community": 6,
+      "community": 10,
       "norm_label": "fetch_metadata()"
     },
     {
@@ -2637,7 +2619,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L66",
       "id": "base_dataprovider_health_check",
-      "community": 8,
+      "community": 9,
       "norm_label": ".health_check()"
     },
     {
@@ -2645,7 +2627,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L1",
-      "community": 0,
+      "community": 1,
       "norm_label": "basestrategy contract. strategies inherit this, implement generate_signals(), an",
       "id": "base_rationale_1"
     },
@@ -2654,7 +2636,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L14",
-      "community": 8,
+      "community": 9,
       "norm_label": "provider-agnostic interface for fetching ohlcv data and stock metadata.     impl",
       "id": "base_rationale_14"
     },
@@ -2663,7 +2645,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L22",
-      "community": 35,
+      "community": 34,
       "norm_label": "unique provider identifier e.g. 'yfinance'.",
       "id": "base_rationale_22"
     },
@@ -2672,7 +2654,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L33",
-      "community": 36,
+      "community": 35,
       "norm_label": "fetch ohlcv data for a single symbol.          returns:             dataframe wi",
       "id": "base_rationale_33"
     },
@@ -2681,7 +2663,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L50",
-      "community": 37,
+      "community": 36,
       "norm_label": "fetch ohlcv for multiple symbols efficiently (batch/parallel where supported).",
       "id": "base_rationale_50"
     },
@@ -2690,7 +2672,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L60",
-      "community": 38,
+      "community": 37,
       "norm_label": "fetch company metadata: name, sector, industry, market cap, isin.         return",
       "id": "base_rationale_60"
     },
@@ -2699,7 +2681,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\base.py",
       "source_location": "L67",
-      "community": 8,
+      "community": 9,
       "norm_label": "return true if provider is reachable. default implementation always true.",
       "id": "base_rationale_67"
     },
@@ -2709,7 +2691,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_providers_yfinance_provider_py",
-      "community": 8,
+      "community": 9,
       "norm_label": "yfinance_provider.py"
     },
     {
@@ -2718,7 +2700,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L34",
       "id": "yfinance_provider_yfinanceprovider",
-      "community": 8,
+      "community": 9,
       "norm_label": "yfinanceprovider"
     },
     {
@@ -2727,7 +2709,7 @@
       "source_file": "",
       "source_location": "",
       "id": "dataprovider",
-      "community": 8,
+      "community": 9,
       "norm_label": "dataprovider"
     },
     {
@@ -2736,7 +2718,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L41",
       "id": "yfinance_provider_yfinanceprovider_init",
-      "community": 8,
+      "community": 9,
       "norm_label": ".__init__()"
     },
     {
@@ -2745,7 +2727,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L46",
       "id": "yfinance_provider_name",
-      "community": 8,
+      "community": 9,
       "norm_label": "name()"
     },
     {
@@ -2754,7 +2736,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L50",
       "id": "yfinance_provider_normalize_symbol",
-      "community": 8,
+      "community": 9,
       "norm_label": "normalize_symbol()"
     },
     {
@@ -2763,7 +2745,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L59",
       "id": "yfinance_provider_yfinanceprovider_clean_dataframe",
-      "community": 8,
+      "community": 9,
       "norm_label": "._clean_dataframe()"
     },
     {
@@ -2772,7 +2754,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L105",
       "id": "yfinance_provider_fetch_ohlcv",
-      "community": 8,
+      "community": 9,
       "norm_label": "fetch_ohlcv()"
     },
     {
@@ -2781,7 +2763,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L136",
       "id": "yfinance_provider_yfinanceprovider_fetch_bulk_ohlcv",
-      "community": 8,
+      "community": 9,
       "norm_label": ".fetch_bulk_ohlcv()"
     },
     {
@@ -2790,7 +2772,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L183",
       "id": "yfinance_provider_yfinanceprovider_fetch_metadata",
-      "community": 8,
+      "community": 9,
       "norm_label": ".fetch_metadata()"
     },
     {
@@ -2799,7 +2781,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L203",
       "id": "yfinance_provider_yfinanceprovider_health_check",
-      "community": 8,
+      "community": 9,
       "norm_label": ".health_check()"
     },
     {
@@ -2807,7 +2789,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L1",
-      "community": 8,
+      "community": 9,
       "norm_label": "yfinance data provider implementation. handles nse/bse symbol normalization, rat",
       "id": "yfinance_provider_rationale_1"
     },
@@ -2816,7 +2798,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L35",
-      "community": 8,
+      "community": 9,
       "norm_label": "yfinance-backed provider.     bulk downloads use yf.download() for performance.",
       "id": "yfinance_provider_rationale_35"
     },
@@ -2825,7 +2807,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L51",
-      "community": 8,
+      "community": 9,
       "norm_label": "convert plain nse symbol to yfinance format e.g. reliance -> reliance.ns",
       "id": "yfinance_provider_rationale_51"
     },
@@ -2834,7 +2816,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L60",
-      "community": 8,
+      "community": 9,
       "norm_label": "normalize column names, drop nan rows, ensure correct dtypes.",
       "id": "yfinance_provider_rationale_60"
     },
@@ -2843,7 +2825,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L143",
-      "community": 8,
+      "community": 9,
       "norm_label": "download all symbols in one yf.download() call \u2014 far more efficient than n calls",
       "id": "yfinance_provider_rationale_143"
     },
@@ -2853,7 +2835,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_data_providers_init_py",
-      "community": 39,
+      "community": 38,
       "norm_label": "__init__.py"
     },
     {
@@ -2898,7 +2880,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L60",
       "id": "connection_get_sync_session",
-      "community": 3,
+      "community": 2,
       "norm_label": "get_sync_session()"
     },
     {
@@ -2934,7 +2916,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_database_models_py",
-      "community": 1,
+      "community": 3,
       "norm_label": "models.py"
     },
     {
@@ -2943,7 +2925,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L24",
       "id": "models_base",
-      "community": 1,
+      "community": 3,
       "norm_label": "base"
     },
     {
@@ -2952,7 +2934,7 @@
       "source_file": "",
       "source_location": "",
       "id": "declarativebase",
-      "community": 1,
+      "community": 3,
       "norm_label": "declarativebase"
     },
     {
@@ -2961,7 +2943,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L28",
       "id": "models_uuid",
-      "community": 4,
+      "community": 8,
       "norm_label": "_uuid()"
     },
     {
@@ -2970,7 +2952,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L32",
       "id": "models_stock",
-      "community": 1,
+      "community": 3,
       "norm_label": "stock"
     },
     {
@@ -2979,7 +2961,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L73",
       "id": "models_ohlcv",
-      "community": 7,
+      "community": 6,
       "norm_label": "ohlcv"
     },
     {
@@ -2988,7 +2970,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L100",
       "id": "models_scanjob",
-      "community": 1,
+      "community": 0,
       "norm_label": "scanjob"
     },
     {
@@ -2997,7 +2979,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L142",
       "id": "models_signal",
-      "community": 1,
+      "community": 0,
       "norm_label": "signal"
     },
     {
@@ -3006,7 +2988,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L190",
       "id": "models_recommendation",
-      "community": 1,
+      "community": 0,
       "norm_label": "recommendation"
     },
     {
@@ -3015,7 +2997,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L245",
       "id": "models_backtestresult",
-      "community": 4,
+      "community": 3,
       "norm_label": "backtestresult"
     },
     {
@@ -3024,7 +3006,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L275",
       "id": "models_replaysession",
-      "community": 1,
+      "community": 3,
       "norm_label": "replaysession"
     },
     {
@@ -3033,7 +3015,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_database_init_py",
-      "community": 40,
+      "community": 39,
       "norm_label": "__init__.py"
     },
     {
@@ -3042,7 +3024,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\base.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_database_repositories_base_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "base.py"
     },
     {
@@ -3051,7 +3033,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\base.py",
       "source_location": "L16",
       "id": "base_baserepository",
-      "community": 1,
+      "community": 0,
       "norm_label": "baserepository"
     },
     {
@@ -3060,7 +3042,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\base.py",
       "source_location": "L17",
       "id": "base_baserepository_init",
-      "community": 1,
+      "community": 0,
       "norm_label": ".__init__()"
     },
     {
@@ -3069,7 +3051,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\base.py",
       "source_location": "L21",
       "id": "base_baserepository_get_by_id",
-      "community": 1,
+      "community": 0,
       "norm_label": ".get_by_id()"
     },
     {
@@ -3078,7 +3060,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\base.py",
       "source_location": "L24",
       "id": "base_baserepository_all",
-      "community": 1,
+      "community": 0,
       "norm_label": ".all()"
     },
     {
@@ -3087,7 +3069,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\base.py",
       "source_location": "L27",
       "id": "base_baserepository_add",
-      "community": 1,
+      "community": 0,
       "norm_label": ".add()"
     },
     {
@@ -3096,7 +3078,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\base.py",
       "source_location": "L32",
       "id": "base_baserepository_add_all",
-      "community": 1,
+      "community": 0,
       "norm_label": ".add_all()"
     },
     {
@@ -3105,7 +3087,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\base.py",
       "source_location": "L36",
       "id": "base_baserepository_delete",
-      "community": 1,
+      "community": 2,
       "norm_label": ".delete()"
     },
     {
@@ -3114,7 +3096,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_database_repositories_market_data_py",
-      "community": 6,
+      "community": 7,
       "norm_label": "market_data.py"
     },
     {
@@ -3123,7 +3105,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L9",
       "id": "market_data_marketdatarepository",
-      "community": 6,
+      "community": 7,
       "norm_label": "marketdatarepository"
     },
     {
@@ -3132,7 +3114,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L10",
       "id": "market_data_marketdatarepository_init",
-      "community": 6,
+      "community": 7,
       "norm_label": ".__init__()"
     },
     {
@@ -3141,7 +3123,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L13",
       "id": "market_data_marketdatarepository_get_stock_by_symbol",
-      "community": 6,
+      "community": 7,
       "norm_label": ".get_stock_by_symbol()"
     },
     {
@@ -3150,7 +3132,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L17",
       "id": "market_data_marketdatarepository_get_active_stocks",
-      "community": 6,
+      "community": 7,
       "norm_label": ".get_active_stocks()"
     },
     {
@@ -3159,7 +3141,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L21",
       "id": "market_data_marketdatarepository_get_latest_ohlcv_date",
-      "community": 6,
+      "community": 7,
       "norm_label": ".get_latest_ohlcv_date()"
     },
     {
@@ -3168,7 +3150,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L27",
       "id": "market_data_marketdatarepository_get_earliest_ohlcv_date",
-      "community": 6,
+      "community": 7,
       "norm_label": ".get_earliest_ohlcv_date()"
     },
     {
@@ -3177,7 +3159,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L33",
       "id": "market_data_marketdatarepository_get_ohlcv_data",
-      "community": 6,
+      "community": 7,
       "norm_label": ".get_ohlcv_data()"
     },
     {
@@ -3186,7 +3168,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\market_data.py",
       "source_location": "L39",
       "id": "market_data_marketdatarepository_bulk_insert_ohlcv",
-      "community": 6,
+      "community": 7,
       "norm_label": ".bulk_insert_ohlcv()"
     },
     {
@@ -3195,7 +3177,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_database_repositories_ohlcv_repo_py",
-      "community": 3,
+      "community": 0,
       "norm_label": "ohlcv_repo.py"
     },
     {
@@ -3204,7 +3186,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L15",
       "id": "ohlcv_repo_ohlcvrepository",
-      "community": 3,
+      "community": 0,
       "norm_label": "ohlcvrepository"
     },
     {
@@ -3213,7 +3195,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L16",
       "id": "ohlcv_repo_ohlcvrepository_init",
-      "community": 3,
+      "community": 0,
       "norm_label": ".__init__()"
     },
     {
@@ -3222,7 +3204,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L19",
       "id": "ohlcv_repo_ohlcvrepository_get_range",
-      "community": 3,
+      "community": 0,
       "norm_label": ".get_range()"
     },
     {
@@ -3231,7 +3213,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L33",
       "id": "ohlcv_repo_ohlcvrepository_get_coverage",
-      "community": 3,
+      "community": 0,
       "norm_label": ".get_coverage()"
     },
     {
@@ -3240,7 +3222,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L40",
       "id": "ohlcv_repo_ohlcvrepository_get_latest_date",
-      "community": 3,
+      "community": 0,
       "norm_label": ".get_latest_date()"
     },
     {
@@ -3249,7 +3231,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L48",
       "id": "ohlcv_repo_ohlcvrepository_get_latest_close",
-      "community": 3,
+      "community": 0,
       "norm_label": ".get_latest_close()"
     },
     {
@@ -3258,7 +3240,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L56",
       "id": "ohlcv_repo_ohlcvrepository_to_dataframe",
-      "community": 3,
+      "community": 0,
       "norm_label": ".to_dataframe()"
     },
     {
@@ -3267,7 +3249,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L76",
       "id": "ohlcv_repo_ohlcvrepository_bulk_insert_ignore",
-      "community": 3,
+      "community": 0,
       "norm_label": ".bulk_insert_ignore()"
     },
     {
@@ -3276,7 +3258,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\ohlcv_repo.py",
       "source_location": "L109",
       "id": "ohlcv_repo_ohlcvrepository_replace_timeframe",
-      "community": 3,
+      "community": 0,
       "norm_label": ".replace_timeframe()"
     },
     {
@@ -3285,7 +3267,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_database_repositories_signal_repo_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "signal_repo.py"
     },
     {
@@ -3294,7 +3276,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L13",
       "id": "signal_repo_signalrepository",
-      "community": 1,
+      "community": 0,
       "norm_label": "signalrepository"
     },
     {
@@ -3303,7 +3285,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L14",
       "id": "signal_repo_signalrepository_init",
-      "community": 3,
+      "community": 2,
       "norm_label": ".__init__()"
     },
     {
@@ -3312,7 +3294,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L17",
       "id": "signal_repo_signalrepository_get_by_stock_date",
-      "community": 3,
+      "community": 2,
       "norm_label": ".get_by_stock_date()"
     },
     {
@@ -3321,7 +3303,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L26",
       "id": "signal_repo_recommendationrepository",
-      "community": 3,
+      "community": 2,
       "norm_label": "recommendationrepository"
     },
     {
@@ -3330,7 +3312,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L27",
       "id": "signal_repo_recommendationrepository_init",
-      "community": 3,
+      "community": 2,
       "norm_label": ".__init__()"
     },
     {
@@ -3339,7 +3321,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L30",
       "id": "signal_repo_recommendationrepository_get_by_scan",
-      "community": 3,
+      "community": 2,
       "norm_label": ".get_by_scan()"
     },
     {
@@ -3348,7 +3330,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L38",
       "id": "signal_repo_recommendationrepository_get_by_date",
-      "community": 3,
+      "community": 2,
       "norm_label": ".get_by_date()"
     },
     {
@@ -3357,7 +3339,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L52",
       "id": "signal_repo_recommendationrepository_get_latest",
-      "community": 3,
+      "community": 2,
       "norm_label": ".get_latest()"
     },
     {
@@ -3366,7 +3348,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L72",
       "id": "signal_repo_recommendationrepository_get_latest_scan",
-      "community": 3,
+      "community": 2,
       "norm_label": ".get_latest_scan()"
     },
     {
@@ -3375,7 +3357,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\signal_repo.py",
       "source_location": "L83",
       "id": "signal_repo_recommendationrepository_get_available_dates",
-      "community": 3,
+      "community": 2,
       "norm_label": ".get_available_dates()"
     },
     {
@@ -3384,7 +3366,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\stock_repo.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_database_repositories_stock_repo_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "stock_repo.py"
     },
     {
@@ -3393,7 +3375,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\stock_repo.py",
       "source_location": "L13",
       "id": "stock_repo_stockrepository",
-      "community": 1,
+      "community": 0,
       "norm_label": "stockrepository"
     },
     {
@@ -3402,7 +3384,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\stock_repo.py",
       "source_location": "L14",
       "id": "stock_repo_stockrepository_init",
-      "community": 1,
+      "community": 0,
       "norm_label": ".__init__()"
     },
     {
@@ -3411,7 +3393,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\stock_repo.py",
       "source_location": "L17",
       "id": "stock_repo_stockrepository_get_by_symbol",
-      "community": 1,
+      "community": 0,
       "norm_label": ".get_by_symbol()"
     },
     {
@@ -3420,7 +3402,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\stock_repo.py",
       "source_location": "L28",
       "id": "stock_repo_stockrepository_get_active",
-      "community": 1,
+      "community": 0,
       "norm_label": ".get_active()"
     },
     {
@@ -3429,7 +3411,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\stock_repo.py",
       "source_location": "L40",
       "id": "stock_repo_stockrepository_upsert",
-      "community": 1,
+      "community": 0,
       "norm_label": ".upsert()"
     },
     {
@@ -3438,7 +3420,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\stock_repo.py",
       "source_location": "L69",
       "id": "stock_repo_stockrepository_bulk_upsert",
-      "community": 1,
+      "community": 0,
       "norm_label": ".bulk_upsert()"
     },
     {
@@ -3447,7 +3429,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\repositories\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_database_repositories_init_py",
-      "community": 41,
+      "community": 40,
       "norm_label": "__init__.py"
     },
     {
@@ -3456,7 +3438,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\base.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_indicators_base_py",
-      "community": 6,
+      "community": 10,
       "norm_label": "base.py"
     },
     {
@@ -3465,7 +3447,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\base.py",
       "source_location": "L14",
       "id": "base_baseindicator",
-      "community": 5,
+      "community": 4,
       "norm_label": "baseindicator"
     },
     {
@@ -3474,7 +3456,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\base.py",
       "source_location": "L25",
       "id": "base_compute",
-      "community": 6,
+      "community": 10,
       "norm_label": "compute()"
     },
     {
@@ -3483,7 +3465,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\base.py",
       "source_location": "L38",
       "id": "base_baseindicator_call",
-      "community": 6,
+      "community": 10,
       "norm_label": ".__call__()"
     },
     {
@@ -3491,7 +3473,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\base.py",
       "source_location": "L15",
-      "community": 5,
+      "community": 4,
       "norm_label": "all indicators extend this.     subclasses implement compute() using vectorized",
       "id": "base_rationale_15"
     },
@@ -3500,7 +3482,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L26",
-      "community": 0,
+      "community": 1,
       "norm_label": "standardized output from every strategy \u2014 the engine only knows this type.",
       "id": "base_rationale_26"
     },
@@ -3510,7 +3492,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_indicators_calculator_py",
-      "community": 11,
+      "community": 7,
       "norm_label": "calculator.py"
     },
     {
@@ -3519,7 +3501,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L14",
       "id": "calculator_indicatorbundle",
-      "community": 11,
+      "community": 7,
       "norm_label": "indicatorbundle"
     },
     {
@@ -3528,7 +3510,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L20",
       "id": "calculator_indicatorcalculator",
-      "community": 11,
+      "community": 7,
       "norm_label": "indicatorcalculator"
     },
     {
@@ -3537,7 +3519,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L24",
       "id": "calculator_build",
-      "community": 11,
+      "community": 7,
       "norm_label": "build()"
     },
     {
@@ -3546,7 +3528,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L33",
       "id": "calculator_require_length",
-      "community": 11,
+      "community": 7,
       "norm_label": "_require_length()"
     },
     {
@@ -3555,7 +3537,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L38",
       "id": "calculator_add_daily_indicators",
-      "community": 11,
+      "community": 7,
       "norm_label": "add_daily_indicators()"
     },
     {
@@ -3564,7 +3546,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L67",
       "id": "calculator_add_weekly_indicators",
-      "community": 11,
+      "community": 7,
       "norm_label": "add_weekly_indicators()"
     },
     {
@@ -3573,7 +3555,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L100",
       "id": "calculator_add_relative_strength",
-      "community": 11,
+      "community": 7,
       "norm_label": "add_relative_strength()"
     },
     {
@@ -3582,7 +3564,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L111",
       "id": "calculator_validate_required_columns",
-      "community": 11,
+      "community": 7,
       "norm_label": "validate_required_columns()"
     },
     {
@@ -3591,7 +3573,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_indicators_momentum_py",
-      "community": 5,
+      "community": 4,
       "norm_label": "momentum.py"
     },
     {
@@ -3600,7 +3582,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L12",
       "id": "momentum_rsi",
-      "community": 5,
+      "community": 4,
       "norm_label": "rsi"
     },
     {
@@ -3609,7 +3591,7 @@
       "source_file": "",
       "source_location": "",
       "id": "baseindicator",
-      "community": 5,
+      "community": 4,
       "norm_label": "baseindicator"
     },
     {
@@ -3618,7 +3600,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L15",
       "id": "momentum_rsi_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3627,7 +3609,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L26",
       "id": "momentum_stochastic",
-      "community": 5,
+      "community": 4,
       "norm_label": "stochastic"
     },
     {
@@ -3636,7 +3618,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L29",
       "id": "momentum_stochastic_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3645,7 +3627,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L42",
       "id": "momentum_williamsr",
-      "community": 5,
+      "community": 4,
       "norm_label": "williamsr"
     },
     {
@@ -3654,7 +3636,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L45",
       "id": "momentum_williamsr_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3663,7 +3645,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L52",
       "id": "momentum_cci",
-      "community": 5,
+      "community": 4,
       "norm_label": "cci"
     },
     {
@@ -3672,7 +3654,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L55",
       "id": "momentum_cci_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3681,7 +3663,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L65",
       "id": "momentum_roc",
-      "community": 5,
+      "community": 4,
       "norm_label": "roc"
     },
     {
@@ -3690,7 +3672,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L70",
       "id": "momentum_roc_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3698,7 +3680,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\momentum.py",
       "source_location": "L1",
-      "community": 5,
+      "community": 4,
       "norm_label": "momentum indicators: rsi, stochastic, williams %r, cci, roc.",
       "id": "momentum_rationale_1"
     },
@@ -3708,7 +3690,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\standardized.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_indicators_standardized_py",
-      "community": 11,
+      "community": 7,
       "norm_label": "standardized.py"
     },
     {
@@ -3717,7 +3699,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\standardized.py",
       "source_location": "L6",
       "id": "standardized_sma",
-      "community": 11,
+      "community": 7,
       "norm_label": "sma()"
     },
     {
@@ -3726,7 +3708,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\standardized.py",
       "source_location": "L10",
       "id": "standardized_ema",
-      "community": 11,
+      "community": 7,
       "norm_label": "ema()"
     },
     {
@@ -3735,7 +3717,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\standardized.py",
       "source_location": "L14",
       "id": "standardized_wilders_rma",
-      "community": 11,
+      "community": 7,
       "norm_label": "wilders_rma()"
     },
     {
@@ -3744,7 +3726,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\standardized.py",
       "source_location": "L18",
       "id": "standardized_average_true_range",
-      "community": 11,
+      "community": 7,
       "norm_label": "average_true_range()"
     },
     {
@@ -3753,7 +3735,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\standardized.py",
       "source_location": "L31",
       "id": "standardized_relative_strength_index",
-      "community": 11,
+      "community": 7,
       "norm_label": "relative_strength_index()"
     },
     {
@@ -3762,7 +3744,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_indicators_trend_py",
-      "community": 5,
+      "community": 4,
       "norm_label": "trend.py"
     },
     {
@@ -3771,7 +3753,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L14",
       "id": "trend_ema",
-      "community": 5,
+      "community": 4,
       "norm_label": "ema"
     },
     {
@@ -3780,7 +3762,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L17",
       "id": "trend_ema_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3789,7 +3771,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L21",
       "id": "trend_sma",
-      "community": 5,
+      "community": 4,
       "norm_label": "sma"
     },
     {
@@ -3798,7 +3780,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L24",
       "id": "trend_sma_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3807,7 +3789,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L28",
       "id": "trend_macd",
-      "community": 5,
+      "community": 4,
       "norm_label": "macd"
     },
     {
@@ -3816,7 +3798,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L31",
       "id": "trend_macd_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3825,7 +3807,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L49",
       "id": "trend_adx",
-      "community": 5,
+      "community": 4,
       "norm_label": "adx"
     },
     {
@@ -3834,7 +3816,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L54",
       "id": "trend_adx_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3843,7 +3825,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L92",
       "id": "trend_supertrend",
-      "community": 5,
+      "community": 4,
       "norm_label": "supertrend"
     },
     {
@@ -3852,7 +3834,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L95",
       "id": "trend_supertrend_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3860,7 +3842,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L1",
-      "community": 5,
+      "community": 4,
       "norm_label": "trend indicators: ema, sma, macd, supertrend, adx. all vectorized \u2014 no python lo",
       "id": "trend_rationale_1"
     },
@@ -3869,7 +3851,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L50",
-      "community": 5,
+      "community": 4,
       "norm_label": "average directional index + di+/di- (wilder's).",
       "id": "trend_rationale_50"
     },
@@ -3879,7 +3861,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_indicators_volatility_py",
-      "community": 5,
+      "community": 4,
       "norm_label": "volatility.py"
     },
     {
@@ -3888,7 +3870,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L12",
       "id": "volatility_atr",
-      "community": 5,
+      "community": 4,
       "norm_label": "atr"
     },
     {
@@ -3897,7 +3879,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L17",
       "id": "volatility_atr_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3906,7 +3888,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L32",
       "id": "volatility_bollingerbands",
-      "community": 5,
+      "community": 4,
       "norm_label": "bollingerbands"
     },
     {
@@ -3915,7 +3897,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L35",
       "id": "volatility_bollingerbands_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3924,7 +3906,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L61",
       "id": "volatility_keltnerchannels",
-      "community": 5,
+      "community": 4,
       "norm_label": "keltnerchannels"
     },
     {
@@ -3933,7 +3915,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L64",
       "id": "volatility_keltnerchannels_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3941,7 +3923,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L1",
-      "community": 5,
+      "community": 4,
       "norm_label": "volatility indicators: atr, bollinger bands, keltner channels.",
       "id": "volatility_rationale_1"
     },
@@ -3950,7 +3932,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volatility.py",
       "source_location": "L13",
-      "community": 5,
+      "community": 4,
       "norm_label": "average true range (wilder's smoothing).",
       "id": "volatility_rationale_13"
     },
@@ -3960,7 +3942,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_indicators_volume_py",
-      "community": 5,
+      "community": 4,
       "norm_label": "volume.py"
     },
     {
@@ -3969,7 +3951,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L12",
       "id": "volume_obv",
-      "community": 5,
+      "community": 4,
       "norm_label": "obv"
     },
     {
@@ -3978,7 +3960,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L17",
       "id": "volume_obv_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -3987,7 +3969,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L23",
       "id": "volume_vwap",
-      "community": 5,
+      "community": 4,
       "norm_label": "vwap"
     },
     {
@@ -3996,7 +3978,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L32",
       "id": "volume_vwap_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -4005,7 +3987,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L39",
       "id": "volume_volumesma",
-      "community": 5,
+      "community": 4,
       "norm_label": "volumesma"
     },
     {
@@ -4014,7 +3996,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L44",
       "id": "volume_volumesma_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -4023,7 +4005,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L48",
       "id": "volume_mfi",
-      "community": 5,
+      "community": 4,
       "norm_label": "mfi"
     },
     {
@@ -4032,7 +4014,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L53",
       "id": "volume_mfi_compute",
-      "community": 5,
+      "community": 4,
       "norm_label": ".compute()"
     },
     {
@@ -4040,7 +4022,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L1",
-      "community": 5,
+      "community": 4,
       "norm_label": "volume indicators: obv, vwap, volume sma, money flow index.",
       "id": "volume_rationale_1"
     },
@@ -4049,7 +4031,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L24",
-      "community": 5,
+      "community": 4,
       "norm_label": "volume weighted average price.     resets daily \u2014 works correctly on daily bars",
       "id": "volume_rationale_24"
     },
@@ -4058,7 +4040,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L40",
-      "community": 5,
+      "community": 4,
       "norm_label": "simple moving average of volume \u2014 identifies above/below average volume days.",
       "id": "volume_rationale_40"
     },
@@ -4067,7 +4049,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\volume.py",
       "source_location": "L49",
-      "community": 5,
+      "community": 4,
       "norm_label": "money flow index \u2014 volume-weighted rsi.",
       "id": "volume_rationale_49"
     },
@@ -4077,7 +4059,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_indicators_init_py",
-      "community": 42,
+      "community": 41,
       "norm_label": "__init__.py"
     },
     {
@@ -4086,7 +4068,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_recommendations_scanner_py",
-      "community": 1,
+      "community": 0,
       "norm_label": "scanner.py"
     },
     {
@@ -4095,7 +4077,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L28",
       "id": "scanner_scanresult",
-      "community": 1,
+      "community": 0,
       "norm_label": "scanresult"
     },
     {
@@ -4104,7 +4086,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L40",
       "id": "scanner_recommendationscanner",
-      "community": 1,
+      "community": 0,
       "norm_label": "recommendationscanner"
     },
     {
@@ -4113,7 +4095,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L41",
       "id": "scanner_recommendationscanner_init",
-      "community": 9,
+      "community": 2,
       "norm_label": ".__init__()"
     },
     {
@@ -4122,7 +4104,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L58",
       "id": "scanner_recommendationscanner_scan",
-      "community": 1,
+      "community": 0,
       "norm_label": ".scan()"
     },
     {
@@ -4131,7 +4113,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L276",
       "id": "scanner_recommendationscanner_save_single_recommendation",
-      "community": 1,
+      "community": 0,
       "norm_label": "._save_single_recommendation()"
     },
     {
@@ -4140,7 +4122,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L336",
       "id": "scanner_recommendationscanner_update_scan_job_progress",
-      "community": 9,
+      "community": 2,
       "norm_label": "._update_scan_job_progress()"
     },
     {
@@ -4149,7 +4131,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L352",
       "id": "scanner_recommendationscanner_load_universe_and_stocks",
-      "community": 1,
+      "community": 0,
       "norm_label": "._load_universe_and_stocks()"
     },
     {
@@ -4158,7 +4140,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L357",
       "id": "scanner_recommendationscanner_create_scan_job",
-      "community": 1,
+      "community": 2,
       "norm_label": "._create_scan_job()"
     },
     {
@@ -4167,7 +4149,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L397",
       "id": "scanner_recommendationscanner_load_strategy_context",
-      "community": 3,
+      "community": 0,
       "norm_label": "._load_strategy_context()"
     },
     {
@@ -4176,7 +4158,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L428",
       "id": "scanner_recommendationscanner_persist_scan_results",
-      "community": 1,
+      "community": 0,
       "norm_label": "._persist_scan_results()"
     },
     {
@@ -4185,7 +4167,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L492",
       "id": "scanner_recommendationscanner_complete_scan_job",
-      "community": 9,
+      "community": 2,
       "norm_label": "._complete_scan_job()"
     },
     {
@@ -4194,7 +4176,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L507",
       "id": "scanner_recommendationscanner_fail_scan_job",
-      "community": 9,
+      "community": 2,
       "norm_label": "._fail_scan_job()"
     },
     {
@@ -4203,7 +4185,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\validator.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_recommendations_validator_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "validator.py"
     },
     {
@@ -4212,7 +4194,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\validator.py",
       "source_location": "L14",
       "id": "validator_validationresult",
-      "community": 0,
+      "community": 1,
       "norm_label": "validationresult"
     },
     {
@@ -4221,7 +4203,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\validator.py",
       "source_location": "L19",
       "id": "validator_recommendationvalidator",
-      "community": 0,
+      "community": 1,
       "norm_label": "recommendationvalidator"
     },
     {
@@ -4230,7 +4212,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\validator.py",
       "source_location": "L20",
       "id": "validator_recommendationvalidator_validate",
-      "community": 0,
+      "community": 1,
       "norm_label": ".validate()"
     },
     {
@@ -4239,7 +4221,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_recommendations_init_py",
-      "community": 43,
+      "community": 42,
       "norm_label": "__init__.py"
     },
     {
@@ -4248,7 +4230,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_replay_engine_py",
-      "community": 2,
+      "community": 4,
       "norm_label": "engine.py"
     },
     {
@@ -4257,7 +4239,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L25",
       "id": "engine_replaystate",
-      "community": 5,
+      "community": 4,
       "norm_label": "replaystate"
     },
     {
@@ -4266,7 +4248,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L44",
       "id": "engine_progress_pct",
-      "community": 2,
+      "community": 4,
       "norm_label": "progress_pct()"
     },
     {
@@ -4275,7 +4257,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L48",
       "id": "engine_replaysession",
-      "community": 2,
+      "community": 8,
       "norm_label": "replaysession"
     },
     {
@@ -4284,7 +4266,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L49",
       "id": "engine_replaysession_init",
-      "community": 2,
+      "community": 8,
       "norm_label": ".__init__()"
     },
     {
@@ -4293,7 +4275,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L60",
       "id": "engine_is_complete",
-      "community": 2,
+      "community": 4,
       "norm_label": "is_complete()"
     },
     {
@@ -4302,7 +4284,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L63",
       "id": "engine_replaysession_current_state",
-      "community": 2,
+      "community": 8,
       "norm_label": ".current_state()"
     },
     {
@@ -4311,7 +4293,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L98",
       "id": "engine_replaysession_step_forward",
-      "community": 2,
+      "community": 8,
       "norm_label": ".step_forward()"
     },
     {
@@ -4320,7 +4302,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L102",
       "id": "engine_replaysession_step_backward",
-      "community": 2,
+      "community": 8,
       "norm_label": ".step_backward()"
     },
     {
@@ -4329,7 +4311,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L106",
       "id": "engine_replaysession_jump_to_date",
-      "community": 2,
+      "community": 8,
       "norm_label": ".jump_to_date()"
     },
     {
@@ -4338,7 +4320,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L111",
       "id": "engine_replaysession_restart",
-      "community": 2,
+      "community": 8,
       "norm_label": ".restart()"
     },
     {
@@ -4347,7 +4329,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L117",
       "id": "engine_replaysession_compute_indicators",
-      "community": 5,
+      "community": 4,
       "norm_label": "._compute_indicators()"
     },
     {
@@ -4356,7 +4338,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L135",
       "id": "engine_replayengine",
-      "community": 2,
+      "community": 5,
       "norm_label": "replayengine"
     },
     {
@@ -4365,7 +4347,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L136",
       "id": "engine_replayengine_init",
-      "community": 2,
+      "community": 5,
       "norm_label": ".__init__()"
     },
     {
@@ -4374,7 +4356,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L139",
       "id": "engine_replayengine_create_session",
-      "community": 2,
+      "community": 5,
       "norm_label": ".create_session()"
     },
     {
@@ -4383,7 +4365,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L161",
       "id": "engine_replayengine_get_session",
-      "community": 2,
+      "community": 8,
       "norm_label": ".get_session()"
     },
     {
@@ -4392,7 +4374,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L166",
       "id": "engine_replayengine_destroy_session",
-      "community": 2,
+      "community": 5,
       "norm_label": ".destroy_session()"
     },
     {
@@ -4400,7 +4382,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\engine.py",
       "source_location": "L1",
-      "community": 5,
+      "community": 4,
       "norm_label": "replay engine \u2014 sync db version.",
       "id": "engine_rationale_1"
     },
@@ -4410,7 +4392,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\replay\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_replay_init_py",
-      "community": 44,
+      "community": 43,
       "norm_label": "__init__.py"
     },
     {
@@ -4464,7 +4446,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\migrate_symbols.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_scripts_migrate_symbols_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "migrate_symbols.py"
     },
     {
@@ -4473,7 +4455,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\migrate_symbols.py",
       "source_location": "L6",
       "id": "migrate_symbols_run_migration",
-      "community": 3,
+      "community": 2,
       "norm_label": "run_migration()"
     },
     {
@@ -4481,7 +4463,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\migrate_symbols.py",
       "source_location": "L7",
-      "community": 3,
+      "community": 2,
       "norm_label": "strips '.ns' from any existing stock symbols in the database     to enforce the",
       "id": "migrate_symbols_rationale_7"
     },
@@ -4491,7 +4473,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_scripts_init_py",
-      "community": 45,
+      "community": 44,
       "norm_label": "__init__.py"
     },
     {
@@ -4500,7 +4482,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_strategies_base_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "base.py"
     },
     {
@@ -4509,7 +4491,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L14",
       "id": "base_indicatorrequirement",
-      "community": 0,
+      "community": 1,
       "norm_label": "indicatorrequirement"
     },
     {
@@ -4518,7 +4500,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L22",
       "id": "base_strategydatarequirements",
-      "community": 0,
+      "community": 1,
       "norm_label": "strategydatarequirements"
     },
     {
@@ -4527,7 +4509,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L30",
       "id": "base_total_daily_bars",
-      "community": 0,
+      "community": 1,
       "norm_label": "total_daily_bars()"
     },
     {
@@ -4536,7 +4518,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L35",
       "id": "base_strategycontext",
-      "community": 0,
+      "community": 1,
       "norm_label": "strategycontext"
     },
     {
@@ -4545,7 +4527,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L46",
       "id": "base_strategysignal",
-      "community": 0,
+      "community": 1,
       "norm_label": "strategysignal"
     },
     {
@@ -4554,7 +4536,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L62",
       "id": "base_strategysignal_post_init",
-      "community": 0,
+      "community": 1,
       "norm_label": ".__post_init__()"
     },
     {
@@ -4563,7 +4545,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L72",
       "id": "base_risk_reward",
-      "community": 0,
+      "community": 1,
       "norm_label": "risk_reward()"
     },
     {
@@ -4572,7 +4554,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L78",
       "id": "base_risk_pct",
-      "community": 0,
+      "community": 1,
       "norm_label": "risk_pct()"
     },
     {
@@ -4581,7 +4563,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L82",
       "id": "base_basestrategy",
-      "community": 0,
+      "community": 1,
       "norm_label": "basestrategy"
     },
     {
@@ -4590,7 +4572,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L90",
       "id": "base_description",
-      "community": 0,
+      "community": 1,
       "norm_label": "description()"
     },
     {
@@ -4599,7 +4581,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L94",
       "id": "base_version",
-      "community": 0,
+      "community": 1,
       "norm_label": "version()"
     },
     {
@@ -4608,7 +4590,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L98",
       "id": "base_indicator_requirements",
-      "community": 0,
+      "community": 1,
       "norm_label": "indicator_requirements()"
     },
     {
@@ -4617,7 +4599,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L102",
       "id": "base_data_requirements",
-      "community": 0,
+      "community": 1,
       "norm_label": "data_requirements()"
     },
     {
@@ -4626,7 +4608,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L117",
       "id": "base_basestrategy_validate_context",
-      "community": 0,
+      "community": 1,
       "norm_label": ".validate_context()"
     },
     {
@@ -4635,7 +4617,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L122",
       "id": "base_generate_signals",
-      "community": 0,
+      "community": 1,
       "norm_label": "generate_signals()"
     },
     {
@@ -4644,7 +4626,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_strategies_institutional_vcp_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "institutional_vcp.py"
     },
     {
@@ -4653,7 +4635,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L18",
       "id": "institutional_vcp_institutionalvcp",
-      "community": 0,
+      "community": 1,
       "norm_label": "institutionalvcp"
     },
     {
@@ -4662,7 +4644,7 @@
       "source_file": "",
       "source_location": "",
       "id": "basestrategy",
-      "community": 0,
+      "community": 1,
       "norm_label": "basestrategy"
     },
     {
@@ -4671,7 +4653,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L20",
       "id": "institutional_vcp_name",
-      "community": 0,
+      "community": 1,
       "norm_label": "name()"
     },
     {
@@ -4680,7 +4662,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L24",
       "id": "institutional_vcp_description",
-      "community": 0,
+      "community": 1,
       "norm_label": "description()"
     },
     {
@@ -4689,7 +4671,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L28",
       "id": "institutional_vcp_version",
-      "community": 0,
+      "community": 1,
       "norm_label": "version()"
     },
     {
@@ -4698,7 +4680,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L32",
       "id": "institutional_vcp_indicator_requirements",
-      "community": 0,
+      "community": 1,
       "norm_label": "indicator_requirements()"
     },
     {
@@ -4707,7 +4689,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L44",
       "id": "institutional_vcp_data_requirements",
-      "community": 0,
+      "community": 1,
       "norm_label": "data_requirements()"
     },
     {
@@ -4716,7 +4698,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L53",
       "id": "institutional_vcp_institutionalvcp_generate_signals",
-      "community": 0,
+      "community": 1,
       "norm_label": ".generate_signals()"
     },
     {
@@ -4725,7 +4707,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L195",
       "id": "institutional_vcp_record",
-      "community": 0,
+      "community": 1,
       "norm_label": "_record()"
     },
     {
@@ -4734,7 +4716,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L203",
       "id": "institutional_vcp_detect_vcp",
-      "community": 0,
+      "community": 1,
       "norm_label": "_detect_vcp()"
     },
     {
@@ -4743,7 +4725,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_strategies_registry_py",
-      "community": 9,
+      "community": 2,
       "norm_label": "registry.py"
     },
     {
@@ -4752,7 +4734,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L23",
       "id": "registry_strategyregistry",
-      "community": 9,
+      "community": 2,
       "norm_label": "strategyregistry"
     },
     {
@@ -4761,7 +4743,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L26",
       "id": "registry_strategyregistry_init",
-      "community": 9,
+      "community": 2,
       "norm_label": ".__init__()"
     },
     {
@@ -4770,7 +4752,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L30",
       "id": "registry_strategyregistry_discover",
-      "community": 9,
+      "community": 2,
       "norm_label": ".discover()"
     },
     {
@@ -4779,7 +4761,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L61",
       "id": "registry_strategyregistry_get",
-      "community": 9,
+      "community": 2,
       "norm_label": ".get()"
     },
     {
@@ -4788,7 +4770,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L67",
       "id": "registry_strategyregistry_all",
-      "community": 3,
+      "community": 2,
       "norm_label": ".all()"
     },
     {
@@ -4797,7 +4779,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L71",
       "id": "registry_strategyregistry_list_names",
-      "community": 9,
+      "community": 2,
       "norm_label": ".list_names()"
     },
     {
@@ -4806,7 +4788,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L75",
       "id": "registry_strategyregistry_len",
-      "community": 9,
+      "community": 2,
       "norm_label": ".__len__()"
     },
     {
@@ -4814,7 +4796,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L1",
-      "community": 9,
+      "community": 2,
       "norm_label": "auto-discovery strategy registry. scans the strategies/ package at startup. user",
       "id": "registry_rationale_1"
     },
@@ -4823,7 +4805,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L24",
-      "community": 9,
+      "community": 2,
       "norm_label": "singleton registry that auto-discovers and holds all basestrategy subclasses.",
       "id": "registry_rationale_24"
     },
@@ -4832,7 +4814,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\registry.py",
       "source_location": "L31",
-      "community": 9,
+      "community": 2,
       "norm_label": "import every module in strategies/ and register concrete basestrategy subclasses",
       "id": "registry_rationale_31"
     },
@@ -4842,7 +4824,7 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_indian_swing_strategies_init_py",
-      "community": 46,
+      "community": 45,
       "norm_label": "__init__.py"
     },
     {
@@ -4869,7 +4851,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_db.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_check_db_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_db.py"
     },
     {
@@ -4878,7 +4860,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_db.py",
       "source_location": "L4",
       "id": "check_db_check_db_rows",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_db_rows()"
     },
     {
@@ -4887,7 +4869,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_db_status.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_check_db_status_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_db_status.py"
     },
     {
@@ -4896,7 +4878,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_db_status.py",
       "source_location": "L6",
       "id": "check_db_status_check",
-      "community": 3,
+      "community": 2,
       "norm_label": "check()"
     },
     {
@@ -4905,7 +4887,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_jobs.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_check_jobs_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_jobs.py"
     },
     {
@@ -4914,7 +4896,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_jobs.py",
       "source_location": "L4",
       "id": "check_jobs_check_jobs",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_jobs()"
     },
     {
@@ -4923,7 +4905,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_pfc.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_check_pfc_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_pfc.py"
     },
     {
@@ -4932,7 +4914,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_pfc.py",
       "source_location": "L4",
       "id": "check_pfc_check_pfc",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_pfc()"
     },
     {
@@ -4941,7 +4923,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_pfc_history.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_check_pfc_history_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_pfc_history.py"
     },
     {
@@ -4950,7 +4932,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_pfc_history.py",
       "source_location": "L4",
       "id": "check_pfc_history_check_pfc_history",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_pfc_history()"
     },
     {
@@ -4959,7 +4941,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_recs_count.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_check_recs_count_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_recs_count.py"
     },
     {
@@ -4968,7 +4950,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_recs_count.py",
       "source_location": "L7",
       "id": "check_recs_count_check",
-      "community": 3,
+      "community": 2,
       "norm_label": "check()"
     },
     {
@@ -4977,7 +4959,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_stock_data.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_check_stock_data_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_stock_data.py"
     },
     {
@@ -4986,7 +4968,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_stock_data.py",
       "source_location": "L5",
       "id": "check_stock_data_check_stock_data",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_stock_data()"
     },
     {
@@ -4995,7 +4977,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_stock_details.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_check_stock_details_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_stock_details.py"
     },
     {
@@ -5004,7 +4986,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\check_stock_details.py",
       "source_location": "L4",
       "id": "check_stock_details_check_stock_details",
-      "community": 3,
+      "community": 2,
       "norm_label": "check_stock_details()"
     },
     {
@@ -5013,7 +4995,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\find_420.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_find_420_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "find_420.py"
     },
     {
@@ -5022,7 +5004,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\find_420.py",
       "source_location": "L4",
       "id": "find_420_find_420",
-      "community": 3,
+      "community": 2,
       "norm_label": "find_420()"
     },
     {
@@ -5031,7 +5013,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\find_exact_close.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_find_exact_close_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "find_exact_close.py"
     },
     {
@@ -5040,7 +5022,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\find_exact_close.py",
       "source_location": "L4",
       "id": "find_exact_close_find_exact_close",
-      "community": 3,
+      "community": 2,
       "norm_label": "find_exact_close()"
     },
     {
@@ -5049,7 +5031,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\read_exception.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_read_exception_py",
-      "community": 47,
+      "community": 46,
       "norm_label": "read_exception.py"
     },
     {
@@ -5058,7 +5040,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\read_scanner_log.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_read_scanner_log_py",
-      "community": 48,
+      "community": 47,
       "norm_label": "read_scanner_log.py"
     },
     {
@@ -5067,7 +5049,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\read_task_log.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_read_task_log_py",
-      "community": 49,
+      "community": 48,
       "norm_label": "read_task_log.py"
     },
     {
@@ -5076,7 +5058,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\search_420_5.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_search_420_5_py",
-      "community": 3,
+      "community": 2,
       "norm_label": "search_420_5.py"
     },
     {
@@ -5085,7 +5067,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\search_420_5.py",
       "source_location": "L4",
       "id": "search_420_5_search_420_5",
-      "community": 3,
+      "community": 2,
       "norm_label": "search_420_5()"
     },
     {
@@ -5112,7 +5094,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\verify_stages.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_verify_stages_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "verify_stages.py"
     },
     {
@@ -5121,7 +5103,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\verify_stages.py",
       "source_location": "L16",
       "id": "verify_stages_diagnose_stock",
-      "community": 0,
+      "community": 1,
       "norm_label": "diagnose_stock()"
     },
     {
@@ -5130,7 +5112,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\verify_stock.py",
       "source_location": "L1",
       "id": "c_indian_swing_scratch_verify_stock_py",
-      "community": 0,
+      "community": 1,
       "norm_label": "verify_stock.py"
     },
     {
@@ -5139,7 +5121,7 @@
       "source_file": "C:\\Indian_Swing\\scratch\\verify_stock.py",
       "source_location": "L9",
       "id": "verify_stock_verify_stock",
-      "community": 0,
+      "community": 1,
       "norm_label": "verify_stock()"
     },
     {
@@ -5148,7 +5130,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L1",
       "id": "c_indian_swing_tests_test_production_readiness_py",
-      "community": 3,
+      "community": 0,
       "norm_label": "test_production_readiness.py"
     },
     {
@@ -5166,7 +5148,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L38",
       "id": "test_production_readiness_build_daily_frame",
-      "community": 3,
+      "community": 0,
       "norm_label": "_build_daily_frame()"
     },
     {
@@ -5175,7 +5157,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L67",
       "id": "test_production_readiness_seed_stock_and_data",
-      "community": 3,
+      "community": 0,
       "norm_label": "_seed_stock_and_data()"
     },
     {
@@ -5184,7 +5166,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L89",
       "id": "test_production_readiness_test_dynamic_lookback_is_explicit_and_not_source_parsed",
-      "community": 0,
+      "community": 1,
       "norm_label": "test_dynamic_lookback_is_explicit_and_not_source_parsed()"
     },
     {
@@ -5193,7 +5175,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L95",
       "id": "test_production_readiness_test_strategy_generates_explainable_signal",
-      "community": 3,
+      "community": 0,
       "norm_label": "test_strategy_generates_explainable_signal()"
     },
     {
@@ -5202,7 +5184,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L125",
       "id": "test_production_readiness_test_database_integrity_blocks_duplicates_and_broken_references",
-      "community": 3,
+      "community": 0,
       "norm_label": "test_database_integrity_blocks_duplicates_and_broken_references()"
     },
     {
@@ -5211,7 +5193,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L157",
       "id": "test_production_readiness_test_scan_persistence_is_deterministic_across_reruns",
-      "community": 3,
+      "community": 0,
       "norm_label": "test_scan_persistence_is_deterministic_across_reruns()"
     },
     {
@@ -5220,7 +5202,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L199",
       "id": "test_production_readiness_test_vcp_slicing_length_no_not_enough_data",
-      "community": 0,
+      "community": 1,
       "norm_label": "test_vcp_slicing_length_no_not_enough_data()"
     },
     {
@@ -5229,7 +5211,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\test_production_readiness.py",
       "source_location": "L217",
       "id": "test_production_readiness_test_risk_allocation_capping_passes",
-      "community": 0,
+      "community": 1,
       "norm_label": "test_risk_allocation_capping_passes()"
     },
     {
@@ -5238,7 +5220,7 @@
       "source_file": "C:\\Indian_Swing\\tests\\__init__.py",
       "source_location": "L1",
       "id": "c_indian_swing_tests_init_py",
-      "community": 50,
+      "community": 49,
       "norm_label": "__init__.py"
     },
     {
@@ -5246,7 +5228,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L61",
-      "community": 7,
+      "community": 6,
       "norm_label": "remove rows where high < low or close is outside [low, high].",
       "id": "validator_rationale_61"
     },
@@ -5255,7 +5237,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\validator.py",
       "source_location": "L69",
-      "community": 7,
+      "community": 6,
       "norm_label": "remove rows with price changes > max_gap_pct (likely data errors).",
       "id": "validator_rationale_69"
     },
@@ -5264,7 +5246,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\trend.py",
       "source_location": "L49",
-      "community": 5,
+      "community": 4,
       "norm_label": "average directional index + di+/di- (wilder's).",
       "id": "trend_rationale_49"
     },
@@ -5273,7 +5255,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
       "source_location": "L24",
-      "community": 1,
+      "community": 0,
       "norm_label": "returns the real-time progress of the active scan.",
       "id": "scanner_rationale_24"
     },
@@ -5282,7 +5264,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
       "source_location": "L33",
-      "community": 1,
+      "community": 0,
       "norm_label": "trigger a manual scan. runs in the background, returns immediately.",
       "id": "scanner_rationale_33"
     },
@@ -5291,7 +5273,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L125",
-      "community": 51,
+      "community": 50,
       "norm_label": "inject yaml values as env vars if not already set (env vars take priority).",
       "id": "settings_rationale_125"
     },
@@ -5300,7 +5282,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\lookback_engine.py",
       "source_location": "L12",
-      "community": 0,
+      "community": 1,
       "norm_label": "parses strategy source code to automatically determine required lookback.",
       "id": "lookback_engine_rationale_12"
     },
@@ -5309,7 +5291,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\pipeline.py",
       "source_location": "L1",
-      "community": 7,
+      "community": 6,
       "norm_label": "institutional data pipeline (sync-db, async-download). download \u2192 validate \u2192 cle",
       "id": "pipeline_rationale_1"
     },
@@ -5318,7 +5300,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L58",
-      "community": 8,
+      "community": 9,
       "norm_label": "normalize column names, drop nan rows, ensure correct dtypes.",
       "id": "yfinance_provider_rationale_58"
     },
@@ -5327,7 +5309,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L141",
-      "community": 8,
+      "community": 9,
       "norm_label": "download all symbols in one yf.download() call \u2014 far more efficient than n calls",
       "id": "yfinance_provider_rationale_141"
     },
@@ -5336,7 +5318,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L1",
-      "community": 1,
+      "community": 3,
       "norm_label": "sqlalchemy sync engine wrapped for async usage via run_in_executor. python 3.14",
       "id": "connection_rationale_1"
     },
@@ -5345,7 +5327,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L25",
-      "community": 1,
+      "community": 3,
       "norm_label": "convert aiosqlite url to sync sqlite url.",
       "id": "connection_rationale_25"
     },
@@ -5354,7 +5336,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L53",
-      "community": 1,
+      "community": 3,
       "norm_label": "sync context manager for use inside run_in_executor.",
       "id": "connection_rationale_53"
     },
@@ -5363,7 +5345,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L68",
-      "community": 1,
+      "community": 3,
       "norm_label": "async-compatible session context manager.     runs the session synchronously but",
       "id": "connection_rationale_68"
     },
@@ -5372,7 +5354,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L89",
-      "community": 1,
+      "community": 3,
       "norm_label": "create all tables. idempotent.",
       "id": "connection_rationale_89"
     },
@@ -5381,7 +5363,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L1",
-      "community": 52,
+      "community": 51,
       "norm_label": "sqlalchemy orm models. all tables prefixed with `sw_` to avoid collisions if sha",
       "id": "models_rationale_1"
     },
@@ -5390,7 +5372,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L7",
-      "community": 53,
+      "community": 52,
       "norm_label": "adds standard daily indicators to a daily ohlcv dataframe.",
       "id": "calculator_rationale_7"
     },
@@ -5399,7 +5381,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L38",
-      "community": 54,
+      "community": 53,
       "norm_label": "adds standard weekly indicators to a weekly ohlcv dataframe.",
       "id": "calculator_rationale_38"
     },
@@ -5408,7 +5390,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\scanner.py",
       "source_location": "L1",
-      "community": 1,
+      "community": 0,
       "norm_label": "recommendation scanner \u2014 sync db version compatible with python 3.14.",
       "id": "scanner_rationale_1"
     },
@@ -5417,7 +5399,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L1",
-      "community": 1,
+      "community": 0,
       "norm_label": "cli entry point using typer. usage:   swing db init   swing data download --univ",
       "id": "cli_rationale_1"
     },
@@ -5426,7 +5408,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L31",
-      "community": 1,
+      "community": 0,
       "norm_label": "initialize database tables.",
       "id": "cli_rationale_31"
     },
@@ -5435,7 +5417,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L50",
-      "community": 1,
+      "community": 0,
       "norm_label": "download ohlcv data for the specified universe.",
       "id": "cli_rationale_50"
     },
@@ -5444,7 +5426,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L87",
-      "community": 1,
+      "community": 0,
       "norm_label": "run the recommendation scanner.",
       "id": "cli_rationale_87"
     },
@@ -5453,7 +5435,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L110",
-      "community": 1,
+      "community": 0,
       "norm_label": "list all discovered strategies.",
       "id": "cli_rationale_110"
     },
@@ -5462,7 +5444,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L73",
-      "community": 0,
+      "community": 1,
       "norm_label": "all strategies must inherit from this.     implement generate_signals() and opti",
       "id": "base_rationale_73"
     },
@@ -5471,7 +5453,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L90",
-      "community": 0,
+      "community": 1,
       "norm_label": "unique strategy identifier e.g. 'emabreakout'.",
       "id": "base_rationale_90"
     },
@@ -5480,7 +5462,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L96",
-      "community": 0,
+      "community": 1,
       "norm_label": "human-readable strategy description.",
       "id": "base_rationale_96"
     },
@@ -5489,7 +5471,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L105",
-      "community": 0,
+      "community": 1,
       "norm_label": "override to provide configurable defaults.",
       "id": "base_rationale_105"
     },
@@ -5498,7 +5480,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L115",
-      "community": 0,
+      "community": 1,
       "norm_label": "analyze the dataframe and return zero or more signals.          args:",
       "id": "base_rationale_115"
     },
@@ -5507,7 +5489,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L129",
-      "community": 0,
+      "community": 1,
       "norm_label": "return false if dataframe is insufficient for this strategy.",
       "id": "base_rationale_129"
     },
@@ -5516,7 +5498,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L19",
-      "community": 0,
+      "community": 1,
       "norm_label": "sivcs institutional-grade strategy pipeline.     executes in a strict short-circ",
       "id": "institutional_vcp_rationale_19"
     },
@@ -5525,7 +5507,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
       "source_location": "L17",
-      "community": 1,
+      "community": 0,
       "norm_label": "trigger a manual scan. runs in the background, returns immediately.",
       "id": "scanner_rationale_17"
     },
@@ -5534,7 +5516,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L53",
-      "community": 0,
+      "community": 1,
       "norm_label": "all strategies must inherit from this.     implement generate_signals() and opti",
       "id": "base_rationale_53"
     },
@@ -5543,7 +5525,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L70",
-      "community": 0,
+      "community": 1,
       "norm_label": "unique strategy identifier e.g. 'emabreakout'.",
       "id": "base_rationale_70"
     },
@@ -5552,7 +5534,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L76",
-      "community": 0,
+      "community": 1,
       "norm_label": "human-readable strategy description.",
       "id": "base_rationale_76"
     },
@@ -5561,7 +5543,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L85",
-      "community": 0,
+      "community": 1,
       "norm_label": "override to provide configurable defaults.",
       "id": "base_rationale_85"
     },
@@ -5570,7 +5552,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L95",
-      "community": 0,
+      "community": 1,
       "norm_label": "analyze the dataframe and return zero or more signals.          args:",
       "id": "base_rationale_95"
     },
@@ -5579,7 +5561,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\base.py",
       "source_location": "L109",
-      "community": 0,
+      "community": 1,
       "norm_label": "return false if dataframe is insufficient for this strategy.",
       "id": "base_rationale_109"
     },
@@ -5588,7 +5570,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\institutional_vcp.py",
       "source_location": "L16",
-      "community": 0,
+      "community": 1,
       "norm_label": "institutional vcp pattern detection for portfolio a (core), b (small-cap), and c",
       "id": "institutional_vcp_rationale_16"
     },
@@ -5597,7 +5579,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
       "source_location": "L18",
-      "community": 1,
+      "community": 0,
       "norm_label": "trigger a manual scan. runs in the background, returns immediately.",
       "id": "scanner_rationale_18"
     },
@@ -5606,7 +5588,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L117",
-      "community": 55,
+      "community": 54,
       "norm_label": "inject yaml values as env vars if not already set (env vars take priority).",
       "id": "settings_rationale_117"
     },
@@ -5615,7 +5597,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L66",
-      "community": 1,
+      "community": 3,
       "norm_label": "sync context manager for use inside run_in_executor.",
       "id": "connection_rationale_66"
     },
@@ -5624,7 +5606,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L81",
-      "community": 1,
+      "community": 3,
       "norm_label": "async-compatible session context manager.     runs the session synchronously but",
       "id": "connection_rationale_81"
     },
@@ -5633,7 +5615,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\connection.py",
       "source_location": "L102",
-      "community": 1,
+      "community": 3,
       "norm_label": "create all tables. idempotent.",
       "id": "connection_rationale_102"
     },
@@ -5642,7 +5624,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L89",
-      "community": 1,
+      "community": 0,
       "norm_label": "run the recommendation scanner.",
       "id": "cli_rationale_89"
     },
@@ -5651,7 +5633,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L112",
-      "community": 1,
+      "community": 0,
       "norm_label": "list all discovered strategies.",
       "id": "cli_rationale_112"
     },
@@ -5660,7 +5642,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\ema_breakout.py",
       "source_location": "L1",
-      "community": 0,
+      "community": 1,
       "norm_label": "ema breakout strategy.  setup: price breaks above a falling/flat 50 ema with vol",
       "id": "ema_breakout_rationale_1"
     },
@@ -5669,7 +5651,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\rsi_crossover.py",
       "source_location": "L1",
-      "community": 0,
+      "community": 1,
       "norm_label": "rsi crossover strategy.  setup: rsi crosses above 30 (oversold exit) while price",
       "id": "rsi_crossover_rationale_1"
     },
@@ -5678,7 +5660,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\strategies\\volume_breakout.py",
       "source_location": "L1",
-      "community": 5,
+      "community": 1,
       "norm_label": "volume breakout strategy.  setup: price breaks above a 20-day resistance level (",
       "id": "volume_breakout_rationale_1"
     },
@@ -5687,7 +5669,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\yfinance_provider.py",
       "source_location": "L131",
-      "community": 8,
+      "community": 9,
       "norm_label": "download all symbols in one yf.download() call \u2014 far more efficient than n calls",
       "id": "yfinance_provider_rationale_131"
     },
@@ -5696,7 +5678,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L49",
-      "community": 1,
+      "community": 0,
       "norm_label": "download ohlcv data for the specified universe.",
       "id": "cli_rationale_49"
     },
@@ -5705,7 +5687,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L85",
-      "community": 1,
+      "community": 0,
       "norm_label": "run the recommendation scanner.",
       "id": "cli_rationale_85"
     },
@@ -5714,7 +5696,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
       "source_location": "L108",
-      "community": 1,
+      "community": 0,
       "norm_label": "list all discovered strategies.",
       "id": "cli_rationale_108"
     }
@@ -5940,36 +5922,12 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
-      "source_location": "L71",
-      "weight": 1.0,
-      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
-      "_tgt": "tradedetail_riskmeter",
-      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
-      "target": "tradedetail_riskmeter",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
-      "source_location": "L84",
+      "source_location": "L69",
       "weight": 1.0,
       "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
       "_tgt": "tradedetail_tradedetail",
       "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
       "target": "tradedetail_tradedetail",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
-      "source_location": "L252",
-      "weight": 1.0,
-      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
-      "_tgt": "tradedetail_positioncalc",
-      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
-      "target": "tradedetail_positioncalc",
       "confidence_score": 1.0
     },
     {
@@ -6900,7 +6858,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\scanner.py",
-      "source_location": "L51",
+      "source_location": "L53",
       "weight": 1.0,
       "_src": "c_indian_swing_indian_swing_api_routes_scanner_py",
       "_tgt": "scanner_list_scan_jobs",
