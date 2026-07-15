@@ -48,10 +48,10 @@ async def get_latest_scan_snapshot():
                     "scan": None,
                     "recommendations": [],
                 }
-            recommendations = [_serialize_recommendation(rec) for rec in repo.get_by_scan(scan.id)]
+            recommendations = [_serialize_recommendation(rec) for rec in repo.get_by_scan(scan.scan_uuid)]
             return {
                 "scan": {
-                    "id": scan.id,
+                    "id": scan.scan_uuid,
                     "scan_date": str(scan.scan_date),
                     "completed_at": scan.completed_at.isoformat() if scan.completed_at else None,
                     "market_status": scan.market_status,

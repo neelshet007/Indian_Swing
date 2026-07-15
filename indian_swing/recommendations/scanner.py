@@ -80,18 +80,50 @@ class RecommendationScanner:
         )
 
         try:
-            self.progress_state["current_stage"] = "Checking Database"
-            await self.pipeline.run_incremental(
-                pipeline_symbols,
-                required_daily_bars=lookback,
-                end=scan_date,
-                force_refresh=force_refresh,
-            )
+            # Download benchmark data first
+            self.progress_state["current_symbol"] = benchmark_symbol
+            self.progress_state["current_stage"] = "Downloading Benchmark Data"
+            try:
+                await self.pipeline.run_incremental(
+                    [benchmark_symbol],
+                    required_daily_bars=lookback,
+                    end=scan_date,
+                    force_refresh=force_refresh,
+                )
+            except Exception as exc:
+                logger.error("scanner.benchmark_fetch_failed", symbol=benchmark_symbol, error=str(exc))
+
+            # Download universe data in bulk first
+            self.progress_state["current_symbol"] = "All Universe Stocks"
+            self.progress_state["current_stage"] = "Downloading Universe Data"
+            try:
+                all_symbols = [s.symbol for s in stocks]
+                await self.pipeline.run_incremental(
+                    all_symbols,
+                    required_daily_bars=lookback,
+                    end=scan_date,
+                    force_refresh=force_refresh,
+                )
+            except Exception as exc:
+                logger.error("scanner.universe_fetch_failed", error=str(exc))
 
             existing_signal_keys: set[tuple[str, str, str]] = set()
             filter_counter: Counter[str] = Counter()
             validation_counter: Counter[str] = Counter()
             persisted: list[tuple[Stock, StrategyContext, StrategySignal]] = []
+
+            # Load benchmark once before loop to avoid duplicate queries
+            benchmark_stock = None
+            benchmark_daily = None
+            with get_sync_session() as session:
+                benchmark_stock = StockRepository(session).get_by_symbol(
+                    settings.scanner.benchmark_symbol,
+                    exchange=settings.scanner.benchmark_exchange,
+                )
+                if benchmark_stock is not None:
+                    repo = OHLCVRepository(session)
+                    start = scan_date - timedelta(days=int(lookback * 1.8))
+                    benchmark_daily = repo.to_dataframe(benchmark_stock.stock_uuid, start, scan_date, "1d")
 
             for stock in stocks:
                 self.progress_state["current_symbol"] = stock.symbol
@@ -103,6 +135,8 @@ class RecommendationScanner:
                         stock,
                         lookback,
                         scan_date,
+                        benchmark_stock,
+                        benchmark_daily,
                     )
                     self.progress_state["current_stage"] = "Running Strategy"
                     signals = self.strategy.generate_signals(stock.symbol, context)
@@ -110,6 +144,16 @@ class RecommendationScanner:
                         filter_counter["Rejected"] += 1
                         result.stocks_scanned += 1
                         self.progress_state["completed"] = result.stocks_scanned
+                        if result.stocks_scanned % 10 == 0 or result.stocks_scanned == len(stocks):
+                            await asyncio.get_running_loop().run_in_executor(
+                                None,
+                                self._update_scan_job_progress,
+                                result.scan_uuid,
+                                result.stocks_scanned,
+                                result.failed_stocks,
+                                dict(filter_counter),
+                                dict(validation_counter),
+                            )
                         continue
 
                     self.progress_state["current_stage"] = "Validating Recommendation"
@@ -129,24 +173,47 @@ class RecommendationScanner:
                         filter_counter["BUY"] += 1
                         persisted.append((stock, context, signal))
 
+                        # Save immediately to the database
+                        rank = len(persisted)
+                        await asyncio.get_running_loop().run_in_executor(
+                            None,
+                            self._save_single_recommendation,
+                            result.scan_uuid,
+                            scan_date,
+                            stock,
+                            signal,
+                            rank,
+                        )
+
                     result.stocks_scanned += 1
                     self.progress_state["completed"] = result.stocks_scanned
+                    if result.stocks_scanned % 10 == 0 or result.stocks_scanned == len(stocks):
+                        await asyncio.get_running_loop().run_in_executor(
+                            None,
+                            self._update_scan_job_progress,
+                            result.scan_uuid,
+                            result.stocks_scanned,
+                            result.failed_stocks,
+                            dict(filter_counter),
+                            dict(validation_counter),
+                        )
                 except Exception as exc:
+                    result.stocks_scanned += 1
                     result.failed_stocks += 1
                     result.errors.append(f"{stock.symbol}: {exc}")
+                    self.progress_state["completed"] = result.stocks_scanned
                     self.progress_state["failed"] = result.failed_stocks
                     logger.error("scanner.stock_failed", symbol=stock.symbol, stage=self.progress_state["current_stage"], error=str(exc))
-
-            self.progress_state["current_stage"] = "Saving Recommendation"
-            await asyncio.get_running_loop().run_in_executor(
-                None,
-                self._persist_scan_results,
-                result.scan_uuid,
-                scan_date,
-                persisted,
-                filter_counter,
-                validation_counter,
-            )
+                    if result.stocks_scanned % 10 == 0 or result.stocks_scanned == len(stocks):
+                        await asyncio.get_running_loop().run_in_executor(
+                            None,
+                            self._update_scan_job_progress,
+                            result.scan_uuid,
+                            result.stocks_scanned,
+                            result.failed_stocks,
+                            dict(filter_counter),
+                            dict(validation_counter),
+                        )
 
             result.signals_generated = len(persisted)
             result.recommendations_saved = len(persisted)
@@ -163,6 +230,82 @@ class RecommendationScanner:
 
         return result
 
+    def _save_single_recommendation(
+        self,
+        scan_uuid: str,
+        scan_date: date,
+        stock: Stock,
+        signal: StrategySignal,
+        rank: int,
+    ) -> None:
+        with get_sync_session() as session:
+            signal_model = Signal(
+                scan_uuid=scan_uuid,
+                stock_uuid=stock.stock_uuid,
+                strategy_name=self.strategy.name,
+                strategy_version=self.strategy.version,
+                signal_date=scan_date,
+                direction=signal.direction.value,
+                entry_price=signal.entry_price,
+                stop_loss=signal.stop_loss,
+                target_1=signal.target_1,
+                target_2=signal.target_2,
+                risk_reward=signal.risk_reward,
+                confidence_score=signal.confidence_score,
+                quality=signal.quality.value,
+                risk_level=signal.risk_level.value,
+                holding_days=signal.holding_days,
+                reasons=signal.reasons,
+                explanation=signal.explanation,
+                indicator_snapshot=signal.indicator_snapshot,
+                metadata_=signal.metadata,
+            )
+            session.add(signal_model)
+            session.flush()
+
+            recommendation = Recommendation(
+                scan_uuid=scan_uuid,
+                signal_id=signal_model.id,
+                stock_uuid=stock.stock_uuid,
+                scan_date=scan_date,
+                strategy_name=self.strategy.name,
+                strategy_version=self.strategy.version,
+                rank=rank,
+                confidence_score=signal.confidence_score,
+                risk_level=signal.risk_level.value,
+                entry_price=signal.entry_price,
+                stop_loss=signal.stop_loss,
+                target_price=signal.target_1,
+                risk_per_share=round(signal.entry_price - signal.stop_loss, 4),
+                risk_pct=signal.risk_pct,
+                position_size=signal.metadata.get("position_size"),
+                portfolio_weight_pct=signal.metadata.get("portfolio_weight_pct"),
+                explanation=signal.explanation,
+                summary="; ".join(signal.reasons[:3]),
+            )
+            session.add(recommendation)
+
+            job = session.get(ScanJob, scan_uuid)
+            if job is not None:
+                job.signals_generated = rank
+                job.recommendations_created = rank
+
+    def _update_scan_job_progress(
+        self,
+        scan_uuid: str,
+        stocks_scanned: int,
+        failed_stocks: int,
+        filter_summary: dict,
+        validation_summary: dict,
+    ) -> None:
+        with get_sync_session() as session:
+            job = session.get(ScanJob, scan_uuid)
+            if job is not None:
+                job.stocks_scanned = stocks_scanned
+                job.failed_stocks = failed_stocks
+                job.filter_summary = filter_summary
+                job.validation_summary = validation_summary
+
     def _load_universe_and_stocks(self) -> list[Stock]:
         with get_sync_session() as session:
             UniverseLoader(session).load_universe()
@@ -170,18 +313,19 @@ class RecommendationScanner:
 
     def _create_scan_job(self, scan_date: date, total_stocks: int) -> str:
         with get_sync_session() as session:
-            existing = session.execute(
+            existing_jobs = session.execute(
                 select(ScanJob).where(
                     ScanJob.environment == settings.environment_name,
                     ScanJob.strategy_name == self.strategy.name,
                     ScanJob.strategy_version == self.strategy.version,
                     ScanJob.scan_date == scan_date,
                 )
-            ).scalar_one_or_none()
-            if existing:
-                session.execute(delete(Recommendation).where(Recommendation.scan_uuid == existing.id))
-                session.execute(delete(Signal).where(Signal.scan_uuid == existing.id))
+            ).scalars().all()
+            for existing in existing_jobs:
+                session.execute(delete(Recommendation).where(Recommendation.scan_uuid == existing.scan_uuid))
+                session.execute(delete(Signal).where(Signal.scan_uuid == existing.scan_uuid))
                 session.delete(existing)
+            if existing_jobs:
                 session.flush()
 
             job = ScanJob(
@@ -196,22 +340,29 @@ class RecommendationScanner:
             )
             session.add(job)
             session.flush()
-            return job.id
+            return job.scan_uuid
 
-    def _load_strategy_context(self, stock: Stock, lookback: int, scan_date: date) -> StrategyContext:
+    def _load_strategy_context(
+        self,
+        stock: Stock,
+        lookback: int,
+        scan_date: date,
+        benchmark_stock: Stock | None = None,
+        benchmark_daily: pd.DataFrame | None = None,
+    ) -> StrategyContext:
         with get_sync_session() as session:
             repo = OHLCVRepository(session)
             start = scan_date - timedelta(days=int(lookback * 1.8))
             daily = repo.to_dataframe(stock.stock_uuid, start, scan_date, "1d")
             if daily.empty:
                 raise ValueError("No daily history available")
-            benchmark = StockRepository(session).get_by_symbol(
-                settings.scanner.benchmark_symbol,
-                exchange=settings.scanner.benchmark_exchange,
-            )
-            benchmark_daily = None
-            if benchmark is not None:
-                benchmark_daily = repo.to_dataframe(benchmark.id, start, scan_date, "1d")
+            if benchmark_stock is None:
+                benchmark_stock = StockRepository(session).get_by_symbol(
+                    settings.scanner.benchmark_symbol,
+                    exchange=settings.scanner.benchmark_exchange,
+                )
+            if benchmark_daily is None and benchmark_stock is not None:
+                benchmark_daily = repo.to_dataframe(benchmark_stock.stock_uuid, start, scan_date, "1d")
             bundle = IndicatorCalculator.build(daily, benchmark_daily if benchmark_daily is not None and not benchmark_daily.empty else None)
             return StrategyContext(
                 symbol=stock.symbol,

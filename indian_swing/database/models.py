@@ -78,7 +78,7 @@ class OHLCV(Base):
         Index("ix_ohlcv_timeframe_date", "timeframe", "date"),
     )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     stock_uuid: Mapped[str] = mapped_column(
         ForeignKey("sw_stocks.stock_uuid", ondelete="CASCADE"),
         nullable=False,

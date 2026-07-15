@@ -67,6 +67,11 @@ class StockRepository(BaseRepository[Stock]):
         return stock
 
     def bulk_upsert(self, records: list[dict]) -> int:
+        all_stocks = self._session.execute(
+            select(Stock).where(Stock.environment == settings.app_env.upper())
+        ).scalars().all()
+        existing_stocks = {(stock.symbol, stock.exchange): stock for stock in all_stocks}
+
         count = 0
         for record in records:
             payload = dict(record)
@@ -74,12 +79,25 @@ class StockRepository(BaseRepository[Stock]):
             name = payload.pop("name")
             exchange = payload.pop("exchange", "NSE")
             instrument_type = payload.pop("instrument_type", "EQUITY")
-            self.upsert(
-                symbol=symbol,
-                name=name,
-                exchange=exchange,
-                instrument_type=instrument_type,
-                **payload,
-            )
+
+            key = (symbol, exchange)
+            if key in existing_stocks:
+                stock = existing_stocks[key]
+                stock.name = name
+                stock.instrument_type = instrument_type
+                for k, v in payload.items():
+                    setattr(stock, k, v)
+            else:
+                stock = Stock(
+                    environment=settings.app_env.upper(),
+                    exchange=exchange,
+                    symbol=symbol,
+                    name=name,
+                    instrument_type=instrument_type,
+                    **payload,
+                )
+                self.add(stock)
+                existing_stocks[key] = stock
             count += 1
+        self._session.flush()
         return count

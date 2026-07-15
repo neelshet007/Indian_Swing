@@ -34,7 +34,7 @@ async def list_stocks(
             q = q.order_by(Stock.exchange, Stock.symbol).offset(offset).limit(limit)
             stocks = session.execute(q).scalars().all()
             ohlcv_repo = OHLCVRepository(session)
-            return [_stock_dict(s, ohlcv_repo.get_latest_close(s.id)) for s in stocks]
+            return [_stock_dict(s, ohlcv_repo.get_latest_close(s.stock_uuid)) for s in stocks]
 
     return await loop.run_in_executor(None, _fetch)
 
@@ -90,7 +90,7 @@ async def get_ohlcv(
 
 def _stock_dict(s: Stock, current_price: float = None) -> dict:
     return {
-        "id": s.id,
+        "id": s.stock_uuid,
         "exchange": s.exchange,
         "symbol": s.symbol,
         "name": s.name,

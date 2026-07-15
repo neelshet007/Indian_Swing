@@ -9,7 +9,7 @@ dev:
 	python -m indian_swing.scripts.cli db init
 
 api:
-	uvicorn indian_swing.api.main:app --host 0.0.0.0 --port 8000 --reload
+	uvicorn indian_swing.api.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir indian_swing
 
 dashboard:
 	cd dashboard && npm run dev

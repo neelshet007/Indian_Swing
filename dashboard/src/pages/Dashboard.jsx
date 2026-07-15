@@ -65,9 +65,10 @@ export default function Dashboard() {
   const [error, setError] = useState(null)
   const [scanning, setScanning] = useState(false)
   const [scanStatus, setScanStatus] = useState(null)
+  const [scanDate, setScanDate] = useState(new Date().toISOString().split('T')[0])
 
-  const loadSnapshot = async () => {
-    setLoading(true)
+  const loadSnapshot = async (silent = false) => {
+    if (!silent) setLoading(true)
     setError(null)
     try {
       const { data } = await axios.get('/api/recommendations/latest')
@@ -75,13 +76,21 @@ export default function Dashboard() {
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to load latest scan snapshot.')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }
 
   const triggerScan = async () => {
     setScanning(true)
-    await axios.post('/api/scanner/run')
+    setScanStatus({
+      status: 'running',
+      current_stage: 'Initializing Scan...',
+      current_symbol: '',
+      completed: 0,
+      total_stocks: 0,
+      failed: 0
+    })
+    await axios.post(`/api/scanner/run?scan_date=${scanDate}`)
     pollProgress()
   }
 
@@ -90,6 +99,7 @@ export default function Dashboard() {
       const { data } = await axios.get('/api/scanner/progress')
       setScanStatus(data)
       if (data.status === 'running') {
+        loadSnapshot(true)
         setTimeout(pollProgress, 1000)
         return
       }
@@ -120,7 +130,14 @@ export default function Dashboard() {
               : 'No completed scan is available yet'}
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <input 
+            type="date" 
+            value={scanDate} 
+            onChange={e => setScanDate(e.target.value)} 
+            className="input-field" 
+            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)', outline: 'none' }}
+          />
           <button className="btn btn-ghost" onClick={loadSnapshot}>Refresh</button>
           <button className={`btn btn-primary ${scanning ? 'pulse' : ''}`} onClick={triggerScan} disabled={scanning}>
             {scanning ? 'Scanning...' : 'Run Scan'}
@@ -144,11 +161,21 @@ export default function Dashboard() {
 
       {scanStatus?.status === 'running' && (
         <div style={{ margin: '0 32px 20px', padding: '16px', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-          <div style={{ color: 'var(--accent-blue-bright)', fontWeight: 600 }}>
-            {scanStatus.current_stage} {scanStatus.current_symbol ? `- ${scanStatus.current_symbol}` : ''}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <div style={{ color: 'var(--accent-blue-bright)', fontWeight: 600 }}>
+              {scanStatus.current_stage} {scanStatus.current_symbol ? `- ${scanStatus.current_symbol}` : ''}
+            </div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+              {scanStatus.completed} / {scanStatus.total_stocks} ({scanStatus.total_stocks > 0 ? Math.round((scanStatus.completed / scanStatus.total_stocks) * 100) : 0}%)
+            </div>
           </div>
-          <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: 6 }}>
-            Completed {scanStatus.completed} of {scanStatus.total_stocks} - Failed {scanStatus.failed}
+          <div style={{ width: '100%', height: '12px', background: 'var(--border)', borderRadius: '6px', overflow: 'hidden', display: 'flex' }}>
+            <div style={{ height: '100%', background: 'var(--accent-green)', width: `${((scanStatus.completed - (scanStatus.failed || 0)) / (scanStatus.total_stocks || 1)) * 100}%`, transition: 'width 0.3s ease' }} />
+            <div style={{ height: '100%', background: 'var(--accent-red)', width: `${((scanStatus.failed || 0) / (scanStatus.total_stocks || 1)) * 100}%`, transition: 'width 0.3s ease' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', fontSize: '0.8rem' }}>
+            <span style={{ color: 'var(--accent-green)', fontWeight: 500 }}>Success: {scanStatus.completed - (scanStatus.failed || 0)}</span>
+            <span style={{ color: 'var(--accent-red)', fontWeight: 500 }}>Failed: {scanStatus.failed || 0}</span>
           </div>
         </div>
       )}

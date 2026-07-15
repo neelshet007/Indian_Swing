@@ -113,7 +113,9 @@ class InstitutionalVCP(BaseStrategy):
             return []
 
         vcp_result = self._detect_vcp(daily)
-        if not self._record(explanation, "VCP", vcp_result["passed"], **vcp_result):
+        vcp_passed = vcp_result.get("passed", False)
+        vcp_details = {k: v for k, v in vcp_result.items() if k != "passed"}
+        if not self._record(explanation, "VCP", vcp_passed, **vcp_details):
             return []
 
         breakout_pivot = vcp_result.get("pivot", min(float(daily.iloc[-20:-1]["high"].max()), float(last_weekly["high_13w"])))
@@ -133,9 +135,15 @@ class InstitutionalVCP(BaseStrategy):
         if risk_per_share <= 0:
             return []
         risk_pct = risk_per_share / float(last_daily["close"])
-        risk_pass = 0 < risk_pct <= 0.10
-        position_size = int(100000 * 0.01 / risk_per_share)
+        # Position sizing with 1% risk rule and maximum 10% portfolio weight limit
+        raw_position_size = int(100000 * 0.01 / risk_per_share)
+        max_allocation = 100000 * 0.10
+        max_position_size = int(max_allocation / float(last_daily["close"]))
+        position_size = min(raw_position_size, max_position_size)
+        
         allocation_pct = (position_size * float(last_daily["close"])) / 100000 * 100 if position_size > 0 else 0.0
+        risk_pass = 0 < risk_pct <= 0.10
+        
         if not self._record(
             explanation,
             "Risk",
@@ -199,7 +207,7 @@ class InstitutionalVCP(BaseStrategy):
         # 2. Measure depth of corrections
         # 3. Verify volume dries up on the right side
         
-        window = daily.iloc[-50:-1].copy()
+        window = daily.iloc[-51:-1].copy()
         if len(window) < 50:
              return {"passed": False, "reason": "Not enough data"}
              

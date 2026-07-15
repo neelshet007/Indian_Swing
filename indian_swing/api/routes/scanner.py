@@ -43,7 +43,7 @@ async def list_scan_jobs(limit: int = 20):
             ).scalars().all()
             return [
                 {
-                    "id": job.id,
+                    "id": job.scan_uuid,
                     "scan_date": str(job.scan_date),
                     "status": job.status,
                     "strategy_name": job.strategy_name,

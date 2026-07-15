@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Sequence
 
-from sqlalchemy import and_, distinct, func, select
+from sqlalchemy import and_, case, distinct, func, select
 from sqlalchemy.orm import Session, joinedload
 
 from indian_swing.database.models import Recommendation, ScanJob, Signal
@@ -37,9 +37,12 @@ class RecommendationRepository(BaseRepository[Recommendation]):
 
     def get_by_date(self, scan_date: date) -> Sequence[Recommendation]:
         latest_scan = self._session.execute(
-            select(ScanJob.id)
-            .where(and_(ScanJob.scan_date == scan_date, ScanJob.status == "completed"))
-            .order_by(ScanJob.completed_at.desc(), ScanJob.created_at.desc())
+            select(ScanJob.scan_uuid)
+            .where(and_(ScanJob.scan_date == scan_date, ScanJob.status.in_(["running", "completed"])))
+            .order_by(
+                case((ScanJob.status == "running", 1), (ScanJob.status == "completed", 2), else_=3).asc(),
+                ScanJob.created_at.desc(),
+            )
             .limit(1)
         ).scalar_one_or_none()
         if not latest_scan:
@@ -48,9 +51,12 @@ class RecommendationRepository(BaseRepository[Recommendation]):
 
     def get_latest(self, limit: int = 50) -> Sequence[Recommendation]:
         latest_scan = self._session.execute(
-            select(ScanJob.id)
-            .where(ScanJob.status == "completed")
-            .order_by(ScanJob.completed_at.desc(), ScanJob.created_at.desc())
+            select(ScanJob.scan_uuid)
+            .where(ScanJob.status.in_(["running", "completed"]))
+            .order_by(
+                case((ScanJob.status == "running", 1), (ScanJob.status == "completed", 2), else_=3).asc(),
+                ScanJob.created_at.desc(),
+            )
             .limit(1)
         ).scalar_one_or_none()
         if not latest_scan:
@@ -66,8 +72,11 @@ class RecommendationRepository(BaseRepository[Recommendation]):
     def get_latest_scan(self) -> ScanJob | None:
         return self._session.execute(
             select(ScanJob)
-            .where(ScanJob.status == "completed")
-            .order_by(ScanJob.completed_at.desc(), ScanJob.created_at.desc())
+            .where(ScanJob.status.in_(["running", "completed"]))
+            .order_by(
+                case((ScanJob.status == "running", 1), (ScanJob.status == "completed", 2), else_=3).asc(),
+                ScanJob.created_at.desc(),
+            )
             .limit(1)
         ).scalar_one_or_none()
 
