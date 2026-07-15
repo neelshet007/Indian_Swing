@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import axios from 'axios'
-import { createChart } from 'lightweight-charts'
+import { createChart, CandlestickSeries } from 'lightweight-charts'
 
 function ReplayChart({ candles, signal }) {
   const containerRef = useRef(null)
@@ -19,7 +19,7 @@ function ReplayChart({ candles, signal }) {
         rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)' },
         timeScale: { borderColor: 'rgba(255,255,255,0.06)', timeVisible: true },
       })
-      const series = chart.addCandlestickSeries({
+      const series = chart.addSeries(CandlestickSeries, {
         upColor: '#22c55e', downColor: '#ef4444',
         borderVisible: false, wickUpColor: '#22c55e', wickDownColor: '#ef4444',
       })

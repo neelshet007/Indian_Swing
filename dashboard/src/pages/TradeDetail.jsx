@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { createChart } from 'lightweight-charts'
+import { createChart, CandlestickSeries } from 'lightweight-charts'
 
 // ---------- helpers ----------
 const fmt = (v, prefix = '₹', decimals = 2) => {
@@ -29,52 +29,83 @@ const fmtK = (v) => {
 function CandlestickChart({ symbol, rec }) {
   const chartRef = useRef(null)
   const containerRef = useRef(null)
+  const [chartError, setChartError] = useState(null)
 
   useEffect(() => {
     if (!containerRef.current || !symbol) return
-    const chart = createChart(containerRef.current, {
-      width: containerRef.current.clientWidth,
-      height: 340,
-      layout: { background: { color: '#0b0f1a' }, textColor: '#8899b5' },
-      grid: {
-        vertLines: { color: 'rgba(255,255,255,0.02)' },
-        horzLines: { color: 'rgba(255,255,255,0.02)' },
-      },
-      crosshair: { mode: 1 },
-      rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)' },
-      timeScale: { borderColor: 'rgba(255,255,255,0.06)', timeVisible: true },
-    })
-
-    const candleSeries = chart.addCandlestickSeries({
-      upColor: '#22c55e', downColor: '#ef4444',
-      borderVisible: false,
-      wickUpColor: '#22c55e', wickDownColor: '#ef4444',
-    })
-
-    axios.get(`/api/stocks/${symbol}/ohlcv`, { params: { days: 365 } })
-      .then(({ data }) => {
-        const candles = data.map(d => ({ time: d.date, open: d.open, high: d.high, low: d.low, close: d.close }))
-        candleSeries.setData(candles)
-        if (rec && data.length > 0) {
-          [
-            { price: rec.entry_price, color: '#4f8ef7', title: `Entry ${fmt(rec.entry_price)}` },
-            { price: rec.stop_loss, color: '#ef4444', title: `Stop ${fmt(rec.stop_loss)}` },
-            { price: rec.target_1, color: '#22c55e', title: `Target ${fmt(rec.target_1)}` },
-          ].filter(p => p.price).forEach(pl =>
-            candleSeries.createPriceLine({ ...pl, lineWidth: 1.5, lineStyle: 2 })
-          )
-        }
-        chart.timeScale().fitContent()
+    let chart = null
+    try {
+      chart = createChart(containerRef.current, {
+        width: containerRef.current.clientWidth,
+        height: 340,
+        layout: { background: { color: '#0b0f1a' }, textColor: '#8899b5' },
+        grid: {
+          vertLines: { color: 'rgba(255,255,255,0.02)' },
+          horzLines: { color: 'rgba(255,255,255,0.02)' },
+        },
+        crosshair: { mode: 1 },
+        rightPriceScale: { borderColor: 'rgba(255,255,255,0.06)' },
+        timeScale: { borderColor: 'rgba(255,255,255,0.06)', timeVisible: true },
       })
-      .catch(() => {})
 
-    chartRef.current = chart
+      // lightweight-charts v5 API: addSeries(SeriesType, options)
+      const candleSeries = chart.addSeries(CandlestickSeries, {
+        upColor: '#22c55e', downColor: '#ef4444',
+        borderVisible: false,
+        wickUpColor: '#22c55e', wickDownColor: '#ef4444',
+      })
+
+      axios.get(`/api/stocks/${encodeURIComponent(symbol)}/ohlcv`, { params: { days: 365 } })
+        .then(({ data }) => {
+          const candles = data
+            .filter(d => d.open && d.high && d.low && d.close)
+            .map(d => ({ time: d.date, open: d.open, high: d.high, low: d.low, close: d.close }))
+          if (candles.length > 0) {
+            candleSeries.setData(candles)
+          }
+          if (rec && candles.length > 0) {
+            [
+              { price: rec.entry_price, color: '#4f8ef7', title: `Entry ${fmt(rec.entry_price)}` },
+              { price: rec.stop_loss, color: '#ef4444', title: `Stop ${fmt(rec.stop_loss)}` },
+              { price: rec.target_1, color: '#22c55e', title: `Target ${fmt(rec.target_1)}` },
+            ].filter(p => p.price && !isNaN(p.price)).forEach(pl =>
+              candleSeries.createPriceLine({ ...pl, lineWidth: 1.5, lineStyle: 2 })
+            )
+          }
+          chart.timeScale().fitContent()
+        })
+        .catch(() => setChartError('Chart data unavailable'))
+
+      chartRef.current = chart
+    } catch (e) {
+      setChartError('Chart failed to initialize')
+      return
+    }
+
     const ro = new ResizeObserver(() => {
-      chart.applyOptions({ width: containerRef.current?.clientWidth || 600 })
+      if (chart && containerRef.current) {
+        chart.applyOptions({ width: containerRef.current.clientWidth || 600 })
+      }
     })
-    ro.observe(containerRef.current)
-    return () => { chart.remove(); ro.disconnect() }
+    if (containerRef.current) ro.observe(containerRef.current)
+
+    return () => {
+      try { chart?.remove() } catch (_) {}
+      ro.disconnect()
+    }
   }, [symbol, rec])
+
+  if (chartError) {
+    return (
+      <div style={{
+        height: 340, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        border: '1px solid var(--border)', borderRadius: 8,
+        color: 'var(--text-muted)', fontSize: '0.85rem',
+      }}>
+        {chartError}
+      </div>
+    )
+  }
 
   return (
     <div ref={containerRef} style={{
