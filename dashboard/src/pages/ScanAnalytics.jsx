@@ -75,7 +75,7 @@ export default function ScanAnalytics() {
         }
 
         const [scanRes, anRes, histRes] = await Promise.all([
-          axios.get(`/api/scans/${targetUuid}`),
+          axios.get(`/api/scans/uuid/${targetUuid}`),
           axios.get(`/api/scans/${targetUuid}/analytics`),
           axios.get('/api/scans/history/summary')
         ])
