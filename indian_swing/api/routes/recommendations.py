@@ -61,6 +61,7 @@ async def get_latest_scan_snapshot():
                     "filter_summary": scan.filter_summary,
                     "validation_summary": scan.validation_summary,
                     "recommendations_created": scan.recommendations_created,
+                    "errors": scan.notes.get("errors", []) if isinstance(scan.notes, dict) else [],
                 },
                 "recommendations": recommendations,
             }

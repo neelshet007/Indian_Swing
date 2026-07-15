@@ -52,6 +52,7 @@ class RecommendationScanner:
             "failed": 0,
             "current_symbol": None,
             "current_stage": "Idle",
+            "errors": [],
         }
 
     async def scan(self, scan_date: date | None = None, force_refresh: bool = False) -> ScanResult:
@@ -76,6 +77,7 @@ class RecommendationScanner:
                 "failed": 0,
                 "current_symbol": None,
                 "current_stage": "Loading Universe",
+                "errors": [],
             }
         )
 
@@ -200,9 +202,13 @@ class RecommendationScanner:
                 except Exception as exc:
                     result.stocks_scanned += 1
                     result.failed_stocks += 1
-                    result.errors.append(f"{stock.symbol}: {exc}")
+                    error_msg = f"{stock.symbol}: {exc}"
+                    result.errors.append(error_msg)
                     self.progress_state["completed"] = result.stocks_scanned
                     self.progress_state["failed"] = result.failed_stocks
+                    if "errors" not in self.progress_state:
+                        self.progress_state["errors"] = []
+                    self.progress_state["errors"].append(error_msg)
                     logger.error("scanner.stock_failed", symbol=stock.symbol, stage=self.progress_state["current_stage"], error=str(exc))
                     if result.stocks_scanned % 10 == 0 or result.stocks_scanned == len(stocks):
                         await asyncio.get_running_loop().run_in_executor(
@@ -449,6 +455,7 @@ class RecommendationScanner:
             job.failed_stocks = result.failed_stocks
             job.filter_summary = result.filter_summary
             job.validation_summary = result.validation_summary
+            job.notes = {"errors": result.errors}
             job.completed_at = datetime.utcnow()
 
     def _fail_scan_job(self, scan_uuid: str, error: str) -> None:

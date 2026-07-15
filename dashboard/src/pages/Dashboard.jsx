@@ -90,7 +90,21 @@ export default function Dashboard() {
       total_stocks: 0,
       failed: 0
     })
-    await axios.post(`/api/scanner/run?scan_date=${scanDate}`)
+    try {
+      const { data } = await axios.post(`/api/scanner/run?scan_date=${scanDate}`)
+      if (data.status === 'completed') {
+        setScanning(false)
+        setScanStatus(null)
+        loadSnapshot()
+        return
+      }
+    } catch (err) {
+      if (err.response?.status !== 409) {
+        setError(err.response?.data?.detail || 'Failed to start scan.')
+        setScanning(false)
+        return
+      }
+    }
     pollProgress()
   }
 
@@ -114,6 +128,19 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadSnapshot()
+    
+    // Hook into active background scan on mount/refresh
+    const checkRunningScan = async () => {
+      try {
+        const { data } = await axios.get('/api/scanner/progress')
+        if (data.status === 'running') {
+          setScanning(true)
+          setScanStatus(data)
+          setTimeout(pollProgress, 1000)
+        }
+      } catch (_err) {}
+    }
+    checkRunningScan()
   }, [])
 
   const scan = snapshot.scan
@@ -156,6 +183,14 @@ export default function Dashboard() {
           <div style={{ marginTop: '12px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
             <strong>Filter Summary:</strong> {Object.entries(scan.filter_summary || {}).map(([key, value]) => `${key} ${value}`).join(' • ') || 'No summary'}
           </div>
+          {scan.errors && scan.errors.length > 0 && (
+            <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)', maxHeight: '150px', overflowY: 'auto' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '4px' }}>Failed Stocks ({scan.failed_stocks}):</div>
+              {scan.errors.map((err, idx) => (
+                <div key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>• {err}</div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -177,6 +212,14 @@ export default function Dashboard() {
             <span style={{ color: 'var(--accent-green)', fontWeight: 500 }}>Success: {scanStatus.completed - (scanStatus.failed || 0)}</span>
             <span style={{ color: 'var(--accent-red)', fontWeight: 500 }}>Failed: {scanStatus.failed || 0}</span>
           </div>
+          {scanStatus.errors && scanStatus.errors.length > 0 && (
+            <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)', maxHeight: '100px', overflowY: 'auto' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '4px' }}>Scan Errors:</div>
+              {scanStatus.errors.map((err, idx) => (
+                <div key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>• {err}</div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
