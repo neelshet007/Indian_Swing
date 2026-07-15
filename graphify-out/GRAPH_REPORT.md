@@ -1,7 +1,7 @@
 # Graph Report - C:\Indian_Swing  (2026-07-15)
 
 ## Corpus Check
-- 94 files · ~107,646 words
+- 94 files · ~107,649 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
