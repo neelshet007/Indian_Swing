@@ -57,6 +57,43 @@ class RecommendationScanner:
 
     async def scan(self, scan_date: date | None = None, force_refresh: bool = False) -> ScanResult:
         scan_date = scan_date or date.today()
+
+        if not force_refresh:
+            loop = asyncio.get_running_loop()
+            def _check_completed():
+                with get_sync_session() as session:
+                    return session.execute(
+                        select(ScanJob).where(
+                            ScanJob.scan_date == scan_date,
+                            ScanJob.status == "completed",
+                            ScanJob.strategy_name == self.strategy.name,
+                            ScanJob.strategy_version == self.strategy.version
+                        )
+                    ).scalars().first()
+            existing_job = await loop.run_in_executor(None, _check_completed)
+            if existing_job:
+                result = ScanResult(
+                    scan_date=scan_date,
+                    scan_uuid=existing_job.scan_uuid,
+                    signals_generated=existing_job.signals_generated,
+                    stocks_scanned=existing_job.stocks_scanned,
+                    recommendations_saved=existing_job.recommendations_created,
+                    failed_stocks=existing_job.failed_stocks,
+                    filter_summary=existing_job.filter_summary,
+                    validation_summary=existing_job.validation_summary,
+                    errors=existing_job.notes.get("errors", []) if isinstance(existing_job.notes, dict) else []
+                )
+                self.progress_state.update({
+                    "status": "completed",
+                    "scan_uuid": existing_job.scan_uuid,
+                    "scan_date": str(scan_date),
+                    "total_stocks": existing_job.total_stocks,
+                    "completed": existing_job.stocks_scanned,
+                    "failed": existing_job.failed_stocks,
+                    "errors": result.errors
+                })
+                return result
+
         result = ScanResult(scan_date=scan_date)
         lookback = DynamicLookbackEngine.get_required_lookback(self.strategy)
 
@@ -343,6 +380,15 @@ class RecommendationScanner:
                 status="running",
                 total_stocks=total_stocks,
                 started_at=datetime.utcnow(),
+                notes={
+                    "trading_date": str(scan_date),
+                    "strategy_version": self.strategy.version,
+                    "scanner_version": "1.0.0",
+                    "indicator_version": "1.0.0",
+                    "configuration_hash": "default",
+                    "universe_version": "1.0.0",
+                    "errors": []
+                }
             )
             session.add(job)
             session.flush()

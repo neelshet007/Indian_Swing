@@ -1,12 +1,12 @@
 # Graph Report - C:\Indian_Swing  (2026-07-15)
 
 ## Corpus Check
-- 94 files · ~106,819 words
+- 94 files · ~107,007 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 635 nodes · 1401 edges · 56 communities detected
-- Extraction: 46% EXTRACTED · 54% INFERRED · 0% AMBIGUOUS · INFERRED: 754 edges (avg confidence: 0.63)
+- 635 nodes · 1402 edges · 56 communities detected
+- Extraction: 46% EXTRACTED · 54% INFERRED · 0% AMBIGUOUS · INFERRED: 755 edges (avg confidence: 0.63)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -398,16 +398,16 @@ Nodes (1): Inject YAML values as env vars if not already set (env vars take prio
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `OHLCVRepository` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 5`, `Community 7`?**
-  _High betweenness centrality (0.073) - this node is a cross-community bridge._
 - **Why does `get_sync_session()` connect `Community 3` to `Community 0`, `Community 1`, `Community 6`, `Community 9`, `Community 11`, `Community 12`?**
   _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `OHLCVRepository` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 5`, `Community 7`?**
+  _High betweenness centrality (0.072) - this node is a cross-community bridge._
 - **Why does `Stock` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 6`, `Community 7`?**
   _High betweenness centrality (0.069) - this node is a cross-community bridge._
 - **Are the 28 inferred relationships involving `RecommendationScanner` (e.g. with `FastAPI application entry point. Mounts all routers, configures CORS, lifespan e` and `DynamicLookbackEngine`) actually correct?**
   _`RecommendationScanner` has 28 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 30 inferred relationships involving `str` (e.g. with `health()` and `list_saved_results()`) actually correct?**
-  _`str` has 30 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 31 inferred relationships involving `str` (e.g. with `health()` and `list_saved_results()`) actually correct?**
+  _`str` has 31 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 25 inferred relationships involving `OHLCVRepository` (e.g. with `BacktestConfig` and `BacktestRunResult`) actually correct?**
   _`OHLCVRepository` has 25 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 31 inferred relationships involving `Stock` (e.g. with `BacktestConfig` and `BacktestRunResult`) actually correct?**

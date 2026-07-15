@@ -141,7 +141,7 @@ export default function Dashboard() {
     }
   }
 
-  const triggerScan = async () => {
+  const triggerScan = async (force = false) => {
     setScanning(true)
     setScanStatus({
       status: 'running',
@@ -153,7 +153,7 @@ export default function Dashboard() {
       errors: []
     })
     try {
-      const { data } = await axios.post(`/api/scanner/run?scan_date=${selectedDate}`)
+      const { data } = await axios.post(`/api/scanner/run?scan_date=${selectedDate}&force_refresh=${force}`)
       if (data.status === 'completed') {
         setScanning(false)
         loadScanForDate(selectedDate)
@@ -217,14 +217,19 @@ export default function Dashboard() {
     loadScanForDate(d)
   }
 
+  const isToday = selectedDate === new Date().toISOString().split('T')[0]
+
   return (
     <div>
       <div className="page-header">
         <div>
           <h1 className="page-title">Trading Terminal</h1>
-          <div className="page-subtitle" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+          <div className="page-subtitle" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
+            <span className={`badge badge-${isToday ? 'live' : 'historical'}`} style={{ textTransform: 'uppercase', fontWeight: 600, background: isToday ? 'rgba(34,197,94,0.1)' : 'rgba(59,130,246,0.1)', color: isToday ? 'var(--accent-green)' : 'var(--accent-blue-bright)' }}>
+              {isToday ? 'Live Scan Mode' : 'Historical Replay Mode'}
+            </span>
             <span className={`badge badge-${scanning ? 'running' : currentScan ? 'completed' : 'pending'}`} style={{ textTransform: 'uppercase', fontWeight: 600 }}>
-              {scanning ? 'Scanning' : currentScan ? 'Completed' : 'No Scan Available'}
+              {scanning ? 'Scanning' : currentScan ? 'Cached Snapshot Available' : 'No Scan Available'}
             </span>
             <span style={{ color: 'var(--text-secondary)' }}>
               {scanning 
@@ -248,9 +253,18 @@ export default function Dashboard() {
             />
           </div>
           <button className="btn btn-ghost" onClick={loadLatest} style={{ marginTop: '16px' }}>Reset to Latest</button>
+          {currentScan && !scanning && (
+            <button 
+              className="btn btn-ghost" 
+              onClick={() => triggerScan(true)} 
+              style={{ marginTop: '16px', color: 'var(--accent-red)', borderColor: 'rgba(239, 68, 68, 0.3)' }}
+            >
+              Force Rescan
+            </button>
+          )}
           <button 
             className={`btn btn-primary ${scanning ? 'pulse' : ''}`} 
-            onClick={triggerScan} 
+            onClick={() => triggerScan(false)} 
             disabled={scanning}
             style={{ marginTop: '16px' }}
           >
@@ -287,11 +301,12 @@ export default function Dashboard() {
                 Scan Completed
               </div>
               <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                <div><strong>Scan Date:</strong> {selectedDate}</div>
                 <div><strong>Scanned:</strong> {scanStatus.total_stocks || (currentScan?.total_stocks)} Stocks</div>
                 <div><strong>Recommendations:</strong> {recommendations.length}</div>
                 {currentScan && (
                   <>
-                    <div><strong>Completed At:</strong> {currentScan.completed_at ? new Date(currentScan.completed_at).toLocaleString() : 'N/A'}</div>
+                    <div><strong>Scan Completed At:</strong> {currentScan.completed_at ? new Date(currentScan.completed_at).toLocaleString() : 'N/A'}</div>
                     {currentScan.started_at && currentScan.completed_at && (
                       <div><strong>Duration:</strong> {formatDuration(currentScan.started_at, currentScan.completed_at)}</div>
                     )}
