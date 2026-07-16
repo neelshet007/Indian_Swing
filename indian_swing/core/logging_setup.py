@@ -71,7 +71,7 @@ def configure_logging(level: str = "INFO", fmt: str = "json") -> None:
     root_logger.setLevel(log_level)
 
     # Quiet noisy third-party loggers
-    for noisy in ("yfinance", "peewee", "urllib3", "sqlalchemy.engine"):
+    for noisy in ("yfinance", "peewee", "urllib3", "sqlalchemy.engine", "httpx", "httpcore"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
 
