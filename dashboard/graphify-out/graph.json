@@ -1,0 +1,667 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "vite.config.js",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\vite.config.js",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_vite_config_js",
+      "community": 8,
+      "norm_label": "vite.config.js"
+    },
+    {
+      "label": "App.jsx",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\App.jsx",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_src_app_jsx",
+      "community": 4,
+      "norm_label": "app.jsx"
+    },
+    {
+      "label": "Sidebar()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\App.jsx",
+      "source_location": "L19",
+      "id": "app_sidebar",
+      "community": 4,
+      "norm_label": "sidebar()"
+    },
+    {
+      "label": "App()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\App.jsx",
+      "source_location": "L79",
+      "id": "app_app",
+      "community": 4,
+      "norm_label": "app()"
+    },
+    {
+      "label": "main.jsx",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\main.jsx",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_src_main_jsx",
+      "community": 9,
+      "norm_label": "main.jsx"
+    },
+    {
+      "label": "Backtesting.jsx",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Backtesting.jsx",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_src_pages_backtesting_jsx",
+      "community": 5,
+      "norm_label": "backtesting.jsx"
+    },
+    {
+      "label": "MetricCard()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Backtesting.jsx",
+      "source_location": "L6",
+      "id": "backtesting_metriccard",
+      "community": 5,
+      "norm_label": "metriccard()"
+    },
+    {
+      "label": "Backtesting()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Backtesting.jsx",
+      "source_location": "L16",
+      "id": "backtesting_backtesting",
+      "community": 5,
+      "norm_label": "backtesting()"
+    },
+    {
+      "label": "Dashboard.jsx",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_src_pages_dashboard_jsx",
+      "community": 3,
+      "norm_label": "dashboard.jsx"
+    },
+    {
+      "label": "getConvictionClass()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
+      "source_location": "L5",
+      "id": "dashboard_getconvictionclass",
+      "community": 3,
+      "norm_label": "getconvictionclass()"
+    },
+    {
+      "label": "RecCard()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
+      "source_location": "L11",
+      "id": "dashboard_reccard",
+      "community": 3,
+      "norm_label": "reccard()"
+    },
+    {
+      "label": "Dashboard()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
+      "source_location": "L62",
+      "id": "dashboard_dashboard",
+      "community": 3,
+      "norm_label": "dashboard()"
+    },
+    {
+      "label": "ReplayPage.jsx",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ReplayPage.jsx",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_src_pages_replaypage_jsx",
+      "community": 6,
+      "norm_label": "replaypage.jsx"
+    },
+    {
+      "label": "ReplayChart()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ReplayPage.jsx",
+      "source_location": "L6",
+      "id": "replaypage_replaychart",
+      "community": 6,
+      "norm_label": "replaychart()"
+    },
+    {
+      "label": "ReplayPage()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ReplayPage.jsx",
+      "source_location": "L56",
+      "id": "replaypage_replaypage",
+      "community": 6,
+      "norm_label": "replaypage()"
+    },
+    {
+      "label": "ScanAnalytics.jsx",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "community": 1,
+      "norm_label": "scananalytics.jsx"
+    },
+    {
+      "label": "Card()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L8",
+      "id": "scananalytics_card",
+      "community": 1,
+      "norm_label": "card()"
+    },
+    {
+      "label": "Metric()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L17",
+      "id": "scananalytics_metric",
+      "community": 1,
+      "norm_label": "metric()"
+    },
+    {
+      "label": "FunnelRow()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L26",
+      "id": "scananalytics_funnelrow",
+      "community": 1,
+      "norm_label": "funnelrow()"
+    },
+    {
+      "label": "ScanAnalytics()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L54",
+      "id": "scananalytics_scananalytics",
+      "community": 1,
+      "norm_label": "scananalytics()"
+    },
+    {
+      "label": "Stocks.jsx",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Stocks.jsx",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_src_pages_stocks_jsx",
+      "community": 7,
+      "norm_label": "stocks.jsx"
+    },
+    {
+      "label": "Stocks()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Stocks.jsx",
+      "source_location": "L4",
+      "id": "stocks_stocks",
+      "community": 7,
+      "norm_label": "stocks()"
+    },
+    {
+      "label": "TradeDetail.jsx",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L1",
+      "id": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "community": 0,
+      "norm_label": "tradedetail.jsx"
+    },
+    {
+      "label": "fmt()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L7",
+      "id": "tradedetail_fmt",
+      "community": 2,
+      "norm_label": "fmt()"
+    },
+    {
+      "label": "fmtPct()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L11",
+      "id": "tradedetail_fmtpct",
+      "community": 2,
+      "norm_label": "fmtpct()"
+    },
+    {
+      "label": "fmtNum()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L15",
+      "id": "tradedetail_fmtnum",
+      "community": 2,
+      "norm_label": "fmtnum()"
+    },
+    {
+      "label": "fmtCr()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L19",
+      "id": "tradedetail_fmtcr",
+      "community": 0,
+      "norm_label": "fmtcr()"
+    },
+    {
+      "label": "fmtK()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L23",
+      "id": "tradedetail_fmtk",
+      "community": 2,
+      "norm_label": "fmtk()"
+    },
+    {
+      "label": "CandlestickChart()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L29",
+      "id": "tradedetail_candlestickchart",
+      "community": 0,
+      "norm_label": "candlestickchart()"
+    },
+    {
+      "label": "Card()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L121",
+      "id": "tradedetail_card",
+      "community": 0,
+      "norm_label": "card()"
+    },
+    {
+      "label": "KV()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L147",
+      "id": "tradedetail_kv",
+      "community": 0,
+      "norm_label": "kv()"
+    },
+    {
+      "label": "RuleRow()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L165",
+      "id": "tradedetail_rulerow",
+      "community": 0,
+      "norm_label": "rulerow()"
+    },
+    {
+      "label": "TradeDetail()",
+      "file_type": "code",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L192",
+      "id": "tradedetail_tradedetail",
+      "community": 2,
+      "norm_label": "tradedetail()"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\App.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_app_jsx",
+      "_tgt": "app_sidebar",
+      "source": "c_indian_swing_dashboard_src_app_jsx",
+      "target": "app_sidebar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\App.jsx",
+      "source_location": "L79",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_app_jsx",
+      "_tgt": "app_app",
+      "source": "c_indian_swing_dashboard_src_app_jsx",
+      "target": "app_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Backtesting.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_backtesting_jsx",
+      "_tgt": "backtesting_metriccard",
+      "source": "c_indian_swing_dashboard_src_pages_backtesting_jsx",
+      "target": "backtesting_metriccard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Backtesting.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_backtesting_jsx",
+      "_tgt": "backtesting_backtesting",
+      "source": "c_indian_swing_dashboard_src_pages_backtesting_jsx",
+      "target": "backtesting_backtesting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_dashboard_jsx",
+      "_tgt": "dashboard_getconvictionclass",
+      "source": "c_indian_swing_dashboard_src_pages_dashboard_jsx",
+      "target": "dashboard_getconvictionclass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_dashboard_jsx",
+      "_tgt": "dashboard_reccard",
+      "source": "c_indian_swing_dashboard_src_pages_dashboard_jsx",
+      "target": "dashboard_reccard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_dashboard_jsx",
+      "_tgt": "dashboard_dashboard",
+      "source": "c_indian_swing_dashboard_src_pages_dashboard_jsx",
+      "target": "dashboard_dashboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Dashboard.jsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "dashboard_reccard",
+      "_tgt": "dashboard_getconvictionclass",
+      "source": "dashboard_getconvictionclass",
+      "target": "dashboard_reccard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ReplayPage.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_replaypage_jsx",
+      "_tgt": "replaypage_replaychart",
+      "source": "c_indian_swing_dashboard_src_pages_replaypage_jsx",
+      "target": "replaypage_replaychart",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ReplayPage.jsx",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_replaypage_jsx",
+      "_tgt": "replaypage_replaypage",
+      "source": "c_indian_swing_dashboard_src_pages_replaypage_jsx",
+      "target": "replaypage_replaypage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "_tgt": "scananalytics_card",
+      "source": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "target": "scananalytics_card",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "_tgt": "scananalytics_metric",
+      "source": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "target": "scananalytics_metric",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "_tgt": "scananalytics_funnelrow",
+      "source": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "target": "scananalytics_funnelrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\ScanAnalytics.jsx",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "_tgt": "scananalytics_scananalytics",
+      "source": "c_indian_swing_dashboard_src_pages_scananalytics_jsx",
+      "target": "scananalytics_scananalytics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\Stocks.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_stocks_jsx",
+      "_tgt": "stocks_stocks",
+      "source": "c_indian_swing_dashboard_src_pages_stocks_jsx",
+      "target": "stocks_stocks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_fmt",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_fmt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_fmtpct",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_fmtpct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_fmtnum",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_fmtnum",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_fmtcr",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_fmtcr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_fmtk",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_fmtk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_candlestickchart",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_candlestickchart",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L121",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_card",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_card",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L147",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_kv",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_kv",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L165",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_rulerow",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_rulerow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L192",
+      "weight": 1.0,
+      "_src": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "_tgt": "tradedetail_tradedetail",
+      "source": "c_indian_swing_dashboard_src_pages_tradedetail_jsx",
+      "target": "tradedetail_tradedetail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L273",
+      "weight": 1.0,
+      "_src": "tradedetail_tradedetail",
+      "_tgt": "tradedetail_fmt",
+      "source": "tradedetail_fmt",
+      "target": "tradedetail_tradedetail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L277",
+      "weight": 1.0,
+      "_src": "tradedetail_tradedetail",
+      "_tgt": "tradedetail_fmtpct",
+      "source": "tradedetail_fmtpct",
+      "target": "tradedetail_tradedetail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L274",
+      "weight": 1.0,
+      "_src": "tradedetail_tradedetail",
+      "_tgt": "tradedetail_fmtnum",
+      "source": "tradedetail_fmtnum",
+      "target": "tradedetail_tradedetail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L372",
+      "weight": 1.0,
+      "_src": "tradedetail_tradedetail",
+      "_tgt": "tradedetail_fmtcr",
+      "source": "tradedetail_fmtcr",
+      "target": "tradedetail_tradedetail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Indian_Swing\\dashboard\\src\\pages\\TradeDetail.jsx",
+      "source_location": "L372",
+      "weight": 1.0,
+      "_src": "tradedetail_tradedetail",
+      "_tgt": "tradedetail_fmtk",
+      "source": "tradedetail_fmtk",
+      "target": "tradedetail_tradedetail",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": []
+}
