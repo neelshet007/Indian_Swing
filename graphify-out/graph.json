@@ -1358,9 +1358,9 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L136",
-      "id": "settings_rationale_136",
       "community": 11,
-      "norm_label": "inject yaml values as env vars if not already set (env vars take priority)."
+      "norm_label": "inject yaml values as env vars if not already set (env vars take priority).",
+      "id": "settings_rationale_136"
     },
     {
       "label": "__init__.py",
@@ -1997,27 +1997,27 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L40",
-      "id": "symbols_rationale_40",
       "community": 4,
-      "norm_label": "centralized symbol management layer.     ensures internal symbols are canonical,"
+      "norm_label": "centralized symbol management layer.     ensures internal symbols are canonical,",
+      "id": "symbols_rationale_40"
     },
     {
       "label": "Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L48",
-      "id": "symbols_rationale_48",
       "community": 29,
-      "norm_label": "cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)"
+      "norm_label": "cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)",
+      "id": "symbols_rationale_48"
     },
     {
       "label": "Gets the provider-specific symbol, utilizing caching to prevent redundant format",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L68",
-      "id": "symbols_rationale_68",
       "community": 30,
-      "norm_label": "gets the provider-specific symbol, utilizing caching to prevent redundant format"
+      "norm_label": "gets the provider-specific symbol, utilizing caching to prevent redundant format",
+      "id": "symbols_rationale_68"
     },
     {
       "label": "types.py",
@@ -2599,7 +2599,7 @@
       "label": "._ensure_benchmark()",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\universe.py",
-      "source_location": "L55",
+      "source_location": "L71",
       "id": "universe_universeloader_ensure_benchmark",
       "community": 0,
       "norm_label": "._ensure_benchmark()"
@@ -2960,18 +2960,18 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L1",
-      "id": "upstox_provider_rationale_1",
       "community": 5,
-      "norm_label": "upstox data provider implementation. handles instrument master mapping, rate lim"
+      "norm_label": "upstox data provider implementation. handles instrument master mapping, rate lim",
+      "id": "upstox_provider_rationale_1"
     },
     {
       "label": "Upstox-backed provider.     Downloads instrument master data once a day to resol",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L32",
-      "id": "upstox_provider_rationale_32",
       "community": 5,
-      "norm_label": "upstox-backed provider.     downloads instrument master data once a day to resol"
+      "norm_label": "upstox-backed provider.     downloads instrument master data once a day to resol",
+      "id": "upstox_provider_rationale_32"
     },
     {
       "label": "yfinance_provider.py",
@@ -9432,8 +9432,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L86",
       "weight": 1.0,
-      "_src": "upstox_provider_upstoxprovider_ensure_instrument_map",
-      "_tgt": "str",
+      "_src": "str",
+      "_tgt": "upstox_provider_upstoxprovider_ensure_instrument_map",
       "source": "str",
       "target": "upstox_provider_upstoxprovider_ensure_instrument_map"
     },
@@ -9444,8 +9444,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L185",
       "weight": 1.0,
-      "_src": "upstox_provider_fetch_ohlcv",
-      "_tgt": "str",
+      "_src": "str",
+      "_tgt": "upstox_provider_fetch_ohlcv",
       "source": "str",
       "target": "upstox_provider_fetch_ohlcv"
     },
@@ -10380,8 +10380,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L181",
       "weight": 1.0,
-      "_src": "upstox_provider_fetch_ohlcv",
-      "_tgt": "exception",
+      "_src": "exception",
+      "_tgt": "upstox_provider_fetch_ohlcv",
       "source": "exception",
       "target": "upstox_provider_fetch_ohlcv"
     },
@@ -10463,11 +10463,11 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L24",
       "weight": 0.8,
-      "_src": "upstox_provider_upstoxprovider",
-      "_tgt": "exceptions_dataprovidererror",
+      "_src": "exceptions_dataprovidererror",
+      "_tgt": "upstox_provider_upstoxprovider",
+      "confidence_score": 0.5,
       "source": "exceptions_dataprovidererror",
-      "target": "upstox_provider_upstoxprovider",
-      "confidence_score": 0.5
+      "target": "upstox_provider_upstoxprovider"
     },
     {
       "relation": "uses",
@@ -10475,11 +10475,11 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L24",
       "weight": 0.8,
-      "_src": "upstox_provider_rationale_1",
-      "_tgt": "exceptions_dataprovidererror",
+      "_src": "exceptions_dataprovidererror",
+      "_tgt": "upstox_provider_rationale_1",
+      "confidence_score": 0.5,
       "source": "exceptions_dataprovidererror",
-      "target": "upstox_provider_rationale_1",
-      "confidence_score": 0.5
+      "target": "upstox_provider_rationale_1"
     },
     {
       "relation": "uses",
@@ -10487,11 +10487,11 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L24",
       "weight": 0.8,
-      "_src": "upstox_provider_rationale_32",
-      "_tgt": "exceptions_dataprovidererror",
+      "_src": "exceptions_dataprovidererror",
+      "_tgt": "upstox_provider_rationale_32",
+      "confidence_score": 0.5,
       "source": "exceptions_dataprovidererror",
-      "target": "upstox_provider_rationale_32",
-      "confidence_score": 0.5
+      "target": "upstox_provider_rationale_32"
     },
     {
       "relation": "uses",
@@ -10572,8 +10572,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L80",
       "weight": 1.0,
-      "_src": "upstox_provider_upstoxprovider_ensure_instrument_map",
-      "_tgt": "exceptions_dataprovidererror",
+      "_src": "exceptions_dataprovidererror",
+      "_tgt": "upstox_provider_upstoxprovider_ensure_instrument_map",
       "source": "exceptions_dataprovidererror",
       "target": "upstox_provider_upstoxprovider_ensure_instrument_map"
     },
@@ -10584,8 +10584,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L144",
       "weight": 1.0,
-      "_src": "upstox_provider_fetch_ohlcv",
-      "_tgt": "exceptions_dataprovidererror",
+      "_src": "exceptions_dataprovidererror",
+      "_tgt": "upstox_provider_fetch_ohlcv",
       "source": "exceptions_dataprovidererror",
       "target": "upstox_provider_fetch_ohlcv"
     },
@@ -13752,8 +13752,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L93",
       "weight": 1.0,
-      "_src": "upstox_provider_upstoxprovider_ensure_instrument_map",
-      "_tgt": "universe_universemanager_load",
+      "_src": "universe_universemanager_load",
+      "_tgt": "upstox_provider_upstoxprovider_ensure_instrument_map",
       "source": "universe_universemanager_load",
       "target": "upstox_provider_upstoxprovider_ensure_instrument_map"
     },
@@ -14965,9 +14965,9 @@
       "weight": 0.8,
       "_src": "provider_factory_rationale_1",
       "_tgt": "upstox_provider_upstoxprovider",
+      "confidence_score": 0.5,
       "source": "provider_factory_rationale_1",
-      "target": "upstox_provider_upstoxprovider",
-      "confidence_score": 0.5
+      "target": "upstox_provider_upstoxprovider"
     },
     {
       "relation": "uses",
@@ -15001,9 +15001,9 @@
       "weight": 0.8,
       "_src": "provider_factory_rationale_15",
       "_tgt": "upstox_provider_upstoxprovider",
+      "confidence_score": 0.5,
       "source": "provider_factory_rationale_15",
-      "target": "upstox_provider_upstoxprovider",
-      "confidence_score": 0.5
+      "target": "upstox_provider_upstoxprovider"
     },
     {
       "relation": "contains",
@@ -15045,7 +15045,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\universe.py",
-      "source_location": "L55",
+      "source_location": "L71",
       "weight": 1.0,
       "_src": "universe_universeloader",
       "_tgt": "universe_universeloader_ensure_benchmark",
@@ -15117,7 +15117,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\universe.py",
-      "source_location": "L51",
+      "source_location": "L67",
       "weight": 1.0,
       "_src": "universe_universeloader_load_universe",
       "_tgt": "universe_universeloader_ensure_benchmark",
@@ -15539,11 +15539,11 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L26",
       "weight": 0.8,
-      "_src": "upstox_provider_upstoxprovider",
-      "_tgt": "base_dataprovider",
+      "_src": "base_dataprovider",
+      "_tgt": "upstox_provider_upstoxprovider",
+      "confidence_score": 0.5,
       "source": "base_dataprovider",
-      "target": "upstox_provider_upstoxprovider",
-      "confidence_score": 0.5
+      "target": "upstox_provider_upstoxprovider"
     },
     {
       "relation": "uses",
@@ -15551,11 +15551,11 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L26",
       "weight": 0.8,
-      "_src": "upstox_provider_rationale_1",
-      "_tgt": "base_dataprovider",
+      "_src": "base_dataprovider",
+      "_tgt": "upstox_provider_rationale_1",
+      "confidence_score": 0.5,
       "source": "base_dataprovider",
-      "target": "upstox_provider_rationale_1",
-      "confidence_score": 0.5
+      "target": "upstox_provider_rationale_1"
     },
     {
       "relation": "uses",
@@ -15563,11 +15563,11 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\data\\providers\\upstox_provider.py",
       "source_location": "L26",
       "weight": 0.8,
-      "_src": "upstox_provider_rationale_32",
-      "_tgt": "base_dataprovider",
+      "_src": "base_dataprovider",
+      "_tgt": "upstox_provider_rationale_32",
+      "confidence_score": 0.5,
       "source": "base_dataprovider",
-      "target": "upstox_provider_rationale_32",
-      "confidence_score": 0.5
+      "target": "upstox_provider_rationale_32"
     },
     {
       "relation": "uses",
@@ -16392,8 +16392,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\migrate_symbols.py",
       "source_location": "L14",
       "weight": 1.0,
-      "_src": "migrate_symbols_run_migration",
-      "_tgt": "connection_get_engine",
+      "_src": "connection_get_engine",
+      "_tgt": "migrate_symbols_run_migration",
       "source": "connection_get_engine",
       "target": "migrate_symbols_run_migration"
     },
@@ -17003,11 +17003,11 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\migrate_symbols.py",
       "source_location": "L12",
       "weight": 0.8,
-      "_src": "migrate_symbols_rationale_7",
-      "_tgt": "models_base",
+      "_src": "models_base",
+      "_tgt": "migrate_symbols_rationale_7",
+      "confidence_score": 0.5,
       "source": "models_base",
-      "target": "migrate_symbols_rationale_7",
-      "confidence_score": 0.5
+      "target": "migrate_symbols_rationale_7"
     },
     {
       "relation": "uses",

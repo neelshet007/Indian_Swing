@@ -108,7 +108,7 @@ class Settings(BaseSettings):
 
     data_dir: Path = ROOT_DIR / "data"
     cache_dir: Path = ROOT_DIR / "data" / "cache"
-    universe_file: Path = ROOT_DIR / "config" / "universe.csv"
+    universe_file: Path = ROOT_DIR / "indian_swing" / "EQUITY_L.csv"
 
     @field_validator("data_dir", "cache_dir", mode="before")
     @classmethod

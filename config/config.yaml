@@ -1,6 +1,7 @@
 app_env: development
 log_level: INFO
 log_format: json   # json | console
+universe_file: "C:/Indian_Swing/indian_swing/EQUITY_L.csv"
 
 database:
   url: "sqlite+aiosqlite:///./data/swing.db"
@@ -11,7 +12,6 @@ data:
   dir: "./data"
   cache_dir: "./data/cache"
   cache_ttl_seconds: 3600
-  universe_file: "./config/universe.csv"
 
 provider:
   default: yfinance
