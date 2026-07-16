@@ -329,14 +329,38 @@ export default function Dashboard() {
             </div>
           )}
 
-          {scanStatus.errors && scanStatus.errors.length > 0 && (
-            <div style={{ marginTop: '12px', padding: '8px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)', maxHeight: '120px', overflowY: 'auto' }}>
-              <div style={{ fontSize: '0.8rem', color: 'var(--accent-red)', fontWeight: 600, marginBottom: '4px' }}>Scan Errors ({scanStatus.errors.length}):</div>
-              {scanStatus.errors.map((err, idx) => (
-                <div key={idx} style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>• {err}</div>
-              ))}
-            </div>
-          )}
+          {scanStatus.errors && scanStatus.errors.length > 0 && (() => {
+            const inactiveWarnings = scanStatus.errors.filter(e => e.startsWith('[INACTIVE]'))
+            const runtimeErrors = scanStatus.errors.filter(e => !e.startsWith('[INACTIVE]'))
+            return (
+              <>
+                {runtimeErrors.length > 0 && (
+                  <div style={{ marginTop: '12px', padding: '10px 12px', background: 'rgba(239, 68, 68, 0.08)', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.25)', maxHeight: '140px', overflowY: 'auto' }}>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--accent-red)', fontWeight: 700, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent-red)' }} />
+                      Scan Errors ({runtimeErrors.length})
+                    </div>
+                    {runtimeErrors.map((err, idx) => (
+                      <div key={`err-${idx}`} style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontFamily: 'monospace', padding: '1px 0' }}>• {err}</div>
+                    ))}
+                  </div>
+                )}
+                {inactiveWarnings.length > 0 && (
+                  <div style={{ marginTop: '10px', padding: '10px 12px', background: 'rgba(245, 158, 11, 0.07)', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.2)', maxHeight: '140px', overflowY: 'auto' }}>
+                    <div style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 700, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }} />
+                      Inactive / Delisted Stocks ({inactiveWarnings.length}) — Skipped
+                    </div>
+                    {inactiveWarnings.map((warn, idx) => (
+                      <div key={`warn-${idx}`} style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace', padding: '1px 0' }}>
+                        {warn.replace('[INACTIVE] ', '')}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )
+          })()}
         </div>
       )}
 
@@ -347,10 +371,15 @@ export default function Dashboard() {
           <div className="empty-title">Unable to load scan</div>
           <div className="empty-sub">{error}</div>
         </div>
+      ) : !currentScan ? (
+        <div className="empty-state">
+          <div className="empty-title">No Scan Completed Yet</div>
+          <div className="empty-sub">No scan has been run for {selectedDate}. Please run a scan to evaluate the market.</div>
+        </div>
       ) : recommendations.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-title">No recommendations yet</div>
-          <div className="empty-sub">Run a scan when you are ready to evaluate the latest market state.</div>
+          <div className="empty-title">No Recommendations Found</div>
+          <div className="empty-sub">Scan was completed successfully for {selectedDate}, but no stocks met the strategy criteria.</div>
         </div>
       ) : (
         <div className="rec-grid">

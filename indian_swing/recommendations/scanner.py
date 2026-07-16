@@ -99,11 +99,19 @@ class RecommendationScanner:
         result = ScanResult(scan_date=scan_date)
         lookback = DynamicLookbackEngine.get_required_lookback(self.strategy)
 
-        stocks = await asyncio.get_running_loop().run_in_executor(None, self._load_universe_and_stocks)
+        active_stocks, inactive_stocks = await asyncio.get_running_loop().run_in_executor(None, self._load_universe_and_stocks)
+        stocks = active_stocks
         benchmark_symbol = settings.scanner.benchmark_symbol
         pipeline_symbols = [stock.symbol for stock in stocks]
         if benchmark_symbol not in pipeline_symbols:
             pipeline_symbols.append(benchmark_symbol)
+
+        # Add inactive stock warnings to errors so they surface in the UI
+        inactive_errors = [
+            f"[INACTIVE] {s.symbol} ({s.company_name or 'Unknown'}): marked inactive — delisted or no valid history"
+            for s in inactive_stocks
+        ]
+        result.errors.extend(inactive_errors)
 
         result.scan_uuid = await asyncio.get_running_loop().run_in_executor(None, self._create_scan_job, scan_date, len(stocks))
         self.progress_state.update(
@@ -116,7 +124,7 @@ class RecommendationScanner:
                 "failed": 0,
                 "current_symbol": None,
                 "current_stage": "Loading Universe",
-                "errors": [],
+                "errors": list(inactive_errors),
             }
         )
 
@@ -401,10 +409,19 @@ class RecommendationScanner:
                 job.filter_summary = filter_summary
                 job.validation_summary = validation_summary
 
-    def _load_universe_and_stocks(self) -> list[Stock]:
+    def _load_universe_and_stocks(self) -> tuple[list[Stock], list[Stock]]:
         with get_sync_session() as session:
             UniverseLoader(session).load_universe()
-            return list(StockRepository(session).get_active())
+            from sqlalchemy import select
+            from indian_swing.database.models import Stock
+            all_stocks = session.execute(
+                select(Stock)
+                .where(Stock.environment == settings.app_env.upper())
+                .order_by(Stock.symbol)
+            ).scalars().all()
+            active = [s for s in all_stocks if s.is_active]
+            inactive = [s for s in all_stocks if not s.is_active]
+            return active, inactive
 
     def _create_scan_job(self, scan_date: date, total_stocks: int) -> str:
         with get_sync_session() as session:

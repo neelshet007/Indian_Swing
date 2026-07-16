@@ -100,9 +100,11 @@ async def get_recommendation_detail_or_scan_list(id_or_uuid: str):
                 return _serialize_recommendation(rec, detailed=True)
 
             # Second, check if it matches a Scan UUID
-            repo = RecommendationRepository(session)
-            recs = repo.get_by_scan(id_or_uuid)
-            if recs:
+            from indian_swing.database.models import ScanJob
+            scan_job = session.get(ScanJob, id_or_uuid)
+            if scan_job is not None:
+                repo = RecommendationRepository(session)
+                recs = repo.get_by_scan(id_or_uuid)
                 return [_serialize_recommendation(r) for r in recs]
 
             return None

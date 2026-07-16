@@ -26,6 +26,16 @@ class YahooAdapter(ProviderAdapter):
             
         return f"{canonical_symbol}.NS"
 
+class UpstoxAdapter(ProviderAdapter):
+    @property
+    def name(self) -> str:
+        return "upstox"
+
+    def format_symbol(self, canonical_symbol: str) -> str:
+        if canonical_symbol == "^NSEI":
+            return "Nifty 50"
+        return canonical_symbol
+
 class SymbolManager:
     """
     Centralized Symbol Management Layer.

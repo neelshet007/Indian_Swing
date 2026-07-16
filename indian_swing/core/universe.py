@@ -54,7 +54,7 @@ class UniverseManager:
                 repo = StockRepository(session)
                 records = [
                     {
-                        "symbol": f"{s.symbol}.NS",
+                        "symbol": s.symbol,
                         "name": s.name,
                         "sector": s.sector or None,
                         "industry": s.industry or None,

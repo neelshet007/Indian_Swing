@@ -9,6 +9,10 @@ def run_migration():
     to enforce the canonical symbol standard.
     """
     print("Starting Symbol Migration...")
+    from indian_swing.database.models import Base
+    from indian_swing.database.connection import get_engine
+    Base.metadata.create_all(bind=get_engine())
+
     with get_sync_session() as session:
         stocks = session.execute(select(Stock)).scalars().all()
         updated_count = 0

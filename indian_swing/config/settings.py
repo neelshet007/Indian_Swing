@@ -40,10 +40,11 @@ class DatabaseSettings(BaseSettings):
 
 
 class ProviderSettings(BaseSettings):
-    default: str = "yfinance"
+    default: str = "upstox"
     yfinance_threads: int = 4
     yfinance_rate_limit_delay: float = 0.5
     yfinance_retry_attempts: int = 3
+    upstox_access_token: str | None = Field(default=None, validation_alias="UPSTOX_ACCESS_TOKEN")
 
 
 class PipelineSettings(BaseSettings):
@@ -103,6 +104,7 @@ class Settings(BaseSettings):
     backtesting: BacktestSettings = Field(default_factory=BacktestSettings)
     api: APISettings = Field(default_factory=APISettings)
     provider: ProviderSettings = Field(default_factory=ProviderSettings)
+    upstox_access_token: str | None = Field(default=None, validation_alias="UPSTOX_ACCESS_TOKEN")
 
     data_dir: Path = ROOT_DIR / "data"
     cache_dir: Path = ROOT_DIR / "data" / "cache"
