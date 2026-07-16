@@ -18,6 +18,7 @@ from indian_swing.database.models import Recommendation, ScanJob, Signal, Stock
 from indian_swing.database.repositories.ohlcv_repo import OHLCVRepository
 from indian_swing.database.repositories.stock_repo import StockRepository
 from indian_swing.indicators.calculator import IndicatorCalculator
+from indian_swing.notifications.telegram_notifier import notify_recommendations
 from indian_swing.recommendations.validator import RecommendationValidator
 from indian_swing.strategies.base import StrategyContext, StrategySignal
 from indian_swing.strategies.registry import strategy_registry
@@ -325,6 +326,25 @@ class RecommendationScanner:
             await asyncio.get_running_loop().run_in_executor(None, self._complete_scan_job, result)
             self.progress_state["status"] = "completed"
             self.progress_state["current_stage"] = "Completed"
+
+            # ----------------------------------------------------------------
+            # Telegram notification — non-invasive, isolated step.
+            # Runs *after* the scan is fully committed to the DB.
+            # Any failure here is caught inside notify_recommendations and
+            # logged; it never affects the scan result or pipeline status.
+            # ----------------------------------------------------------------
+            try:
+                await asyncio.get_running_loop().run_in_executor(
+                    None,
+                    self._send_telegram_notification,
+                    persisted,
+                )
+            except Exception as tg_exc:  # noqa: BLE001
+                logger.error(
+                    "scanner.telegram_notification_failed",
+                    error=str(tg_exc),
+                )
+
         except Exception as exc:
             await asyncio.get_running_loop().run_in_executor(None, self._fail_scan_job, result.scan_uuid, str(exc))
             self.progress_state["status"] = "failed"
@@ -584,3 +604,30 @@ class RecommendationScanner:
             job.status = "failed"
             job.error = error
             job.completed_at = datetime.utcnow()
+
+    def _send_telegram_notification(
+        self,
+        persisted: list[tuple[Stock, StrategyContext, StrategySignal]],
+    ) -> None:
+        """Build lightweight recommendation dicts and forward to the Telegram notifier.
+
+        This method is the *only* bridge between the scanner and the
+        notifications package.  It intentionally extracts a minimal,
+        serialisable snapshot so the notifier has zero dependency on ORM
+        objects or strategy internals.
+        """
+        rec_dicts: list[dict[str, Any]] = [
+            {
+                "symbol": stock.symbol,
+                "company_name": stock.name,
+                "action": signal.direction.value.upper(),
+                "entry_price": signal.entry_price,
+                "target_1": signal.target_1,
+                "target_2": signal.target_2,
+                "stop_loss": signal.stop_loss,
+                "confidence_score": signal.confidence_score,
+                "explanation": signal.explanation or {},
+            }
+            for stock, _context, signal in persisted
+        ]
+        notify_recommendations(rec_dicts)
