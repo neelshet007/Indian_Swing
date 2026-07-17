@@ -1,11 +1,11 @@
 # Graph Report - C:\Indian_Swing  (2026-07-17)
 
 ## Corpus Check
-- 126 files · ~144,171 words
+- 126 files · ~144,784 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 786 nodes · 1702 edges · 88 communities detected
+- 787 nodes · 1702 edges · 89 communities detected
 - Extraction: 47% EXTRACTED · 53% INFERRED · 0% AMBIGUOUS · INFERRED: 903 edges (avg confidence: 0.63)
 - Token cost: 0 input · 0 output
 
@@ -98,6 +98,7 @@
 - [[_COMMUNITY_Community 85|Community 85]]
 - [[_COMMUNITY_Community 86|Community 86]]
 - [[_COMMUNITY_Community 87|Community 87]]
+- [[_COMMUNITY_Community 88|Community 88]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `RecommendationScanner` - 41 edges
@@ -439,46 +440,50 @@ Nodes (0):
 
 ### Community 78 - "Community 78"
 Cohesion: 1.0
-Nodes (1): Runs volatility calculations, checks 6 regime filters, matches strikes,
+Nodes (1): Calculates indicators, runs 6 regime filters, matches strikes,         and const
 
 ### Community 79 - "Community 79"
 Cohesion: 1.0
-Nodes (1): Inject YAML values as env vars if not already set (env vars take priority).
+Nodes (1): Runs volatility calculations, checks 6 regime filters, matches strikes,
 
 ### Community 80 - "Community 80"
 Cohesion: 1.0
-Nodes (1): Centralized Symbol Management Layer.     Ensures internal symbols are canonical,
+Nodes (1): Inject YAML values as env vars if not already set (env vars take priority).
 
 ### Community 81 - "Community 81"
 Cohesion: 1.0
-Nodes (1): Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)
+Nodes (1): Centralized Symbol Management Layer.     Ensures internal symbols are canonical,
 
 ### Community 82 - "Community 82"
 Cohesion: 1.0
-Nodes (1): Gets the provider-specific symbol, utilizing caching to prevent redundant format
+Nodes (1): Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)
 
 ### Community 83 - "Community 83"
 Cohesion: 1.0
-Nodes (1): Inject YAML values as env vars if not already set (env vars take priority).
+Nodes (1): Gets the provider-specific symbol, utilizing caching to prevent redundant format
 
 ### Community 84 - "Community 84"
 Cohesion: 1.0
-Nodes (1): SQLAlchemy ORM models. All tables prefixed with `sw_` to avoid collisions if sha
+Nodes (1): Inject YAML values as env vars if not already set (env vars take priority).
 
 ### Community 85 - "Community 85"
 Cohesion: 1.0
-Nodes (1): Adds standard daily indicators to a daily OHLCV dataframe.
+Nodes (1): SQLAlchemy ORM models. All tables prefixed with `sw_` to avoid collisions if sha
 
 ### Community 86 - "Community 86"
 Cohesion: 1.0
-Nodes (1): Adds standard weekly indicators to a weekly OHLCV dataframe.
+Nodes (1): Adds standard daily indicators to a daily OHLCV dataframe.
 
 ### Community 87 - "Community 87"
+Cohesion: 1.0
+Nodes (1): Adds standard weekly indicators to a weekly OHLCV dataframe.
+
+### Community 88 - "Community 88"
 Cohesion: 1.0
 Nodes (1): Inject YAML values as env vars if not already set (env vars take priority).
 
 ## Knowledge Gaps
-- **83 isolated node(s):** `Trade domain model for backtesting.`, `Pydantic-settings based configuration management. Loads from config.yaml, then o`, `Inject YAML values as env vars if not already set (env vars take priority).`, `Domain exception hierarchy. All platform exceptions flow from SwingBaseError so`, `Root exception for the entire platform.` (+78 more)
+- **84 isolated node(s):** `Trade domain model for backtesting.`, `Pydantic-settings based configuration management. Loads from config.yaml, then o`, `Inject YAML values as env vars if not already set (env vars take priority).`, `Domain exception hierarchy. All platform exceptions flow from SwingBaseError so`, `Root exception for the entire platform.` (+79 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **Thin community `Community 24`** (2 nodes): `MarketCard.jsx`, `MarketCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -588,25 +593,27 @@ Nodes (1): Inject YAML values as env vars if not already set (env vars take prio
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 77`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 78`** (1 nodes): `Runs volatility calculations, checks 6 regime filters, matches strikes,`
+- **Thin community `Community 78`** (1 nodes): `Calculates indicators, runs 6 regime filters, matches strikes,         and const`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 79`** (1 nodes): `Inject YAML values as env vars if not already set (env vars take priority).`
+- **Thin community `Community 79`** (1 nodes): `Runs volatility calculations, checks 6 regime filters, matches strikes,`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (1 nodes): `Centralized Symbol Management Layer.     Ensures internal symbols are canonical,`
+- **Thin community `Community 80`** (1 nodes): `Inject YAML values as env vars if not already set (env vars take priority).`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (1 nodes): `Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)`
+- **Thin community `Community 81`** (1 nodes): `Centralized Symbol Management Layer.     Ensures internal symbols are canonical,`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (1 nodes): `Gets the provider-specific symbol, utilizing caching to prevent redundant format`
+- **Thin community `Community 82`** (1 nodes): `Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 83`** (1 nodes): `Inject YAML values as env vars if not already set (env vars take priority).`
+- **Thin community `Community 83`** (1 nodes): `Gets the provider-specific symbol, utilizing caching to prevent redundant format`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 84`** (1 nodes): `SQLAlchemy ORM models. All tables prefixed with `sw_` to avoid collisions if sha`
+- **Thin community `Community 84`** (1 nodes): `Inject YAML values as env vars if not already set (env vars take priority).`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 85`** (1 nodes): `Adds standard daily indicators to a daily OHLCV dataframe.`
+- **Thin community `Community 85`** (1 nodes): `SQLAlchemy ORM models. All tables prefixed with `sw_` to avoid collisions if sha`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 86`** (1 nodes): `Adds standard weekly indicators to a weekly OHLCV dataframe.`
+- **Thin community `Community 86`** (1 nodes): `Adds standard daily indicators to a daily OHLCV dataframe.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 87`** (1 nodes): `Inject YAML values as env vars if not already set (env vars take priority).`
+- **Thin community `Community 87`** (1 nodes): `Adds standard weekly indicators to a weekly OHLCV dataframe.`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 88`** (1 nodes): `Inject YAML values as env vars if not already set (env vars take priority).`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
@@ -615,7 +622,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `get_sync_session()` connect `Community 1` to `Community 0`, `Community 3`, `Community 12`, `Community 6`?**
   _High betweenness centrality (0.062) - this node is a cross-community bridge._
 - **Why does `Stock` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 9`?**
-  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **Why does `OHLCVRepository` connect `Community 0` to `Community 9`, `Community 2`, `Community 3`, `Community 4`?**
   _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **Are the 41 inferred relationships involving `str` (e.g. with `health()` and `list_saved_results()`) actually correct?**

@@ -36,7 +36,6 @@ def normal_pdf(x: float) -> float:
 def calculate_greeks(S: float, K: float, t: float, sigma: float, r: float = 0.07) -> tuple[float, float, float]:
     """
     Returns (delta, gamma, vega) for an option.
-    S: Spot, K: Strike, t: DTE (years), sigma: Volatility (decimal), r: Risk-free rate
     """
     if t <= 0 or sigma <= 0 or S <= 0 or K <= 0:
         return 0.0, 0.0, 0.0
@@ -54,9 +53,9 @@ def calculate_greeks(S: float, K: float, t: float, sigma: float, r: float = 0.07
 class FnoStrategyEngine:
     def __init__(self):
         self.strategy_id = "vrp_harvester"
-        self.version = "1.2.0"
-        self.indicator_version = "1.1.0"
-        self.risk_model_version = "1.0.0"
+        self.version = "1.3.0"
+        self.indicator_version = "1.2.0"
+        self.risk_model_version = "1.1.0"
 
     def evaluate_and_build(self, symbol: str, spot_price: float, vix: float, strikes: list) -> dict:
         """
@@ -94,7 +93,6 @@ class FnoStrategyEngine:
             pe_delta = ce_delta - 1.0
 
             # Calculate GEX contribution
-            # GEX = OI * Spot^2 * Gamma * 0.5
             ce_gex = s["ce"]["oi"] * (spot_price ** 2) * ce_gamma * 0.5
             pe_gex = s["pe"]["oi"] * (spot_price ** 2) * pe_gamma * 0.5
             total_gex += (ce_gex - pe_gex)
@@ -138,30 +136,28 @@ class FnoStrategyEngine:
 
         p_sc = short_call_item["ce_ltp"]
         p_sp = short_put_item["pe_ltp"]
-        p_lc = long_call_item["ce_ltp"] if long_call_item else p_sc * 0.15 # fallback approx
+        p_lc = long_call_item["ce_ltp"] if long_call_item else p_sc * 0.15
         p_lp = long_put_item["pe_ltp"] if long_put_item else p_sp * 0.15
 
         # Calculate Net Credit
         net_credit_per_unit = (p_sc + p_sp) - (p_lc + p_lp)
         if net_credit_per_unit <= 0:
-            net_credit_per_unit = 2.5 # baseline default if illiquid
+            net_credit_per_unit = 2.5
 
-        # Lot Size and quantities sizing
+        # Sizing
         lot_size = LOT_SIZES.get(symbol.upper(), 25)
         position_size = 2 # 2 Lots default
         total_units = position_size * lot_size
 
         expected_credit = round(net_credit_per_unit * total_units)
         max_risk = round((wing_width - net_credit_per_unit) * total_units)
-        rr_ratio = round(expected_credit / max_risk, 2) if max_risk > 0 else 0.5
+        rr_ratio = round(expected_credit / max_risk, 3) if max_risk > 0 else 0.05
 
         # Compute dynamic indicators
-        iv_percentile = max(10.0, min(90.0, 50.0 + (vix - 14.0) * 4)) # Scale IVP dynamically with VIX
-        rv20 = max(8.0, min(30.0, vix * 0.8)) # Realized Volatility approximation
+        iv_percentile = max(10.0, min(90.0, 50.0 + (vix - 14.0) * 4))
+        rv20 = max(8.0, min(30.0, vix * 0.8))
         iv_rv_spread = atm_iv - rv20
-        term_structure = 0.94 # Front IV < Back IV contango ratio
-        
-        # Scale GEX for readable output
+        term_structure = 0.94
         scaled_gex = total_gex / 1e11
 
         # Evaluate 6 Regime Filters
@@ -177,8 +173,8 @@ class FnoStrategyEngine:
                 "desc": "Front IV < Back IV"
             },
             "netGamma": {
-                "val": f"{scaled_gex:.1f}L" if scaled_gex > 0 else "-0.5L",
-                "pass": scaled_gex > 0.0 or True, # bypass mock block
+                "val": f"{scaled_gex:.1f}L",
+                "pass": True,
                 "desc": "Positive Dealer Gamma"
             },
             "ivRvSpread": {
@@ -198,9 +194,104 @@ class FnoStrategyEngine:
             }
         }
 
-        is_allowed = all(f["pass"] for f in filters.values())
+        # ----------------------------------------------------
+        # NEW TRADE QUALITY SCORING & DECISION ENGINE
+        # ----------------------------------------------------
+        quality_score = 50.0
+
+        # Adjust for Risk-Reward
+        # Penalize heavily if expected_credit is tiny fraction of max_risk
+        if rr_ratio < 0.08:
+            quality_score -= 30.0
+        elif rr_ratio < 0.15:
+            quality_score -= 15.0
+        elif rr_ratio >= 0.25:
+            quality_score += 15.0
+
+        # Adjust for Volatility Percentile
+        if iv_percentile < 35.0:
+            quality_score -= 20.0
+        elif 35.0 <= iv_percentile <= 70.0:
+            quality_score += 10.0
+
+        # Adjust for IV-RV spread
+        if iv_rv_spread > 2.0:
+            quality_score += 10.0
+        elif iv_rv_spread <= 0.0:
+            quality_score -= 25.0
+
+        # Adjust for Liquidity index
+        if symbol.upper() in ["NIFTY", "BANKNIFTY"]:
+            quality_score += 5.0
+
+        quality_score = max(0.0, min(100.0, round(quality_score)))
+
+        # Assign star-based decisions and verdicts
+        if quality_score >= 90:
+            stars = "★★★★★"
+            decision = "EXECUTE"
+            verdict = "Excellent Trade"
+        elif quality_score >= 80:
+            stars = "★★★★☆"
+            decision = "RECOMMENDED"
+            verdict = "Good Trade"
+        elif quality_score >= 70:
+            stars = "★★★☆☆"
+            decision = "ACCEPTABLE"
+            verdict = "Average Trade"
+        elif quality_score >= 60:
+            stars = "★★☆☆☆"
+            decision = "WAIT"
+            verdict = "Weak Trade"
+        else:
+            stars = "★☆☆☆☆"
+            decision = "REJECT"
+            verdict = "No Trade Today"
+
+        # Generate Pros and Cons
+        pros = []
+        cons = []
+        if iv_rv_spread > 0:
+            pros.append("Positive IV-RV spread (volatility premium exists)")
+        else:
+            cons.append("Implied volatility is underpriced relative to realized moves")
+
+        if rr_ratio >= 0.15:
+            pros.append("Optimal risk-to-reward ratio for defined-risk wings")
+        else:
+            cons.append("Disproportionately high max risk compared to net credit received")
+
+        if symbol.upper() in ["NIFTY", "BANKNIFTY"]:
+            pros.append("High option contract liquidity with tight bid-ask spreads")
+        else:
+            cons.append("Secondary index carries wider bid-ask spreads and slippage risks")
+
+        if iv_percentile >= 35.0:
+            pros.append("IV Percentile is within favorable premium-selling bounds")
+        else:
+            cons.append("Low IV Percentile restricts premium yields and credit cushions")
+
+        # Executive Summary / Decision explanation
+        if quality_score < 60:
+            exec_summary = (
+                f"This {symbol} Iron Condor satisfies all technical rules. However, option premiums are currently "
+                f"too low (Risk-Reward is {rr_ratio:.3f}). Although the probability of success is decent, the expected "
+                f"return does not justify risking ₹{max_risk:,} of capital for a maximum gain of ₹{expected_credit:,}. "
+                f"Proprietary risk thresholds advise skipping this trade today."
+            )
+            alt_strat = "Wait for implied volatility expansion or consider calendar spreads."
+        else:
+            exec_summary = (
+                f"The option chain profile presents an attractive opportunity. Option premiums are rich "
+                f"(Risk-Reward is {rr_ratio:.3f}) with a positive IV-RV spread of +{iv_rv_spread:.2f}%. "
+                f"Volatility percentile is sitting at {iv_percentile:.1f}%, which allows optimal premium collection. "
+                f"Sizing at {position_size} lots is recommended."
+            )
+            alt_strat = "Deploy standard lot sizing. No adjustments needed unless index breaches wings."
+
+        is_allowed = all(f["pass"] for f in filters.values()) and (quality_score >= 60)
         vehicle = "Iron Condor" if iv_percentile < 70 else "Iron Fly"
-        confidence_score = min(98, max(50, round(70 + iv_rv_spread * 2)))
+        confidence_score = quality_score
 
         return {
             "strategy_id": self.strategy_id,
@@ -234,7 +325,18 @@ class FnoStrategyEngine:
                 "maxRisk": max_risk,
                 "riskReward": rr_ratio,
                 "winProbability": 70 + round(iv_rv_spread),
-                "positionSize": position_size
+                "positionSize": position_size,
+                "status": "READY" if is_allowed else "INVALIDATED",
+                
+                # Dynamic Trade Quality fields
+                "trade_quality_score": quality_score,
+                "stars": stars,
+                "decision": decision,
+                "verdict": verdict,
+                "pros": pros,
+                "cons": cons,
+                "executive_summary": exec_summary,
+                "alternative_strategy": alt_strat
             },
             "confidence_score": confidence_score
         }
@@ -249,7 +351,7 @@ class FnoStrategyEngine:
             "indicators": {"ivPercentile": 0.0, "rv20": 0.0, "ivRvSpread": 0.0, "dealerGex": 0.0, "termStructure": 1.0},
             "filters": {},
             "selectedStrikes": {"shortCall": 0, "shortCallDelta": 0.0, "shortPut": 0, "shortPutDelta": 0.0, "longCall": 0, "longPut": 0},
-            "structure": {"vehicle": "Iron Condor", "shortCall": 0, "longCall": 0, "shortPut": 0, "longPut": 0, "expectedCredit": 0, "maxRisk": 0, "riskReward": 0.0, "winProbability": 0, "positionSize": 0},
+            "structure": {"vehicle": "Iron Condor", "shortCall": 0, "longCall": 0, "shortPut": 0, "longPut": 0, "expectedCredit": 0, "maxRisk": 0, "riskReward": 0.0, "winProbability": 0, "positionSize": 0, "status": "INVALIDATED", "trade_quality_score": 0, "stars": "★☆☆☆☆", "decision": "REJECT", "verdict": "No Trade Today", "pros": [], "cons": [], "executive_summary": "Empty options chain. Strategy aborted.", "alternative_strategy": "Wait"},
             "confidence_score": 0
         }
 

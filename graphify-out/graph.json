@@ -5218,7 +5218,7 @@
       "label": "FnoStrategyEngine",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L54",
+      "source_location": "L53",
       "id": "fno_strategy_fnostrategyengine",
       "community": 14,
       "norm_label": "fnostrategyengine"
@@ -5227,7 +5227,7 @@
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L55",
+      "source_location": "L54",
       "id": "fno_strategy_fnostrategyengine_init",
       "community": 14,
       "norm_label": ".__init__()"
@@ -5236,7 +5236,7 @@
       "label": ".evaluate_and_build()",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L61",
+      "source_location": "L60",
       "id": "fno_strategy_fnostrategyengine_evaluate_and_build",
       "community": 14,
       "norm_label": ".evaluate_and_build()"
@@ -5245,7 +5245,7 @@
       "label": "._get_empty_strategy_response()",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L242",
+      "source_location": "L344",
       "id": "fno_strategy_fnostrategyengine_get_empty_strategy_response",
       "community": 14,
       "norm_label": "._get_empty_strategy_response()"
@@ -5281,10 +5281,10 @@
       "label": "Calculates indicators, runs 6 regime filters, matches strikes,         and const",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L62",
+      "source_location": "L61",
+      "id": "fno_strategy_rationale_61",
       "community": 14,
-      "norm_label": "calculates indicators, runs 6 regime filters, matches strikes,         and const",
-      "id": "fno_strategy_rationale_62"
+      "norm_label": "calculates indicators, runs 6 regime filters, matches strikes,         and const"
     },
     {
       "label": "scanner.py",
@@ -6502,6 +6502,15 @@
       "norm_label": "__init__.py"
     },
     {
+      "label": "Calculates indicators, runs 6 regime filters, matches strikes,         and const",
+      "file_type": "rationale",
+      "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
+      "source_location": "L62",
+      "community": 78,
+      "norm_label": "calculates indicators, runs 6 regime filters, matches strikes,         and const",
+      "id": "fno_strategy_rationale_62"
+    },
+    {
       "label": "Returns only active, ready, or open recommendations from the database.",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
@@ -6533,7 +6542,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
       "source_location": "L15",
-      "community": 78,
+      "community": 79,
       "norm_label": "runs volatility calculations, checks 6 regime filters, matches strikes,",
       "id": "fno_strategy_rationale_15"
     },
@@ -6569,7 +6578,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L134",
-      "community": 79,
+      "community": 80,
       "norm_label": "inject yaml values as env vars if not already set (env vars take priority).",
       "id": "settings_rationale_134"
     },
@@ -6578,7 +6587,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L30",
-      "community": 80,
+      "community": 81,
       "norm_label": "centralized symbol management layer.     ensures internal symbols are canonical,",
       "id": "symbols_rationale_30"
     },
@@ -6587,7 +6596,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L38",
-      "community": 81,
+      "community": 82,
       "norm_label": "cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)",
       "id": "symbols_rationale_38"
     },
@@ -6596,7 +6605,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\core\\symbols.py",
       "source_location": "L58",
-      "community": 82,
+      "community": 83,
       "norm_label": "gets the provider-specific symbol, utilizing caching to prevent redundant format",
       "id": "symbols_rationale_58"
     },
@@ -6650,7 +6659,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L125",
-      "community": 83,
+      "community": 84,
       "norm_label": "inject yaml values as env vars if not already set (env vars take priority).",
       "id": "settings_rationale_125"
     },
@@ -6740,7 +6749,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\database\\models.py",
       "source_location": "L1",
-      "community": 84,
+      "community": 85,
       "norm_label": "sqlalchemy orm models. all tables prefixed with `sw_` to avoid collisions if sha",
       "id": "models_rationale_1"
     },
@@ -6749,7 +6758,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L7",
-      "community": 85,
+      "community": 86,
       "norm_label": "adds standard daily indicators to a daily ohlcv dataframe.",
       "id": "calculator_rationale_7"
     },
@@ -6758,7 +6767,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\indicators\\calculator.py",
       "source_location": "L38",
-      "community": 86,
+      "community": 87,
       "norm_label": "adds standard weekly indicators to a weekly ohlcv dataframe.",
       "id": "calculator_rationale_38"
     },
@@ -6965,7 +6974,7 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\config\\settings.py",
       "source_location": "L117",
-      "community": 87,
+      "community": 88,
       "norm_label": "inject yaml values as env vars if not already set (env vars take priority).",
       "id": "settings_rationale_117"
     },
@@ -24675,7 +24684,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L54",
+      "source_location": "L53",
       "weight": 1.0,
       "_src": "c_indian_swing_indian_swing_recommendations_fno_strategy_py",
       "_tgt": "fno_strategy_fnostrategyengine",
@@ -24687,7 +24696,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L46",
+      "source_location": "L45",
       "weight": 1.0,
       "_src": "fno_strategy_calculate_greeks",
       "_tgt": "fno_strategy_normal_cdf",
@@ -24711,7 +24720,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L47",
+      "source_location": "L46",
       "weight": 1.0,
       "_src": "fno_strategy_calculate_greeks",
       "_tgt": "fno_strategy_normal_pdf",
@@ -24735,7 +24744,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L90",
+      "source_location": "L89",
       "weight": 1.0,
       "_src": "fno_strategy_fnostrategyengine_evaluate_and_build",
       "_tgt": "fno_strategy_calculate_greeks",
@@ -24759,7 +24768,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L55",
+      "source_location": "L54",
       "weight": 1.0,
       "_src": "fno_strategy_fnostrategyengine",
       "_tgt": "fno_strategy_fnostrategyengine_init",
@@ -24771,7 +24780,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L61",
+      "source_location": "L60",
       "weight": 1.0,
       "_src": "fno_strategy_fnostrategyengine",
       "_tgt": "fno_strategy_fnostrategyengine_evaluate_and_build",
@@ -24783,7 +24792,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L242",
+      "source_location": "L344",
       "weight": 1.0,
       "_src": "fno_strategy_fnostrategyengine",
       "_tgt": "fno_strategy_fnostrategyengine_get_empty_strategy_response",
@@ -24795,7 +24804,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L68",
+      "source_location": "L67",
       "weight": 1.0,
       "_src": "fno_strategy_fnostrategyengine_evaluate_and_build",
       "_tgt": "fno_strategy_fnostrategyengine_get_empty_strategy_response",
@@ -24807,12 +24816,12 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L62",
+      "source_location": "L61",
       "weight": 1.0,
-      "_src": "fno_strategy_rationale_62",
+      "_src": "fno_strategy_rationale_61",
       "_tgt": "fno_strategy_fnostrategyengine_evaluate_and_build",
       "source": "fno_strategy_fnostrategyengine_evaluate_and_build",
-      "target": "fno_strategy_rationale_62",
+      "target": "fno_strategy_rationale_61",
       "confidence_score": 1.0
     },
     {

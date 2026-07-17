@@ -116,38 +116,78 @@ export default function MonitoringCard({ symbol, session }) {
             </div>
           </div>
 
+          {/* Trade Quality Score Widget */}
+          <div style={{ background: 'rgba(0,0,0,0.15)', padding: '14px', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Trade Quality Score</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                <span style={{ fontSize: '1.25rem', fontWeight: '800', fontFamily: 'var(--font-mono)' }}>
+                  {structure.trade_quality_score || 0}/100
+                </span>
+                <span style={{ color: 'var(--accent-amber)', fontSize: '0.95rem' }}>
+                  {structure.stars || '★☆☆☆☆'}
+                </span>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Proprietary Verdict</div>
+              <div style={{ fontSize: '1rem', fontWeight: '800', color: (structure.trade_quality_score || 0) >= 60 ? 'var(--accent-green)' : 'var(--accent-red)', marginTop: '4px' }}>
+                {structure.verdict || 'No Trade Today'}
+              </div>
+            </div>
+          </div>
+
           {/* BEGINNER MODE */}
           {viewMode === 'beginner' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               
-              {/* Market View */}
-              <div style={{ background: 'rgba(99, 155, 255, 0.05)', padding: '12px 16px', borderRadius: '6px', borderLeft: '3px solid var(--accent-blue-bright)' }}>
-                <div style={{ fontWeight: '700', fontSize: '0.82rem', marginBottom: '2px' }}>📈 Range-Bound Market View</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                  The market is expected to remain steady. This trade profits if {symbol} stays between <strong style={{ color: 'var(--text-primary)' }}>{structure.shortPut.toLocaleString()}</strong> and <strong style={{ color: 'var(--text-primary)' }}>{structure.shortCall.toLocaleString()}</strong> until expiry.
-                </div>
+              {/* Executive Summary */}
+              <div style={{ background: 'rgba(99, 155, 255, 0.04)', padding: '12px 14px', borderRadius: '6px', border: '1px solid rgba(99,155,255,0.1)', fontSize: '0.78rem', lineHeight: '1.4' }}>
+                <div style={{ fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>Executive Decision Summary</div>
+                <div style={{ color: 'var(--text-secondary)' }}>{structure.executive_summary}</div>
+                {(structure.trade_quality_score || 0) < 60 && (
+                  <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed var(--border)', color: 'var(--accent-amber)' }}>
+                    💡 <strong>Suggested alternative:</strong> {structure.alternative_strategy}
+                  </div>
+                )}
               </div>
 
               {/* Visual Order Sequence Flow */}
-              <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: '700' }}>VISUAL ORDER FLOW SEQUENCE</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
-                  <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.62rem', color: 'var(--accent-red)', fontWeight: '800' }}>1. SELL (CE)</div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.shortCall}</div>
+              {structure.shortCall > 0 && (
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: '700' }}>VISUAL ORDER FLOW SEQUENCE</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--accent-red)', fontWeight: '800' }}>1. SELL (CE)</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.shortCall}</div>
+                    </div>
+                    <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: '800' }}>2. BUY (CE)</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.longCall}</div>
+                    </div>
+                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--accent-red)', fontWeight: '800' }}>3. SELL (PE)</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.shortPut}</div>
+                    </div>
+                    <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: '800' }}>4. BUY (PE)</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.longPut}</div>
+                    </div>
                   </div>
-                  <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: '800' }}>2. BUY (CE)</div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.longCall}</div>
-                  </div>
-                  <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.62rem', color: 'var(--accent-red)', fontWeight: '800' }}>3. SELL (PE)</div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.shortPut}</div>
-                  </div>
-                  <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: '800' }}>4. BUY (PE)</div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.longPut}</div>
-                  </div>
+                </div>
+              )}
+
+              {/* Pros & Cons list */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.72rem' }}>
+                <div style={{ background: 'rgba(34,197,94,0.03)', padding: '10px', borderRadius: '4px', border: '1px solid rgba(34,197,94,0.1)' }}>
+                  <div style={{ fontWeight: '700', color: 'var(--accent-green)', marginBottom: '6px' }}>✓ ADVANTAGES</div>
+                  {structure.pros?.map((p, i) => <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: '3px' }}>• {p}</div>)}
+                  {(!structure.pros || structure.pros.length === 0) && <div style={{ color: 'var(--text-muted)' }}>None identified.</div>}
+                </div>
+                <div style={{ background: 'rgba(239,68,68,0.03)', padding: '10px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.1)' }}>
+                  <div style={{ fontWeight: '700', color: 'var(--accent-red)', marginBottom: '6px' }}>✗ DISADVANTAGES</div>
+                  {structure.cons?.map((c, i) => <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: '3px' }}>• {c}</div>)}
+                  {(!structure.cons || structure.cons.length === 0) && <div style={{ color: 'var(--text-muted)' }}>None identified.</div>}
                 </div>
               </div>
 
@@ -268,8 +308,8 @@ export default function MonitoringCard({ symbol, session }) {
           {/* Action Footer */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '14px', marginTop: '4px' }}>
             <div>
-              <span style={{ fontSize: '0.72rem', fontWeight: '800', padding: '3px 8px', borderRadius: '3px', background: (!marketData?.validationPassed) ? 'rgba(239,68,68,0.15)' : regimeResults.isAllowed ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)', color: (!marketData?.validationPassed) ? 'var(--accent-red)' : regimeResults.isAllowed ? 'var(--accent-green)' : 'var(--accent-amber)' }}>
-                {(!marketData?.validationPassed) ? 'DATA UNTRUSTED' : regimeResults.isAllowed ? 'READY TO EXECUTE' : 'REGIME BLOCK'}
+              <span style={{ fontSize: '0.72rem', fontWeight: '800', padding: '3px 8px', borderRadius: '3px', background: (structure.trade_quality_score || 0) < 60 ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)', color: (structure.trade_quality_score || 0) < 60 ? 'var(--accent-red)' : 'var(--accent-green)' }}>
+                {structure.decision || 'REJECT'}
               </span>
               <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '4px' }}>
                 {statusExplanations[structure.status || 'READY']}
