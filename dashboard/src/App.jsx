@@ -1,24 +1,26 @@
-import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
 import axios from 'axios'
 import Dashboard from './pages/Dashboard'
 import TradeDetail from './pages/TradeDetail'
-import Backtesting from './pages/Backtesting'
-import ReplayPage from './pages/ReplayPage'
-import Stocks from './pages/Stocks'
 import ScanAnalytics from './pages/ScanAnalytics'
+import HomeDashboard from './pages/HomeDashboard'
+import Settings from './pages/Settings'
+import Logs from './pages/Logs'
+
+// Lazy loaded F&O module to optimize bundle size
+const FOTrading = lazy(() => import('./pages/FOTrading'))
 
 const NAV = [
-  { to: '/', label: 'Recommendations', icon: '◈', section: 'ANALYSIS' },
-  { to: '/analytics', label: 'Scanner Analytics', icon: '📊', section: 'ANALYSIS' },
-  { to: '/stocks', label: 'Universe', icon: '⊞', section: 'ANALYSIS' },
-  { to: '/backtesting', label: 'Backtesting', icon: '⟳', section: 'RESEARCH' },
-  { to: '/replay', label: 'Replay', icon: '▶', section: 'RESEARCH' },
+  { to: '/dashboard', label: 'Dashboard', icon: '⊞' },
+  { to: '/', label: 'Recommendation Scanner', icon: '◈' },
+  { to: '/fo-trading', label: 'F&O Trading', icon: '⚡' },
+  { to: '/settings', label: 'Settings', icon: '⚙' },
+  { to: '/logs', label: 'Logs', icon: '📋' },
 ]
 
 function Sidebar() {
   const [health, setHealth] = useState({ db: 'checking', error: null })
-  const sections = [...new Set(NAV.map(n => n.section))]
 
   useEffect(() => {
     const checkHealth = async () => {
@@ -40,22 +42,17 @@ function Sidebar() {
         <div className="logo-mark">SwingIQ</div>
         <div className="logo-sub">Indian Equity Platform</div>
       </div>
-      <nav className="sidebar-nav">
-        {sections.map(section => (
-          <div key={section}>
-            <div className="nav-section-label">{section}</div>
-            {NAV.filter(n => n.section === section).map(item => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              >
-                <span style={{ fontSize: '1rem', width: 18 }}>{item.icon}</span>
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
-          </div>
+      <nav className="sidebar-nav" style={{ marginTop: '16px' }}>
+        {NAV.map(item => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === '/'}
+            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+          >
+            <span style={{ fontSize: '1.1rem', width: 22, display: 'inline-block' }}>{item.icon}</span>
+            <span>{item.label}</span>
+          </NavLink>
         ))}
       </nav>
       <div className="sidebar-footer">
@@ -69,7 +66,7 @@ function Sidebar() {
           </div>
         )}
         <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 8 }}>
-          v1.0.0 — Indian Equities
+          v1.1.0 — Multi-Asset Terminal
         </div>
       </div>
     </aside>
@@ -82,15 +79,25 @@ export default function App() {
       <div className="app-layout">
         <Sidebar />
         <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/recommendation/:id" element={<TradeDetail />} />
-            <Route path="/analytics" element={<ScanAnalytics />} />
-            <Route path="/analytics/:uuid" element={<ScanAnalytics />} />
-            <Route path="/stocks" element={<Stocks />} />
-            <Route path="/backtesting" element={<Backtesting />} />
-            <Route path="/replay" element={<ReplayPage />} />
-          </Routes>
+          <Suspense fallback={<div className="loader-container"><div className="loader" /></div>}>
+            <Routes>
+              {/* Home Dashboard */}
+              <Route path="/dashboard" element={<HomeDashboard />} />
+              
+              {/* Legacy Scanner (Must NOT break existing routes) */}
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/recommendation/:id" element={<TradeDetail />} />
+              <Route path="/analytics" element={<ScanAnalytics />} />
+              <Route path="/analytics/:uuid" element={<ScanAnalytics />} />
+              
+              {/* F&O Module */}
+              <Route path="/fo-trading" element={<FOTrading />} />
+              
+              {/* Settings & Logs */}
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/logs" element={<Logs />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </BrowserRouter>
