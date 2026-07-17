@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { marketService } from '../services/market/marketService'
 import { optionChainService } from '../services/option-chain/optionChainService'
+import { strategyService } from '../services/strategy/strategyService'
 
 export default function useFnoEngine() {
   const [monitoringMode, setMonitoringMode] = useState('single') // 'single' | 'multi'
@@ -10,37 +11,49 @@ export default function useFnoEngine() {
 
   const intervalRef = useRef(null)
 
-  // Fetch updates for all active indices
-  const tick = useCallback(() => {
+  // Fetch updates and run strategy engine for active indices asynchronously
+  const tick = useCallback(async () => {
     if (!isMonitoring || selectedIndices.length === 0) return
 
-    setSessions(prev => {
-      const updated = { ...prev }
-      selectedIndices.forEach(symbol => {
-        const start = performance.now()
-        try {
-          const marketData = marketService.getLatestMarketData(symbol)
-          const optionChain = optionChainService.getOptionChain(symbol)
-          const end = performance.now()
+    const updatedSessions = {}
 
-          updated[symbol] = {
-            marketData,
-            optionChain,
-            connectionStatus: 'Connected',
-            status: 'Running',
-            lastUpdate: new Date().toLocaleTimeString(),
-            latency: Math.round(end - start + 25)
+    try {
+      await Promise.all(
+        selectedIndices.map(async (symbol) => {
+          const start = performance.now()
+          try {
+            const marketData = await marketService.getLatestMarketData(symbol)
+            const optionChain = await optionChainService.getOptionChain(symbol)
+            
+            // Execute strategy engine to compute metrics & spreads
+            const evalResults = strategyService.evaluate(symbol, marketData, optionChain)
+            const end = performance.now()
+
+            updatedSessions[symbol] = {
+              marketData,
+              optionChain,
+              indicators: evalResults.indicators,
+              regimeResults: evalResults.regimeResults,
+              selectedStrikes: evalResults.selectedStrikes,
+              structure: evalResults.structure,
+              connectionStatus: 'Connected',
+              status: 'Running',
+              lastUpdate: new Date().toLocaleTimeString(),
+              latency: Math.round(end - start)
+            }
+          } catch (e) {
+            updatedSessions[symbol] = {
+              connectionStatus: 'Error',
+              status: 'Stopped'
+            }
           }
-        } catch (e) {
-          updated[symbol] = {
-            ...(prev[symbol] || {}),
-            connectionStatus: 'Error',
-            status: 'Stopped'
-          }
-        }
-      })
-      return updated
-    })
+        })
+      )
+      
+      setSessions(prev => ({ ...prev, ...updatedSessions }))
+    } catch (e) {
+      // Top level failure handling
+    }
   }, [isMonitoring, selectedIndices])
 
   const startMonitoring = () => {
@@ -78,10 +91,8 @@ export default function useFnoEngine() {
   const toggleMultiIndex = (symbol) => {
     setSelectedIndices(prev => {
       if (prev.includes(symbol)) {
-        // Keep at least one index selected
         if (prev.length === 1) return prev
         const filtered = prev.filter(s => s !== symbol)
-        // Clean session for removed index
         setSessions(sPrev => {
           const copy = { ...sPrev }
           delete copy[symbol]
@@ -94,10 +105,8 @@ export default function useFnoEngine() {
     })
   }
 
-  // Manage background loop (starts only when isMonitoring is true, cleans up on stop/unmount)
   useEffect(() => {
     if (isMonitoring) {
-      // Run immediately
       tick()
       intervalRef.current = setInterval(tick, 3000)
     } else {
