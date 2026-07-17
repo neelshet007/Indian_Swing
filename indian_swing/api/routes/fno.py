@@ -71,16 +71,24 @@ async def get_market_data(symbol: str):
             last_price = base_prices.get(symbol.upper(), 24350.0)
             vix_price = 14.12
 
-    # Log tick
+    # Log tick to DB
     _log_tick_to_db(symbol.upper(), last_price, vix_price)
-    
-    # Run data integrity validation
+
+    # 3. Retrieve option chain strikes to feed strategy engine
+    try:
+        chain_response = await get_option_chain(symbol.upper())
+        strikes_list = chain_response.get("strikes", [])
+    except Exception as ce:
+        logger.warning("fno.get_chain_failed_for_strategy", error=str(ce))
+        strikes_list = _simulate_option_chain(symbol.upper()).get("strikes", [])
+
+    # Run data integrity validation on the actual quote and chain
     spot_packet = {"spotPrice": last_price, "indiaVix": vix_price, "marketStatus": "OPEN", "expiry": "23-JUL-2026", "timestamp": datetime.utcnow().isoformat()}
-    chain_packet = {"strikes": [{"strike": last_price, "ce": {"ltp": 120.0, "iv": 12.0, "oi": 500000}, "pe": {"ltp": 115.0, "iv": 12.5, "oi": 450000}}]}
+    chain_packet = {"strikes": strikes_list}
     passed, score, errs = validator.validate_packet(symbol.upper(), spot_packet, chain_packet)
 
     # 4. Strategy Engine Recommendation Generation & Save
-    rec_obj = fno_strategy_engine.evaluate_and_build(symbol.upper(), last_price, vix_price)
+    rec_obj = fno_strategy_engine.evaluate_and_build(symbol.upper(), last_price, vix_price, strikes_list)
     saved_rec = _save_or_update_recommendation(symbol.upper(), rec_obj)
 
     return {

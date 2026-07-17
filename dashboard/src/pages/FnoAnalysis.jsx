@@ -406,6 +406,9 @@ export default function FnoAnalysis() {
           </div>
         </div>
 
+        {/* Dynamic Margin & Risk Calculator Widget */}
+        <MarginCalculator structure={structure} />
+
         {/* Section 10: Charts Placeholders */}
         <div className="card" style={{ padding: '20px' }}>
           <h3 className="section-title" style={{ marginBottom: '16px' }}>Section 10: Chart Visualizations (Standby)</h3>
@@ -418,6 +421,93 @@ export default function FnoAnalysis() {
         </div>
 
       </div>
+    </div>
+  )
+}
+
+function MarginCalculator({ structure }) {
+  const [marginPerLot, setMarginPerLot] = useState(150000)
+  const [availableCapital, setAvailableCapital] = useState(10000000)
+  const [lots, setLots] = useState(structure?.positionSize || 2)
+
+  const calcResults = useMemo(() => {
+    if (!structure) return null
+    const totalMargin = marginPerLot * lots
+    const utilization = (totalMargin / availableCapital) * 100
+    const roic = (structure.expectedCredit / totalMargin) * 100
+    const roc = (structure.expectedCredit / availableCapital) * 100
+    const maxDrawdown = (structure.maxRisk / availableCapital) * 100
+    return {
+      totalMargin,
+      utilization,
+      roic,
+      roc,
+      maxDrawdown
+    }
+  }, [structure, marginPerLot, availableCapital, lots])
+
+  return (
+    <div className="card" style={{ padding: '20px' }}>
+      <h3 className="section-title" style={{ marginBottom: '16px' }}>Interactive Institutional Margin & Risk Calculator</h3>
+      
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '20px' }}>
+        <div>
+          <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Margin per Lot (₹)</label>
+          <input 
+            type="number" 
+            value={marginPerLot} 
+            onChange={(e) => setMarginPerLot(Number(e.target.value))}
+            style={{ width: '100%', background: 'rgba(0,0,0,0.15)', border: '1px solid var(--border)', padding: '8px 12px', borderRadius: '4px', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}
+          />
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Available Capital (₹)</label>
+          <input 
+            type="number" 
+            value={availableCapital} 
+            onChange={(e) => setAvailableCapital(Number(e.target.value))}
+            style={{ width: '100%', background: 'rgba(0,0,0,0.15)', border: '1px solid var(--border)', padding: '8px 12px', borderRadius: '4px', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}
+          />
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>Position Size (Lots)</label>
+          <input 
+            type="number" 
+            value={lots} 
+            onChange={(e) => setLots(Number(e.target.value))}
+            style={{ width: '100%', background: 'rgba(0,0,0,0.15)', border: '1px solid var(--border)', padding: '8px 12px', borderRadius: '4px', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}
+          />
+        </div>
+      </div>
+
+      {calcResults && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', fontSize: '0.85rem' }}>
+          <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '6px', textAlign: 'center' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Total Margin Required</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: '700', marginTop: '4px', fontFamily: 'var(--font-mono)' }}>
+              ₹ {calcResults.totalMargin.toLocaleString('en-IN')}
+            </div>
+          </div>
+          <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '6px', textAlign: 'center' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Capital Utilization</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: '700', marginTop: '4px', fontFamily: 'var(--font-mono)', color: 'var(--accent-blue-bright)' }}>
+              {calcResults.utilization.toFixed(2)}%
+            </div>
+          </div>
+          <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '6px', textAlign: 'center' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Max Return on Margin (ROIC)</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: '700', marginTop: '4px', fontFamily: 'var(--font-mono)', color: 'var(--accent-green)' }}>
+              {calcResults.roic.toFixed(2)}%
+            </div>
+          </div>
+          <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '6px', textAlign: 'center' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Max Drawdown Risk (ROC)</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: '700', marginTop: '4px', fontFamily: 'var(--font-mono)', color: 'var(--accent-red)' }}>
+              {calcResults.maxDrawdown.toFixed(3)}%
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
