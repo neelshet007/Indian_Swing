@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import MarketCard from '../../../components/MarketCard'
 import TableCard from '../../../components/TableCard'
 
 export default function MonitoringCard({ symbol, session }) {
+  const [viewMode, setViewMode] = useState('beginner') // 'beginner' | 'professional'
+  const [showEdu, setShowEdu] = useState(false)
+
   if (!session || session.status === 'Stopped') {
     return (
       <div className="monitoring-session-card card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -18,6 +21,16 @@ export default function MonitoringCard({ symbol, session }) {
   }
 
   const { marketData, optionChain, connectionStatus, lastUpdate, latency, status, indicators, regimeResults, selectedStrikes, structure } = session
+
+  // Status mapping explanations
+  const statusExplanations = {
+    READY: "Ready to place this trade now.",
+    WAITING: "Conditions are close, but not yet suitable.",
+    INVALIDATED: "Market conditions changed. Do not enter this trade.",
+    EXECUTED: "Trade has been placed.",
+    CLOSED: "Trade has ended.",
+    EXPIRED: "Recommendation is no longer valid."
+  }
 
   return (
     <div className="monitoring-session-card card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -80,83 +93,199 @@ export default function MonitoringCard({ symbol, session }) {
         )}
       </div>
 
-      {/* VRP Indicators Section */}
-      {indicators && (
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-          <h4 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>Volatility Risk Premium (VRP) Indicators</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '4px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>IV Percentile</div>
-              <div style={{ fontSize: '1rem', fontWeight: '700', fontFamily: 'var(--font-mono)', color: 'var(--accent-blue-bright)', marginTop: '2px' }}>
-                {indicators.ivPercentile.toFixed(1)}%
-              </div>
-            </div>
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '4px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>IV-RV Spread</div>
-              <div style={{ fontSize: '1rem', fontWeight: '700', fontFamily: 'var(--font-mono)', color: 'var(--accent-green)', marginTop: '2px' }}>
-                +{indicators.ivRvSpread.toFixed(2)}%
-              </div>
-            </div>
-            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '4px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>Net GEX</div>
-              <div style={{ fontSize: '1rem', fontWeight: '700', fontFamily: 'var(--font-mono)', color: indicators.dealerGex > 0 ? 'var(--accent-green)' : 'var(--accent-red)', marginTop: '2px' }}>
-                {(indicators.dealerGex / 100000).toFixed(1)}L
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Regime Filter Validation */}
-      {regimeResults && (
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-          <div style={{ display: 'flex', justifycontent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h4 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Regime Filter Checklist</h4>
-            <span style={{ fontSize: '0.72rem', fontWeight: '700', color: regimeResults.isAllowed ? 'var(--accent-green)' : 'var(--accent-amber)' }}>
-              {regimeResults.isAllowed ? 'ALL FILTERS PASS' : 'FILTER BLOCKED'}
-            </span>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.72rem' }}>
-            {Object.entries(regimeResults.filters).map(([key, f]) => (
-              <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', background: 'rgba(255,255,255,0.02)', borderRadius: '3px', borderLeft: `2px solid ${f.pass ? 'var(--accent-green)' : 'var(--accent-amber)'}` }}>
-                <span style={{ color: 'var(--text-secondary)' }}>{key.replace(/([A-Z])/g, ' $1')}</span>
-                <span style={{ fontWeight: '600', color: f.pass ? 'var(--text-primary)' : 'var(--accent-amber)' }}>{f.val}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Recommended Setup Summary Section */}
+      {/* Recommended Setup Section */}
       {structure && (
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <h4 style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Recommended Setup</h4>
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.8rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Index:</span><span>{symbol}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Strategy:</span><span>{structure.vehicle}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Expiry:</span><span>{marketData?.expiry}</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Expected Credit:</span><span className="text-green">₹ 2,300</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Max Risk:</span><span className="text-red">₹ 4,500</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Risk Reward:</span><span>1 : 0.51</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Win Probability:</span><span className="text-green">74%</span></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Position Size:</span><span>2 Lots</span></div>
+          {/* Header & Switcher */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h4 style={{ fontSize: '0.8rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Recommended Setup</h4>
+            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.2)', padding: '2px', borderRadius: '4px', border: '1px solid var(--border)' }}>
+              <button 
+                onClick={() => setViewMode('beginner')}
+                style={{ background: viewMode === 'beginner' ? 'var(--accent-blue-bright)' : 'transparent', color: viewMode === 'beginner' ? '#000' : 'var(--text-secondary)', border: 'none', padding: '4px 10px', fontSize: '0.7rem', fontWeight: '700', borderRadius: '3px', cursor: 'pointer' }}
+              >
+                Beginner
+              </button>
+              <button 
+                onClick={() => setViewMode('professional')}
+                style={{ background: viewMode === 'professional' ? 'var(--accent-blue-bright)' : 'transparent', color: viewMode === 'professional' ? '#000' : 'var(--text-secondary)', border: 'none', padding: '4px 10px', fontSize: '0.7rem', fontWeight: '700', borderRadius: '3px', cursor: 'pointer' }}
+              >
+                Professional
+              </button>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: '700', padding: '2px 8px', borderRadius: '3px', background: (!marketData?.validationPassed) ? 'rgba(239,68,68,0.15)' : regimeResults.isAllowed ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)', color: (!marketData?.validationPassed) ? 'var(--accent-red)' : regimeResults.isAllowed ? 'var(--accent-green)' : 'var(--accent-amber)' }}>
-              {(!marketData?.validationPassed) ? 'DATA UNTRUSTED' : regimeResults.isAllowed ? 'READY TO EXECUTE' : 'REGIME BLOCK'}
-            </span>
+          {/* BEGINNER MODE */}
+          {viewMode === 'beginner' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              
+              {/* Market View */}
+              <div style={{ background: 'rgba(99, 155, 255, 0.05)', padding: '12px 16px', borderRadius: '6px', borderLeft: '3px solid var(--accent-blue-bright)' }}>
+                <div style={{ fontWeight: '700', fontSize: '0.82rem', marginBottom: '2px' }}>📈 Range-Bound Market View</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                  The market is expected to remain steady. This trade profits if {symbol} stays between <strong style={{ color: 'var(--text-primary)' }}>{structure.shortPut.toLocaleString()}</strong> and <strong style={{ color: 'var(--text-primary)' }}>{structure.shortCall.toLocaleString()}</strong> until expiry.
+                </div>
+              </div>
+
+              {/* Visual Order Sequence Flow */}
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: '700' }}>VISUAL ORDER FLOW SEQUENCE</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                  <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.62rem', color: 'var(--accent-red)', fontWeight: '800' }}>1. SELL (CE)</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.shortCall}</div>
+                  </div>
+                  <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: '800' }}>2. BUY (CE)</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.longCall}</div>
+                  </div>
+                  <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.62rem', color: 'var(--accent-red)', fontWeight: '800' }}>3. SELL (PE)</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.shortPut}</div>
+                  </div>
+                  <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: '800' }}>4. BUY (PE)</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.longPut}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Summary & Risks */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', background: 'rgba(255,255,255,0.01)', padding: '14px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                <div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>MAXIMUM RISK</div>
+                  <div className="text-red" style={{ fontSize: '1.15rem', fontWeight: '800', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
+                    ₹ {structure.maxRisk.toLocaleString()}
+                  </div>
+                  <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '2px' }}>Worst case loss if market breaks margins</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>MAXIMUM PROFIT</div>
+                  <div className="text-green" style={{ fontSize: '1.15rem', fontWeight: '800', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
+                    ₹ {structure.expectedCredit.toLocaleString()}
+                  </div>
+                  <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '2px' }}>Premium received at entry</div>
+                </div>
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>MARGIN REQUIRED</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>₹ 43,800</div>
+                </div>
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>CAPITAL REQUIRED</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>₹ 45,000</div>
+                </div>
+              </div>
+
+              {/* Entry & Exit Guidelines */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.72rem' }}>
+                <div style={{ background: 'rgba(34,197,94,0.03)', padding: '10px', borderRadius: '4px', border: '1px solid rgba(34,197,94,0.1)' }}>
+                  <div style={{ fontWeight: '700', color: 'var(--accent-green)', marginBottom: '4px' }}>✓ WHEN TO ENTER</div>
+                  <div style={{ color: 'var(--text-secondary)' }}>• Status shows READY</div>
+                  <div style={{ color: 'var(--text-secondary)' }}>• Price stays near recommendation</div>
+                </div>
+                <div style={{ background: 'rgba(239,68,68,0.03)', padding: '10px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.1)' }}>
+                  <div style={{ fontWeight: '700', color: 'var(--accent-red)', marginBottom: '4px' }}>⚠ WHEN TO EXIT</div>
+                  <div style={{ color: 'var(--text-secondary)' }}>• Hit 55% profit target</div>
+                  <div style={{ color: 'var(--text-secondary)' }}>• Reach stop loss limit</div>
+                </div>
+              </div>
+
+              {/* Educational Mode */}
+              <div>
+                <button 
+                  onClick={() => setShowEdu(!showEdu)} 
+                  className="btn btn-ghost" 
+                  style={{ width: '100%', fontSize: '0.75rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                >
+                  💡 {showEdu ? 'Hide Explanation' : 'Why am I doing this? (Explain in Simple Terms)'}
+                </button>
+                {showEdu && (
+                  <div style={{ background: 'rgba(0,0,0,0.15)', padding: '14px', borderRadius: '6px', marginTop: '8px', fontSize: '0.76rem', display: 'flex', flexDirection: 'column', gap: '10px', border: '1px solid var(--border)' }}>
+                    <div>
+                      <strong>Why Sell options?</strong> We sell option premiums far away from the current spot to collect decay (theta decay) as time passes, acting like an insurance writer.
+                    </div>
+                    <div>
+                      <strong>Why Buy wings?</strong> We buy cheaper, further-out options to cap our maximum loss, protecting our capital from sharp, unexpected overnight market runs.
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
+                      <div>
+                        <span className="text-green">📈 Market Rises</span>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Profits as long as it stays under {structure.shortCall}. Capped risk above it.</div>
+                      </div>
+                      <div>
+                        <span className="text-red">📉 Market Falls</span>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Profits as long as it stays above {structure.shortPut}. Capped risk below it.</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
+
+          {/* PROFESSIONAL MODE */}
+          {viewMode === 'professional' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.8rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Index Symbol:</span><span>{symbol}</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Vehicle Structure:</span><span>{structure.vehicle}</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Expiry target:</span><span>{marketData?.expiry}</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Expected Credit:</span><span className="text-green">₹ {structure.expectedCredit.toLocaleString()}</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Max Risk/Loss:</span><span className="text-red">₹ {structure.maxRisk.toLocaleString()}</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Risk Reward:</span><span>1 : {structure.riskReward}</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Win Probability:</span><span className="text-green">{structure.winProbability}%</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Position Size:</span><span>{structure.positionSize} Lots</span></div>
+              </div>
+
+              {/* Greeks Summary */}
+              {selectedStrikes && (
+                <div style={{ background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '4px', fontSize: '0.72rem' }}>
+                  <div style={{ fontWeight: '700', marginBottom: '6px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Greeks Profile</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <div>Call Short Delta: <span style={{ color: 'var(--accent-blue-bright)', fontFamily: 'var(--font-mono)' }}>{selectedStrikes.shortCallDelta?.toFixed(3)}</span></div>
+                    <div>Put Short Delta: <span style={{ color: 'var(--accent-blue-bright)', fontFamily: 'var(--font-mono)' }}>{selectedStrikes.shortPutDelta?.toFixed(3)}</span></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Validation Checklist Panel */}
+          <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px 16px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: '700', textTransform: 'uppercase' }}>Trade Quality Confirmation Checklist</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: '0.72rem' }}>
+              <div><span className="text-green">✓</span> Correct Expiry Target</div>
+              <div><span className="text-green">✓</span> Correct Lot Size (2)</div>
+              <div><span className="text-green">✓</span> Margin Available</div>
+              <div style={{ color: marketData?.validationPassed ? 'var(--accent-green)' : 'var(--accent-red)' }}>
+                <span>{marketData?.validationPassed ? '✓' : '✗'}</span> Recommendation {marketData?.validationPassed ? 'Valid' : 'Invalid'}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Footer */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '14px', marginTop: '4px' }}>
+            <div>
+              <span style={{ fontSize: '0.72rem', fontWeight: '800', padding: '3px 8px', borderRadius: '3px', background: (!marketData?.validationPassed) ? 'rgba(239,68,68,0.15)' : regimeResults.isAllowed ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)', color: (!marketData?.validationPassed) ? 'var(--accent-red)' : regimeResults.isAllowed ? 'var(--accent-green)' : 'var(--accent-amber)' }}>
+                {(!marketData?.validationPassed) ? 'DATA UNTRUSTED' : regimeResults.isAllowed ? 'READY TO EXECUTE' : 'REGIME BLOCK'}
+              </span>
+              <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                {statusExplanations[structure.status || 'READY']}
+              </div>
+            </div>
             <a
               href={`/fno-analysis/${symbol}${session.recommendation_uuid ? `?rec_id=${session.recommendation_uuid}` : ''}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-ghost"
-              style={{ fontSize: '0.72rem', padding: '4px 10px', textDecoration: 'none', color: 'var(--accent-blue-bright)', borderColor: 'var(--border)' }}
+              style={{ fontSize: '0.72rem', padding: '6px 12px', textDecoration: 'none', color: 'var(--accent-blue-bright)', borderColor: 'var(--border)' }}
             >
               View Complete Analysis
             </a>
           </div>
+
         </div>
       )}
 

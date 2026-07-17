@@ -863,27 +863,27 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L218",
-      "id": "fno_rationale_218",
       "community": 8,
-      "norm_label": "returns only active, ready, or open recommendations from the database."
+      "norm_label": "returns only active, ready, or open recommendations from the database.",
+      "id": "fno_rationale_218"
     },
     {
       "label": "Retrieve full paginated history for audit screens.",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L249",
-      "id": "fno_rationale_249",
       "community": 8,
-      "norm_label": "retrieve full paginated history for audit screens."
+      "norm_label": "retrieve full paginated history for audit screens.",
+      "id": "fno_rationale_249"
     },
     {
       "label": "Saves a recommendation. Prevents duplicates by verifying Symbol, Expiry,     Str",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L332",
-      "id": "fno_rationale_332",
       "community": 8,
-      "norm_label": "saves a recommendation. prevents duplicates by verifying symbol, expiry,     str"
+      "norm_label": "saves a recommendation. prevents duplicates by verifying symbol, expiry,     str",
+      "id": "fno_rationale_332"
     },
     {
       "label": "recommendations.py",
@@ -5201,36 +5201,36 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
       "source_location": "L19",
-      "id": "fno_strategy_rationale_19",
       "community": 14,
-      "norm_label": "high-precision numerical approximation of standard normal cdf."
+      "norm_label": "high-precision numerical approximation of standard normal cdf.",
+      "id": "fno_strategy_rationale_19"
     },
     {
       "label": "Standard normal probability density function.",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
       "source_location": "L33",
-      "id": "fno_strategy_rationale_33",
       "community": 14,
-      "norm_label": "standard normal probability density function."
+      "norm_label": "standard normal probability density function.",
+      "id": "fno_strategy_rationale_33"
     },
     {
       "label": "Returns (delta, gamma, vega) for an option.     S: Spot, K: Strike, t: DTE (year",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
       "source_location": "L37",
-      "id": "fno_strategy_rationale_37",
       "community": 14,
-      "norm_label": "returns (delta, gamma, vega) for an option.     s: spot, k: strike, t: dte (year"
+      "norm_label": "returns (delta, gamma, vega) for an option.     s: spot, k: strike, t: dte (year",
+      "id": "fno_strategy_rationale_37"
     },
     {
       "label": "Calculates indicators, runs 6 regime filters, matches strikes,         and const",
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
       "source_location": "L62",
-      "id": "fno_strategy_rationale_62",
       "community": 14,
-      "norm_label": "calculates indicators, runs 6 regime filters, matches strikes,         and const"
+      "norm_label": "calculates indicators, runs 6 regime filters, matches strikes,         and const",
+      "id": "fno_strategy_rationale_62"
     },
     {
       "label": "scanner.py",
@@ -8809,9 +8809,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_218",
       "_tgt": "models_fnomarkettick",
+      "confidence_score": 0.5,
       "source": "fno_rationale_218",
-      "target": "models_fnomarkettick",
-      "confidence_score": 0.5
+      "target": "models_fnomarkettick"
     },
     {
       "relation": "uses",
@@ -8821,9 +8821,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_218",
       "_tgt": "models_fnooptionchainsnapshot",
+      "confidence_score": 0.5,
       "source": "fno_rationale_218",
-      "target": "models_fnooptionchainsnapshot",
-      "confidence_score": 0.5
+      "target": "models_fnooptionchainsnapshot"
     },
     {
       "relation": "uses",
@@ -8833,9 +8833,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_218",
       "_tgt": "models_fnoauditlog",
+      "confidence_score": 0.5,
       "source": "fno_rationale_218",
-      "target": "models_fnoauditlog",
-      "confidence_score": 0.5
+      "target": "models_fnoauditlog"
     },
     {
       "relation": "uses",
@@ -8845,9 +8845,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_218",
       "_tgt": "models_fnorecommendation",
+      "confidence_score": 0.5,
       "source": "fno_rationale_218",
-      "target": "models_fnorecommendation",
-      "confidence_score": 0.5
+      "target": "models_fnorecommendation"
     },
     {
       "relation": "uses",
@@ -8857,9 +8857,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_218",
       "_tgt": "models_fnorecommendationfilter",
+      "confidence_score": 0.5,
       "source": "fno_rationale_218",
-      "target": "models_fnorecommendationfilter",
-      "confidence_score": 0.5
+      "target": "models_fnorecommendationfilter"
     },
     {
       "relation": "uses",
@@ -8869,9 +8869,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_218",
       "_tgt": "integrity_layer_dataintegritylayer",
+      "confidence_score": 0.5,
       "source": "fno_rationale_218",
-      "target": "integrity_layer_dataintegritylayer",
-      "confidence_score": 0.5
+      "target": "integrity_layer_dataintegritylayer"
     },
     {
       "relation": "uses",
@@ -8881,9 +8881,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_249",
       "_tgt": "models_fnomarkettick",
+      "confidence_score": 0.5,
       "source": "fno_rationale_249",
-      "target": "models_fnomarkettick",
-      "confidence_score": 0.5
+      "target": "models_fnomarkettick"
     },
     {
       "relation": "uses",
@@ -8893,9 +8893,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_249",
       "_tgt": "models_fnooptionchainsnapshot",
+      "confidence_score": 0.5,
       "source": "fno_rationale_249",
-      "target": "models_fnooptionchainsnapshot",
-      "confidence_score": 0.5
+      "target": "models_fnooptionchainsnapshot"
     },
     {
       "relation": "uses",
@@ -8905,9 +8905,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_249",
       "_tgt": "models_fnoauditlog",
+      "confidence_score": 0.5,
       "source": "fno_rationale_249",
-      "target": "models_fnoauditlog",
-      "confidence_score": 0.5
+      "target": "models_fnoauditlog"
     },
     {
       "relation": "uses",
@@ -8917,9 +8917,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_249",
       "_tgt": "models_fnorecommendation",
+      "confidence_score": 0.5,
       "source": "fno_rationale_249",
-      "target": "models_fnorecommendation",
-      "confidence_score": 0.5
+      "target": "models_fnorecommendation"
     },
     {
       "relation": "uses",
@@ -8929,9 +8929,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_249",
       "_tgt": "models_fnorecommendationfilter",
+      "confidence_score": 0.5,
       "source": "fno_rationale_249",
-      "target": "models_fnorecommendationfilter",
-      "confidence_score": 0.5
+      "target": "models_fnorecommendationfilter"
     },
     {
       "relation": "uses",
@@ -8941,9 +8941,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_249",
       "_tgt": "integrity_layer_dataintegritylayer",
+      "confidence_score": 0.5,
       "source": "fno_rationale_249",
-      "target": "integrity_layer_dataintegritylayer",
-      "confidence_score": 0.5
+      "target": "integrity_layer_dataintegritylayer"
     },
     {
       "relation": "uses",
@@ -8953,9 +8953,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_332",
       "_tgt": "models_fnomarkettick",
+      "confidence_score": 0.5,
       "source": "fno_rationale_332",
-      "target": "models_fnomarkettick",
-      "confidence_score": 0.5
+      "target": "models_fnomarkettick"
     },
     {
       "relation": "uses",
@@ -8965,9 +8965,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_332",
       "_tgt": "models_fnooptionchainsnapshot",
+      "confidence_score": 0.5,
       "source": "fno_rationale_332",
-      "target": "models_fnooptionchainsnapshot",
-      "confidence_score": 0.5
+      "target": "models_fnooptionchainsnapshot"
     },
     {
       "relation": "uses",
@@ -8977,9 +8977,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_332",
       "_tgt": "models_fnoauditlog",
+      "confidence_score": 0.5,
       "source": "fno_rationale_332",
-      "target": "models_fnoauditlog",
-      "confidence_score": 0.5
+      "target": "models_fnoauditlog"
     },
     {
       "relation": "uses",
@@ -8989,9 +8989,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_332",
       "_tgt": "models_fnorecommendation",
+      "confidence_score": 0.5,
       "source": "fno_rationale_332",
-      "target": "models_fnorecommendation",
-      "confidence_score": 0.5
+      "target": "models_fnorecommendation"
     },
     {
       "relation": "uses",
@@ -9001,9 +9001,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_332",
       "_tgt": "models_fnorecommendationfilter",
+      "confidence_score": 0.5,
       "source": "fno_rationale_332",
-      "target": "models_fnorecommendationfilter",
-      "confidence_score": 0.5
+      "target": "models_fnorecommendationfilter"
     },
     {
       "relation": "uses",
@@ -9013,9 +9013,9 @@
       "weight": 0.8,
       "_src": "fno_rationale_332",
       "_tgt": "integrity_layer_dataintegritylayer",
+      "confidence_score": 0.5,
       "source": "fno_rationale_332",
-      "target": "integrity_layer_dataintegritylayer",
-      "confidence_score": 0.5
+      "target": "integrity_layer_dataintegritylayer"
     },
     {
       "relation": "contains",
@@ -11652,8 +11652,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
       "source_location": "L51",
       "weight": 1.0,
-      "_src": "fno_strategy_calculate_greeks",
-      "_tgt": "str",
+      "_src": "str",
+      "_tgt": "fno_strategy_calculate_greeks",
       "source": "str",
       "target": "fno_strategy_calculate_greeks"
     },
@@ -18479,8 +18479,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L15",
       "weight": 0.8,
-      "_src": "fno_rationale_210",
-      "_tgt": "integrity_layer_dataintegritylayer",
+      "_src": "integrity_layer_dataintegritylayer",
+      "_tgt": "fno_rationale_210",
       "confidence_score": 0.5,
       "source": "integrity_layer_dataintegritylayer",
       "target": "fno_rationale_210"
@@ -18491,8 +18491,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L15",
       "weight": 0.8,
-      "_src": "fno_rationale_241",
-      "_tgt": "integrity_layer_dataintegritylayer",
+      "_src": "integrity_layer_dataintegritylayer",
+      "_tgt": "fno_rationale_241",
       "confidence_score": 0.5,
       "source": "integrity_layer_dataintegritylayer",
       "target": "fno_rationale_241"
@@ -18503,8 +18503,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L15",
       "weight": 0.8,
-      "_src": "fno_rationale_324",
-      "_tgt": "integrity_layer_dataintegritylayer",
+      "_src": "integrity_layer_dataintegritylayer",
+      "_tgt": "fno_rationale_324",
       "confidence_score": 0.5,
       "source": "integrity_layer_dataintegritylayer",
       "target": "fno_rationale_324"
@@ -20315,8 +20315,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_210",
-      "_tgt": "models_fnomarkettick",
+      "_src": "models_fnomarkettick",
+      "_tgt": "fno_rationale_210",
       "confidence_score": 0.5,
       "source": "models_fnomarkettick",
       "target": "fno_rationale_210"
@@ -20327,8 +20327,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_241",
-      "_tgt": "models_fnomarkettick",
+      "_src": "models_fnomarkettick",
+      "_tgt": "fno_rationale_241",
       "confidence_score": 0.5,
       "source": "models_fnomarkettick",
       "target": "fno_rationale_241"
@@ -20339,8 +20339,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_324",
-      "_tgt": "models_fnomarkettick",
+      "_src": "models_fnomarkettick",
+      "_tgt": "fno_rationale_324",
       "confidence_score": 0.5,
       "source": "models_fnomarkettick",
       "target": "fno_rationale_324"
@@ -20387,8 +20387,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_210",
-      "_tgt": "models_fnooptionchainsnapshot",
+      "_src": "models_fnooptionchainsnapshot",
+      "_tgt": "fno_rationale_210",
       "confidence_score": 0.5,
       "source": "models_fnooptionchainsnapshot",
       "target": "fno_rationale_210"
@@ -20399,8 +20399,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_241",
-      "_tgt": "models_fnooptionchainsnapshot",
+      "_src": "models_fnooptionchainsnapshot",
+      "_tgt": "fno_rationale_241",
       "confidence_score": 0.5,
       "source": "models_fnooptionchainsnapshot",
       "target": "fno_rationale_241"
@@ -20411,8 +20411,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_324",
-      "_tgt": "models_fnooptionchainsnapshot",
+      "_src": "models_fnooptionchainsnapshot",
+      "_tgt": "fno_rationale_324",
       "confidence_score": 0.5,
       "source": "models_fnooptionchainsnapshot",
       "target": "fno_rationale_324"
@@ -20459,8 +20459,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_210",
-      "_tgt": "models_fnorecommendation",
+      "_src": "models_fnorecommendation",
+      "_tgt": "fno_rationale_210",
       "confidence_score": 0.5,
       "source": "models_fnorecommendation",
       "target": "fno_rationale_210"
@@ -20471,8 +20471,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_241",
-      "_tgt": "models_fnorecommendation",
+      "_src": "models_fnorecommendation",
+      "_tgt": "fno_rationale_241",
       "confidence_score": 0.5,
       "source": "models_fnorecommendation",
       "target": "fno_rationale_241"
@@ -20483,8 +20483,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_324",
-      "_tgt": "models_fnorecommendation",
+      "_src": "models_fnorecommendation",
+      "_tgt": "fno_rationale_324",
       "confidence_score": 0.5,
       "source": "models_fnorecommendation",
       "target": "fno_rationale_324"
@@ -20531,8 +20531,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_210",
-      "_tgt": "models_fnorecommendationfilter",
+      "_src": "models_fnorecommendationfilter",
+      "_tgt": "fno_rationale_210",
       "confidence_score": 0.5,
       "source": "models_fnorecommendationfilter",
       "target": "fno_rationale_210"
@@ -20543,8 +20543,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_241",
-      "_tgt": "models_fnorecommendationfilter",
+      "_src": "models_fnorecommendationfilter",
+      "_tgt": "fno_rationale_241",
       "confidence_score": 0.5,
       "source": "models_fnorecommendationfilter",
       "target": "fno_rationale_241"
@@ -20555,8 +20555,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_324",
-      "_tgt": "models_fnorecommendationfilter",
+      "_src": "models_fnorecommendationfilter",
+      "_tgt": "fno_rationale_324",
       "confidence_score": 0.5,
       "source": "models_fnorecommendationfilter",
       "target": "fno_rationale_324"
@@ -20603,8 +20603,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_210",
-      "_tgt": "models_fnoauditlog",
+      "_src": "models_fnoauditlog",
+      "_tgt": "fno_rationale_210",
       "confidence_score": 0.5,
       "source": "models_fnoauditlog",
       "target": "fno_rationale_210"
@@ -20615,8 +20615,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_241",
-      "_tgt": "models_fnoauditlog",
+      "_src": "models_fnoauditlog",
+      "_tgt": "fno_rationale_241",
       "confidence_score": 0.5,
       "source": "models_fnoauditlog",
       "target": "fno_rationale_241"
@@ -20627,8 +20627,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\fno.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "fno_rationale_324",
-      "_tgt": "models_fnoauditlog",
+      "_src": "models_fnoauditlog",
+      "_tgt": "fno_rationale_324",
       "confidence_score": 0.5,
       "source": "models_fnoauditlog",
       "target": "fno_rationale_324"
