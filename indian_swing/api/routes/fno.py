@@ -71,8 +71,33 @@ async def get_market_data(symbol: str):
             last_price = base_prices.get(symbol.upper(), 24350.0)
             vix_price = 14.12
 
-    # Log tick to DB
-    _log_tick_to_db(symbol.upper(), last_price, vix_price)
+    # 4. Compute changePct from last two DB ticks (A2)
+    change_pct = 0.0
+    try:
+        with get_sync_session() as tick_session:
+            from sqlalchemy import desc as _desc
+            prev_ticks = tick_session.execute(
+                select(FnoMarketTick)
+                .where(FnoMarketTick.symbol == symbol.upper())
+                .order_by(_desc(FnoMarketTick.timestamp))
+                .limit(2)
+            ).scalars().all()
+            if len(prev_ticks) == 2:
+                prev_price = prev_ticks[1].price
+                if prev_price > 0:
+                    change_pct = round((last_price - prev_price) / prev_price * 100, 2)
+    except Exception:
+        pass
+
+    # Log tick to DB (A6: pass atm_iv for future historical IV percentile)
+    atm_iv_for_log = None
+    try:
+        if strikes_list:
+            atm_s = min(strikes_list, key=lambda x: abs(x["strike"] - last_price))
+            atm_iv_for_log = (atm_s["ce"]["iv"] + atm_s["pe"]["iv"]) / 2.0
+    except Exception:
+        pass
+    _log_tick_to_db(symbol.upper(), last_price, vix_price, atm_iv=atm_iv_for_log)
 
     # 3. Retrieve option chain strikes to feed strategy engine
     try:
@@ -87,14 +112,14 @@ async def get_market_data(symbol: str):
     chain_packet = {"strikes": strikes_list}
     passed, score, errs = validator.validate_packet(symbol.upper(), spot_packet, chain_packet)
 
-    # 4. Strategy Engine Recommendation Generation & Save
+    # 5. Strategy Engine Recommendation Generation & Save
     rec_obj = fno_strategy_engine.evaluate_and_build(symbol.upper(), last_price, vix_price, strikes_list)
     saved_rec = _save_or_update_recommendation(symbol.upper(), rec_obj)
 
     return {
         "symbol": symbol,
         "spotPrice": last_price,
-        "changePct": 0.45 if symbol != "BANKNIFTY" else -0.22,
+        "changePct": change_pct,
         "indiaVix": vix_price,
         "marketStatus": "OPEN",
         "expiry": "23-JUL-2026",
@@ -409,7 +434,8 @@ def _save_or_update_recommendation(symbol: str, rec: dict) -> dict:
             "is_allowed": rec["is_allowed"]
         }
 
-def _log_tick_to_db(symbol: str, price: float, vix: float):
+def _log_tick_to_db(symbol: str, price: float, vix: float, atm_iv: float | None = None):
+    """Persist market tick. atm_iv stored in payload for future historical IV percentile calc (A6)."""
     try:
         with get_sync_session() as session:
             tick = FnoMarketTick(
@@ -423,10 +449,14 @@ def _log_tick_to_db(symbol: str, price: float, vix: float):
             )
             session.add(tick)
             
+            payload: dict = {"price": price, "vix": vix}
+            if atm_iv is not None:
+                payload["atm_iv"] = round(atm_iv, 4)   # stored for future IV-percentile computation
+
             event = FnoAuditLog(
                 event_type="MARKET_TICK",
                 symbol=symbol,
-                payload={"price": price, "vix": vix}
+                payload=payload
             )
             session.add(event)
     except Exception as e:
@@ -454,39 +484,63 @@ def _log_chain_to_db(symbol: str, strikes: list):
         logger.warning("fno.db_chain_log_failed", error=str(e))
 
 def _simulate_option_chain(symbol: str):
+    """
+    A1 — Deterministic synthetic option chain.
+    Generates LTP values from a simplified Black-Scholes approximation seeded
+    purely from spot price and ATM IV. Same inputs always produce the same outputs.
+    This guarantees reproducibility and traceability of simulated recommendations.
+    """
     index_configs = {
-        "NIFTY": {"basePrice": 24350, "interval": 50},
-        "BANKNIFTY": {"basePrice": 52420, "interval": 100},
-        "SENSEX": {"basePrice": 79890, "interval": 100},
-        "FINNIFTY": {"basePrice": 23680, "interval": 50},
-        "MIDCPNIFTY": {"basePrice": 12340, "interval": 25}
+        "NIFTY":      {"basePrice": 24350, "interval": 50,  "atm_iv": 14.0},
+        "BANKNIFTY":  {"basePrice": 52420, "interval": 100, "atm_iv": 16.0},
+        "SENSEX":     {"basePrice": 79890, "interval": 100, "atm_iv": 14.5},
+        "FINNIFTY":   {"basePrice": 23680, "interval": 50,  "atm_iv": 15.0},
+        "MIDCPNIFTY": {"basePrice": 12340, "interval": 25,  "atm_iv": 18.0},
     }
+    from indian_swing.recommendations.fno_strategy import calculate_greeks, normal_cdf
+    import math as _math
 
-    config = index_configs.get(symbol.upper(), index_configs["NIFTY"])
-    import random
-    base_strike = round(config["basePrice"] / config["interval"]) * config["interval"]
-    
+    config    = index_configs.get(symbol.upper(), index_configs["NIFTY"])
+    S         = float(config["basePrice"])
+    interval  = config["interval"]
+    sigma     = config["atm_iv"] / 100.0
+    r         = 0.07
+    t         = 5.0 / 365.0   # weekly expiry
+    base_strike = round(S / interval) * interval
+
+    def _bs_call(spot, strike, t, sigma, r):
+        """Black-Scholes call price."""
+        if t <= 0 or sigma <= 0:
+            return max(0.0, spot - strike)
+        d1 = (_math.log(spot / strike) + (r + 0.5 * sigma ** 2) * t) / (sigma * _math.sqrt(t))
+        d2 = d1 - sigma * _math.sqrt(t)
+        return spot * normal_cdf(d1) - strike * _math.exp(-r * t) * normal_cdf(d2)
+
+    def _bs_put(spot, strike, t, sigma, r):
+        """Black-Scholes put price via put-call parity."""
+        call = _bs_call(spot, strike, t, sigma, r)
+        return call - spot + strike * _math.exp(-r * t)
+
     strikes = []
-    for i in range(-5, 6):
-      strike_price = base_strike + (i * config["interval"])
-      strikes.append({
-        "strike": strike_price,
-        "ce": {
-          "ltp": max(2.0, (10 - i * 2) * (config["interval"] / 10) + random.random()),
-          "change": (random.random() - 0.4) * 10,
-          "oi": round(100000 + random.random() * 500000),
-          "iv": 12.0 + random.random() * 4
-        },
-        "pe": {
-          "ltp": max(2.0, (10 + i * 2) * (config["interval"] / 10) + random.random()),
-          "change": (random.random() - 0.6) * 10,
-          "oi": round(100000 + random.random() * 500000),
-          "iv": 12.5 + random.random() * 4
-        }
-      })
+    for i in range(-6, 7):   # 13 strikes around ATM
+        strike_price = base_strike + i * interval
+        # Apply slight skew: OTM puts have higher IV than OTM calls (vol smile)
+        ce_iv = sigma * (1.0 + max(0, i) * 0.005)   # calls flatten toward OTM
+        pe_iv = sigma * (1.0 + max(0, -i) * 0.008)  # puts steepen toward OTM
 
-    return {
-      "index": symbol,
-      "strikes": strikes,
-      "timestamp": "15:30:00"
-    }
+        ce_ltp = max(0.5, round(_bs_call(S, strike_price, t, ce_iv, r), 2))
+        pe_ltp = max(0.5, round(_bs_put(S, strike_price, t, pe_iv, r), 2))
+
+        # Deterministic OI: higher near ATM, lower at extremes
+        oi_base = 500000
+        oi_decay = max(0.1, 1.0 - abs(i) * 0.15)
+        ce_oi = int(oi_base * oi_decay)
+        pe_oi = int(oi_base * oi_decay)
+
+        strikes.append({
+            "strike": strike_price,
+            "ce": {"ltp": ce_ltp, "change": 0.0, "oi": ce_oi, "iv": round(ce_iv * 100, 2)},
+            "pe": {"ltp": pe_ltp, "change": 0.0, "oi": pe_oi, "iv": round(pe_iv * 100, 2)},
+        })
+
+    return {"index": symbol, "strikes": strikes, "timestamp": "deterministic"}

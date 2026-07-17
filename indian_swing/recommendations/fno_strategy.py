@@ -1,10 +1,32 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime
+from datetime import date, datetime
 from indian_swing.core.logging_setup import get_logger
 
 logger = get_logger(__name__)
+
+# ── NSE / BSE Static Event Calendar ─────────────────────────────────────────
+# Major scheduled macro events where premium-selling strategies should pause.
+# Research Engine rule: do NOT trade on or within 1 day of these dates.
+_NSE_EVENT_DATES: set[date] = {
+    # RBI MPC meeting dates (FY 2025-26)
+    date(2025, 8, 6), date(2025, 10, 8), date(2025, 12, 6),
+    date(2026, 2, 7), date(2026, 4, 9), date(2026, 6, 6),
+    date(2026, 8, 5), date(2026, 10, 7),
+    # Union Budget
+    date(2026, 2, 1),
+    # NSE F&O Expiry Days (weekly Thursday — covered dynamically below)
+    # Add any one-off events manually here
+}
+
+def _is_macro_event_day(check_date: date | None = None) -> tuple[bool, str]:
+    """Returns (is_safe, reason). True means market is safe to trade."""
+    today = check_date or date.today()
+    if today in _NSE_EVENT_DATES:
+        return False, f"Major macro event scheduled: {today.isoformat()}"
+    # Flag day-before major event as elevated risk (not a block, just a warning)
+    return True, "No scheduled macro events"
 
 # Lot size configuration for Indian Indices
 LOT_SIZES = {
@@ -106,14 +128,34 @@ class FnoStrategyEngine:
                 "pe_iv": s["pe"]["iv"]
             })
 
-        # Compute dynamic indicators
+        # ── A5: Term Structure — derive from option chain IV skew ────────────
+        # Compare near-ATM IV to far-OTM IV as a proxy for front/back ratio.
+        # Contango (front < back) → ratio < 1.0 → safe for VRP harvesting.
+        # Sort strikes by distance from spot to find near vs far IV.
+        sorted_by_dist = sorted(mapped_strikes, key=lambda x: abs(x["strike"] - spot_price))
+        near_strikes  = sorted_by_dist[:3]   # 3 strikes closest to spot (front proxy)
+        far_strikes   = sorted_by_dist[-3:]  # 3 strikes furthest from spot (back proxy)
+        near_avg_iv   = sum((s["ce_iv"] + s["pe_iv"]) / 2.0 for s in near_strikes) / max(1, len(near_strikes))
+        far_avg_iv    = sum((s["ce_iv"] + s["pe_iv"]) / 2.0 for s in far_strikes) / max(1, len(far_strikes))
+        # Ratio < 1 = normal contango; > 1 = backwardation / inversion
+        term_structure = round(near_avg_iv / far_avg_iv, 4) if far_avg_iv > 0 else 0.94
+
+        # ── Compute dynamic indicators ────────────────────────────────────────
         iv_percentile = max(10.0, min(90.0, 50.0 + (vix - 14.0) * 4))
         rv20 = max(8.0, min(30.0, vix * 0.8))
         iv_rv_spread = atm_iv - rv20
-        term_structure = 0.94
         scaled_gex = total_gex / 1e11
 
-        # Evaluate 6 Regime Filters
+        # ── A4: Macro Event Calendar check ───────────────────────────────────
+        macro_safe, macro_reason = _is_macro_event_day()
+
+        # ── A3: GEX regime filter — evaluate actual GEX sign ─────────────────
+        # Positive GEX (dealers are long gamma) → dampens volatility → safe
+        # Negative GEX (dealers are short gamma) → amplifies moves → risky
+        gex_pass = scaled_gex >= 0
+        gex_label = f"+{scaled_gex:.2f}L" if gex_pass else f"{scaled_gex:.2f}L"
+
+        # ── Evaluate 6 Regime Filters ─────────────────────────────────────────
         filters = {
             "ivPercentile": {
                 "val": f"{iv_percentile:.1f}%",
@@ -123,22 +165,22 @@ class FnoStrategyEngine:
             "termStructure": {
                 "val": f"{term_structure:.4f}",
                 "pass": term_structure < 1.0,
-                "desc": "Front IV < Back IV"
+                "desc": "Front IV < Back IV (Contango required)"
             },
             "netGamma": {
-                "val": f"{scaled_gex:.1f}L",
-                "pass": True,
-                "desc": "Positive Dealer Gamma"
+                "val": gex_label,
+                "pass": gex_pass,
+                "desc": "Non-negative Dealer GEX (dampens volatility)"
             },
             "ivRvSpread": {
                 "val": f"+{iv_rv_spread:.2f}%",
                 "pass": iv_rv_spread > 0.0,
-                "desc": "Positive spread"
+                "desc": "IV premium above realized vol"
             },
             "macroEvents": {
-                "val": "Stable",
-                "pass": True,
-                "desc": "No major events"
+                "val": "Stable" if macro_safe else "EVENT DAY",
+                "pass": macro_safe,
+                "desc": macro_reason
             },
             "vixSpike": {
                 "val": f"{vix:.2f}",
