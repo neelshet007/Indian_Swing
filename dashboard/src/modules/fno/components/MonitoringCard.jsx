@@ -29,6 +29,17 @@ export default function MonitoringCard({ symbol, session }) {
           <span className="badge-status" style={{ background: 'rgba(34, 197, 94, 0.12)', color: 'var(--accent-green)' }}>
             {status}
           </span>
+          {marketData && (
+            <span 
+              className="badge-status" 
+              style={{ 
+                background: marketData.validationPassed ? 'rgba(99, 155, 255, 0.12)' : 'rgba(239, 68, 68, 0.12)', 
+                color: marketData.validationPassed ? 'var(--accent-blue-bright)' : 'var(--accent-red)' 
+              }}
+            >
+              DQ: {marketData.dataQualityScore?.toFixed(0)}%
+            </span>
+          )}
         </div>
         <div style={{ display: 'flex', gap: '12px', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
           <div>Feed: <span style={{ color: connectionStatus === 'Connected' ? 'var(--accent-green)' : 'var(--accent-red)' }}>{connectionStatus}</span></div>
@@ -36,6 +47,16 @@ export default function MonitoringCard({ symbol, session }) {
           <div>Updated: <span style={{ fontFamily: 'var(--font-mono)' }}>{lastUpdate}</span></div>
         </div>
       </div>
+
+      {/* Validation Warnings */}
+      {marketData && !marketData.validationPassed && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '10px 14px', borderRadius: '4px', fontSize: '0.75rem', color: 'var(--accent-red)' }}>
+          <div style={{ fontWeight: '700', marginBottom: '4px' }}>⚠️ STRATEGY ENGINE SUSPENDED - DATA QUALITY BREACH</div>
+          {marketData.validationErrors?.slice(0, 2).map((err, idx) => (
+            <div key={idx} style={{ fontFamily: 'var(--font-mono)' }}>• {err}</div>
+          ))}
+        </div>
+      )}
 
       {/* Market Prices */}
       <div className="market-cards-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
@@ -123,8 +144,8 @@ export default function MonitoringCard({ symbol, session }) {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: '700', padding: '2px 8px', borderRadius: '3px', background: regimeResults.isAllowed ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)', color: regimeResults.isAllowed ? 'var(--accent-green)' : 'var(--accent-amber)' }}>
-              {regimeResults.isAllowed ? 'READY TO EXECUTE' : 'REGIME BLOCK'}
+            <span style={{ fontSize: '0.72rem', fontWeight: '700', padding: '2px 8px', borderRadius: '3px', background: (!marketData?.validationPassed) ? 'rgba(239,68,68,0.15)' : regimeResults.isAllowed ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.15)', color: (!marketData?.validationPassed) ? 'var(--accent-red)' : regimeResults.isAllowed ? 'var(--accent-green)' : 'var(--accent-amber)' }}>
+              {(!marketData?.validationPassed) ? 'DATA UNTRUSTED' : regimeResults.isAllowed ? 'READY TO EXECUTE' : 'REGIME BLOCK'}
             </span>
             <a
               href={`/fno-analysis/${symbol}`}

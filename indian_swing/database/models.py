@@ -295,3 +295,127 @@ class ReplaySession(Base):
     )
 
     stock: Mapped["Stock"] = relationship()
+
+
+# ── F&O Derivatives Platform Models ──────────────────────────────────────────
+
+class FnoStrategyVersion(Base):
+    __tablename__ = "fno_strategy_versions"
+
+    strategy_id: Mapped[str] = mapped_column(String(50), primary_key=True)
+    strategy_version: Mapped[str] = mapped_column(String(20), primary_key=True)
+    indicator_version: Mapped[str] = mapped_column(String(20), nullable=False)
+    risk_model_version: Mapped[str] = mapped_column(String(20), nullable=False)
+    parameter_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    parameters_json: Mapped[dict] = mapped_column(JSON, nullable=False)
+    deployed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class FnoMarketTick(Base):
+    __tablename__ = "fno_market_ticks"
+    __table_args__ = (
+        Index("ix_fno_ticks_sym_time", "symbol", "timestamp"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    symbol: Mapped[str] = mapped_column(String(30), nullable=False)
+    price: Mapped[float] = mapped_column(Float, nullable=False)
+    volume: Mapped[int] = mapped_column(Integer, nullable=False)
+    oi: Mapped[int] = mapped_column(Integer, nullable=False)
+    pcr: Mapped[Optional[float]] = mapped_column(Float)
+    vix: Mapped[Optional[float]] = mapped_column(Float)
+
+
+class FnoOptionChainSnapshot(Base):
+    __tablename__ = "fno_option_chain_snapshots"
+    __table_args__ = (
+        Index("ix_fno_chain_sym_expiry_time", "symbol", "expiry_date", "timestamp"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    symbol: Mapped[str] = mapped_column(String(30), nullable=False)
+    expiry_date: Mapped[date] = mapped_column(Date, nullable=False)
+    strikes_data: Mapped[dict] = mapped_column(JSON, nullable=False)
+    last_update_seq: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class FnoOptionGreek(Base):
+    __tablename__ = "fno_option_greeks"
+    __table_args__ = (
+        Index("ix_fno_greeks_sym_strike_time", "symbol", "strike", "option_type", "timestamp"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    symbol: Mapped[str] = mapped_column(String(30), nullable=False)
+    strike: Mapped[float] = mapped_column(Float, nullable=False)
+    option_type: Mapped[str] = mapped_column(String(2), nullable=False)
+    delta: Mapped[float] = mapped_column(Float, nullable=False)
+    gamma: Mapped[float] = mapped_column(Float, nullable=False)
+    theta: Mapped[float] = mapped_column(Float, nullable=False)
+    vega: Mapped[float] = mapped_column(Float, nullable=False)
+    implied_volatility: Mapped[float] = mapped_column(Float, nullable=False)
+
+
+class FnoIndicatorSnapshot(Base):
+    __tablename__ = "fno_indicator_snapshots"
+    __table_args__ = (
+        Index("ix_fno_indicators_sym_time", "symbol", "timestamp"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    symbol: Mapped[str] = mapped_column(String(30), nullable=False)
+    iv_percentile: Mapped[float] = mapped_column(Float, nullable=False)
+    rv20: Mapped[float] = mapped_column(Float, nullable=False)
+    iv_rv_spread: Mapped[float] = mapped_column(Float, nullable=False)
+    net_gex: Mapped[float] = mapped_column(Float, nullable=False)
+    term_structure_ratio: Mapped[float] = mapped_column(Float, nullable=False)
+
+
+class FnoRecommendation(Base):
+    __tablename__ = "fno_recommendations"
+    __table_args__ = (
+        Index("ix_fno_recs_sym_time", "symbol", "timestamp"),
+    )
+
+    recommendation_uuid: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    symbol: Mapped[str] = mapped_column(String(30), nullable=False)
+    strategy_id: Mapped[str] = mapped_column(String(50), nullable=False)
+    strategy_version: Mapped[str] = mapped_column(String(20), nullable=False)
+    structure: Mapped[dict] = mapped_column(JSON, nullable=False)
+    net_credit: Mapped[float] = mapped_column(Float, nullable=False)
+    max_risk: Mapped[float] = mapped_column(Float, nullable=False)
+    risk_reward_ratio: Mapped[float] = mapped_column(Float, nullable=False)
+    confidence_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_allowed: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+
+class FnoRecommendationFilter(Base):
+    __tablename__ = "fno_recommendation_filters"
+
+    recommendation_uuid: Mapped[str] = mapped_column(
+        ForeignKey("fno_recommendations.recommendation_uuid", ondelete="CASCADE"),
+        primary_key=True
+    )
+    filter_name: Mapped[str] = mapped_column(String(50), primary_key=True)
+    value_measured: Mapped[str] = mapped_column(String(50), nullable=False)
+    value_required: Mapped[str] = mapped_column(String(50), nullable=False)
+    passed: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+
+class FnoAuditLog(Base):
+    __tablename__ = "fno_audit_logs"
+    __table_args__ = (
+        Index("ix_fno_audit_type_time", "event_type", "timestamp"),
+    )
+
+    event_id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    symbol: Mapped[Optional[str]] = mapped_column(String(30))
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False)
+
