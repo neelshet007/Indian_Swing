@@ -5245,7 +5245,7 @@
       "label": "._get_empty_strategy_response()",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L344",
+      "source_location": "L401",
       "id": "fno_strategy_fnostrategyengine_get_empty_strategy_response",
       "community": 14,
       "norm_label": "._get_empty_strategy_response()"
@@ -5282,9 +5282,9 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
       "source_location": "L61",
-      "id": "fno_strategy_rationale_61",
       "community": 14,
-      "norm_label": "calculates indicators, runs 6 regime filters, matches strikes,         and const"
+      "norm_label": "calculates indicators, runs 6 regime filters, matches strikes,         and const",
+      "id": "fno_strategy_rationale_61"
     },
     {
       "label": "scanner.py",
@@ -24792,7 +24792,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\recommendations\\fno_strategy.py",
-      "source_location": "L344",
+      "source_location": "L401",
       "weight": 1.0,
       "_src": "fno_strategy_fnostrategyengine",
       "_tgt": "fno_strategy_fnostrategyengine_get_empty_strategy_response",
