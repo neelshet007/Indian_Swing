@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import MetricCard from '../components/MetricCard'
 import SystemStatusCard from '../components/SystemStatusCard'
 import TableCard from '../components/TableCard'
