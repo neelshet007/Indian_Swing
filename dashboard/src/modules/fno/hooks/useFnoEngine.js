@@ -16,6 +16,7 @@ export default function useFnoEngine() {
 
   const intervalRef       = useRef(null)
   const failureCountRef   = useRef({})   // { NIFTY: 0, BANKNIFTY: 0, ... }
+  const delayRef          = useRef(BASE_INTERVAL_MS)
 
   // ── Core tick function ───────────────────────────────────────────────────
   const tick = useCallback(async () => {
@@ -73,11 +74,11 @@ export default function useFnoEngine() {
     // Adaptive polling: if any symbol is degraded, slow down to DEGRADED_INTERVAL_MS
     const anyDegraded = Object.values(failureCountRef.current).some(c => c >= MAX_CONSECUTIVE_FAILURES)
     const targetInterval = anyDegraded ? DEGRADED_INTERVAL_MS : BASE_INTERVAL_MS
-    if (intervalRef.current?._delay !== targetInterval) {
+    if (delayRef.current !== targetInterval) {
       // Restart interval at new rate if needed
       if (intervalRef.current) clearInterval(intervalRef.current)
       intervalRef.current = setInterval(tick, targetInterval)
-      intervalRef.current._delay = targetInterval
+      delayRef.current = targetInterval
     }
   }, [isMonitoring, selectedIndices, sessions])
 
@@ -131,7 +132,7 @@ export default function useFnoEngine() {
     if (isMonitoring) {
       tick()
       intervalRef.current = setInterval(tick, BASE_INTERVAL_MS)
-      intervalRef.current._delay = BASE_INTERVAL_MS
+      delayRef.current = BASE_INTERVAL_MS
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
