@@ -7,15 +7,16 @@ import ScanAnalytics from './pages/ScanAnalytics'
 import HomeDashboard from './pages/HomeDashboard'
 import Settings from './pages/Settings'
 import Logs from './pages/Logs'
+import FnoHistory from './pages/FnoHistory'
 import FnoAnalysis from './pages/FnoAnalysis'
 
-// Lazy loaded F&O module to optimize bundle size
 const FOTrading = lazy(() => import('./pages/FOTrading'))
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: '⊞' },
   { to: '/', label: 'Recommendation Scanner', icon: '◈' },
   { to: '/fo-trading', label: 'F&O Trading', icon: '⚡' },
+  { to: '/fno-history', label: 'F&O History', icon: '📜' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
   { to: '/logs', label: 'Logs', icon: '📋' },
 ]
@@ -94,6 +95,7 @@ export default function App() {
               {/* F&O Module */}
               <Route path="/fo-trading" element={<FOTrading />} />
               <Route path="/fno-analysis/:symbol" element={<FnoAnalysis />} />
+              <Route path="/fno-history" element={<FnoHistory />} />
               
               {/* Settings & Logs */}
               <Route path="/settings" element={<Settings />} />

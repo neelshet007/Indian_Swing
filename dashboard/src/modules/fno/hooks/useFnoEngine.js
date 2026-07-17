@@ -24,18 +24,16 @@ export default function useFnoEngine() {
           try {
             const marketData = await marketService.getLatestMarketData(symbol)
             const optionChain = await optionChainService.getOptionChain(symbol)
-            
-            // Execute strategy engine to compute metrics & spreads
-            const evalResults = strategyService.evaluate(symbol, marketData, optionChain)
             const end = performance.now()
 
             updatedSessions[symbol] = {
               marketData,
               optionChain,
-              indicators: evalResults.indicators,
-              regimeResults: evalResults.regimeResults,
-              selectedStrikes: evalResults.selectedStrikes,
-              structure: evalResults.structure,
+              indicators: marketData.indicators,
+              regimeResults: marketData.regimeResults,
+              selectedStrikes: marketData.selectedStrikes,
+              structure: marketData.structure,
+              recommendation_uuid: marketData.recommendation_uuid,
               connectionStatus: 'Connected',
               status: 'Running',
               lastUpdate: new Date().toLocaleTimeString(),

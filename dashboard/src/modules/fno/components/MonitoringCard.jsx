@@ -148,7 +148,7 @@ export default function MonitoringCard({ symbol, session }) {
               {(!marketData?.validationPassed) ? 'DATA UNTRUSTED' : regimeResults.isAllowed ? 'READY TO EXECUTE' : 'REGIME BLOCK'}
             </span>
             <a
-              href={`/fno-analysis/${symbol}`}
+              href={`/fno-analysis/${symbol}${session.recommendation_uuid ? `?rec_id=${session.recommendation_uuid}` : ''}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-ghost"
