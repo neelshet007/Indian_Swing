@@ -62,6 +62,9 @@ async def get_market_data(symbol: str):
 
                 last_price = spot_info.get("last_price", 0.0)
                 vix_price = vix_info.get("last_price", 14.12)
+                
+                if last_price <= 0.0:
+                    raise ValueError("LTP value missing or zero from Upstox API response")
         except Exception as e:
             logger.error("fno.market_data_api_failed", symbol=symbol, error=str(e))
             base_prices = {"NIFTY": 24350.0, "BANKNIFTY": 52420.0, "SENSEX": 79890.0, "FINNIFTY": 23680.0, "MIDCPNIFTY": 12340.0}
