@@ -98,6 +98,8 @@ export default function FOTrading() {
     })
   }, [btParams.riskPerTrade, selectedIndices])
 
+  const tradeHeaders = ['ID', 'Time', 'Instrument', 'Type', 'Qty', 'Entry', 'Exit', 'P&L', 'Status']
+
   const portfolioMetrics = useMemo(() => [
     { label: 'Open Positions', value: isMonitoring ? `${selectedIndices.length}` : '0', subValue: isMonitoring ? 'Live tracking' : 'Idle', trend: 'neutral' },
     { label: "Today's P&L", value: '₹ 0.00', subValue: '0.00%', trend: 'neutral' },
