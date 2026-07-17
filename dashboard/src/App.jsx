@@ -9,13 +9,14 @@ import Settings from './pages/Settings'
 import Logs from './pages/Logs'
 import FnoHistory from './pages/FnoHistory'
 import FnoAnalysis from './pages/FnoAnalysis'
+import ErrorBoundary from './components/ErrorBoundary'
 
 const FOTrading = lazy(() => import('./pages/FOTrading'))
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: '⊞' },
   { to: '/', label: 'Recommendation Scanner', icon: '◈' },
-  { to: '/fo-trading', label: 'F&O Trading', icon: '⚡' },
+  { to: '/fno-trading', label: 'F&O Trading', icon: '⚡' },
   { to: '/fno-history', label: 'F&O History', icon: '📜' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
   { to: '/logs', label: 'Logs', icon: '📋' },
@@ -79,28 +80,33 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app-layout">
-        <Sidebar />
+        <ErrorBoundary>
+          <Sidebar />
+        </ErrorBoundary>
         <main className="main-content">
           <Suspense fallback={<div className="loader-container"><div className="loader" /></div>}>
-            <Routes>
-              {/* Home Dashboard */}
-              <Route path="/dashboard" element={<HomeDashboard />} />
-              
-              {/* Legacy Scanner (Must NOT break existing routes) */}
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/recommendation/:id" element={<TradeDetail />} />
-              <Route path="/analytics" element={<ScanAnalytics />} />
-              <Route path="/analytics/:uuid" element={<ScanAnalytics />} />
-              
-              {/* F&O Module */}
-              <Route path="/fo-trading" element={<FOTrading />} />
-              <Route path="/fno-analysis/:symbol" element={<FnoAnalysis />} />
-              <Route path="/fno-history" element={<FnoHistory />} />
-              
-              {/* Settings & Logs */}
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/logs" element={<Logs />} />
-            </Routes>
+            <ErrorBoundary>
+              <Routes>
+                {/* Home Dashboard */}
+                <Route path="/dashboard" element={<HomeDashboard />} />
+                
+                {/* Legacy Scanner (Must NOT break existing routes) */}
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/recommendation/:id" element={<TradeDetail />} />
+                <Route path="/analytics" element={<ScanAnalytics />} />
+                <Route path="/analytics/:uuid" element={<ScanAnalytics />} />
+                
+                {/* F&O Module */}
+                <Route path="/fo-trading" element={<FOTrading />} />
+                <Route path="/fno-trading" element={<FOTrading />} />
+                <Route path="/fno-analysis/:symbol" element={<FnoAnalysis />} />
+                <Route path="/fno-history" element={<FnoHistory />} />
+                
+                {/* Settings & Logs */}
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/logs" element={<Logs />} />
+              </Routes>
+            </ErrorBoundary>
           </Suspense>
         </main>
       </div>
