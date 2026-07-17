@@ -198,6 +198,10 @@ class FnoStrategyEngine:
                 cand_risk = round((wing_width - net_credit_per_unit) * total_units)
                 cand_rr = round(cand_credit / cand_risk, 3) if cand_risk > 0 else 0.0
                 
+                # Margin and capital requirement calculations (hedged options spreads in India)
+                margin_required = 35000 * position_size
+                capital_required = margin_required + cand_risk
+                
                 # Approximate win probability from short Delta
                 win_prob = round((1.0 - target_delta) * 100)
                 
@@ -264,6 +268,9 @@ class FnoStrategyEngine:
                     "winProbability": 0,
                     "positionSize": position_size,
                     "status": "INVALIDATED",
+                    
+                    "marginRequired": 35000 * position_size,
+                    "capitalRequired": 35000 * position_size,
                     
                     "trade_quality_score": 30.0,
                     "stars": "★☆☆☆☆",
@@ -386,6 +393,9 @@ class FnoStrategyEngine:
                 "positionSize": position_size,
                 "status": "READY" if is_allowed else "INVALIDATED",
                 
+                "marginRequired": 35000 * position_size,
+                "capitalRequired": (35000 * position_size) + best_cand["maxRisk"],
+                
                 "trade_quality_score": quality_score,
                 "stars": stars,
                 "decision": decision,
@@ -408,7 +418,7 @@ class FnoStrategyEngine:
             "indicators": {"ivPercentile": 0.0, "rv20": 0.0, "ivRvSpread": 0.0, "dealerGex": 0.0, "termStructure": 1.0},
             "filters": {},
             "selectedStrikes": {"shortCall": 0, "shortCallDelta": 0.0, "shortPut": 0, "shortPutDelta": 0.0, "longCall": 0, "longPut": 0},
-            "structure": {"vehicle": "Iron Condor", "shortCall": 0, "longCall": 0, "shortPut": 0, "longPut": 0, "expectedCredit": 0, "maxRisk": 0, "riskReward": 0.0, "winProbability": 0, "positionSize": 0, "status": "INVALIDATED", "trade_quality_score": 0, "stars": "★☆☆☆☆", "decision": "REJECT", "verdict": "No Trade Today", "pros": [], "cons": [], "executive_summary": "Empty options chain. Strategy aborted.", "alternative_strategy": "Wait"},
+            "structure": {"vehicle": "Iron Condor", "shortCall": 0, "longCall": 0, "shortPut": 0, "longPut": 0, "expectedCredit": 0, "maxRisk": 0, "riskReward": 0.0, "winProbability": 0, "positionSize": 0, "status": "INVALIDATED", "marginRequired": 0, "capitalRequired": 0, "trade_quality_score": 0, "stars": "★☆☆☆☆", "decision": "REJECT", "verdict": "No Trade Today", "pros": [], "cons": [], "executive_summary": "Empty options chain. Strategy aborted.", "alternative_strategy": "Wait"},
             "confidence_score": 0
         }
 

@@ -209,11 +209,15 @@ export default function MonitoringCard({ symbol, session }) {
                 </div>
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
                   <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>MARGIN REQUIRED</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>₹ 43,800</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
+                    ₹ {structure.marginRequired?.toLocaleString() || '0'}
+                  </div>
                 </div>
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
                   <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>CAPITAL REQUIRED</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>₹ 45,000</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
+                    ₹ {structure.capitalRequired?.toLocaleString() || '0'}
+                  </div>
                 </div>
               </div>
 
