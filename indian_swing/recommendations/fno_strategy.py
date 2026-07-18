@@ -355,10 +355,6 @@ class FnoStrategyEngine:
             {"id": "diagonal_spread", "name": "Diagonal Spread"},
         ]
 
-        # ATM strike
-        atm_strike_item = min(mapped_strikes, key=lambda x: abs(x["strike"] - spot_price))
-        atm_strike = atm_strike_item["strike"]
-        
         # Sells/Wings interval helper
         interval = 50 if symbol.upper() != "MIDCPNIFTY" else 25
         if symbol.upper() == "BANKNIFTY":
@@ -368,6 +364,7 @@ class FnoStrategyEngine:
 
         results = []
         lot_size = LOT_SIZES.get(symbol.upper(), 25)
+        raw_mapped_strikes = mapped_strikes
 
         for strat in strategies_configs:
             sid = strat["id"]
@@ -388,6 +385,54 @@ class FnoStrategyEngine:
                     dte_days = 5.0 * tf
                 t = dte_days / 365.0
                 r = 0.07
+
+                # Build expiry-specific strikes by dynamically calculating Greeks and scaling premiums (Fix 2 & 3)
+                mapped_strikes = []
+                for s in raw_mapped_strikes:
+                    strike_val = s["strike"]
+                    ce_iv_raw = s.get("ce_iv", 14.0)
+                    pe_iv_raw = s.get("pe_iv", 14.5)
+                    ce_iv = ce_iv_raw / 100.0 if ce_iv_raw > 0 else vix / 100.0
+                    pe_iv = pe_iv_raw / 100.0 if pe_iv_raw > 0 else vix / 100.0
+                    
+                    ce_delta, ce_gamma, _ = calculate_greeks(spot_price, strike_val, t, ce_iv, r)
+                    pe_delta = ce_delta - 1.0
+                    
+                    weekly_dte = 5.0
+                    time_ratio = math.sqrt(dte_days / weekly_dte)
+                    
+                    ce_ltp_base = s.get("ce_ltp", 0.0)
+                    pe_ltp_base = s.get("pe_ltp", 0.0)
+                    
+                    if ce_ltp_base > 0:
+                        ce_ltp = round(ce_ltp_base * time_ratio, 2)
+                    else:
+                        from indian_swing.recommendations.fno_strategy import normal_cdf
+                        d1 = (math.log(spot_price / strike_val) + (r + 0.5 * ce_iv ** 2) * t) / (ce_iv * math.sqrt(t))
+                        d2 = d1 - ce_iv * math.sqrt(t)
+                        ce_ltp = round(max(0.5, spot_price * normal_cdf(d1) - strike_val * math.exp(-r * t) * normal_cdf(d2)), 2)
+                        
+                    if pe_ltp_base > 0:
+                        pe_ltp = round(pe_ltp_base * time_ratio, 2)
+                    else:
+                        from indian_swing.recommendations.fno_strategy import normal_cdf
+                        d1 = (math.log(spot_price / strike_val) + (r + 0.5 * pe_iv ** 2) * t) / (pe_iv * math.sqrt(t))
+                        d2 = d1 - pe_iv * math.sqrt(t)
+                        call_price = spot_price * normal_cdf(d1) - strike_val * math.exp(-r * t) * normal_cdf(d2)
+                        pe_ltp = round(max(0.5, call_price - spot_price + strike_val * math.exp(-r * t)), 2)
+                    
+                    mapped_strikes.append({
+                        "strike": strike_val,
+                        "ce_ltp": ce_ltp,
+                        "pe_ltp": pe_ltp,
+                        "ce_delta": ce_delta,
+                        "pe_delta": pe_delta,
+                        "ce_iv": ce_iv_raw,
+                        "pe_iv": pe_iv_raw
+                    })
+                
+                atm_strike_item = min(mapped_strikes, key=lambda x: abs(x["strike"] - spot_price))
+                atm_strike = atm_strike_item["strike"]
 
                 short_call = 0.0
                 short_put = 0.0
