@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import TableCard from '../components/TableCard'
+import UniverseBadge from '../components/UniverseBadge'
 
 export default function FnoHistory() {
   const [recs, setRecs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [badgeCache, setBadgeCache] = useState({})
   
   // Filtering States
   const [symbolFilter, setSymbolFilter] = useState('')
@@ -22,6 +24,20 @@ export default function FnoHistory() {
       const response = await fetch(url)
       const data = await response.json()
       setRecs(data)
+      
+      // Load universe badges for unique symbols (presentation-only lookup)
+      const uniqueSymbols = [...new Set(data.map(r => r.symbol))]
+      const badges = {}
+      await Promise.all(
+        uniqueSymbols.map(async (sym) => {
+          try {
+            const res = await fetch(`/api/fno/universe-badges?symbol=${sym}`)
+            const json = await res.json()
+            badges[sym] = json.universes || []
+          } catch { badges[sym] = [] }
+        })
+      )
+      setBadgeCache(prev => ({ ...prev, ...badges }))
     } catch (e) {
       console.error(e)
     } finally {
@@ -127,7 +143,12 @@ export default function FnoHistory() {
                 <td style={{ fontFamily: 'var(--font-mono)' }}>
                   {new Date(r.timestamp).toLocaleString()}
                 </td>
-                <td style={{ fontWeight: '700' }}>{r.symbol}</td>
+                <td style={{ fontWeight: '700' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    {r.symbol}
+                    <UniverseBadge universes={badgeCache[r.symbol]} size="tiny" />
+                  </div>
+                </td>
                 <td>
                   <span style={{ color: 'var(--accent-blue-bright)', fontWeight: '600' }}>
                     {r.structure.vehicle}

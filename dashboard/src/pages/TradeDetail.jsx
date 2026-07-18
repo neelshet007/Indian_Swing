@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { createChart, CandlestickSeries } from 'lightweight-charts'
+import UniverseBadge from '../components/UniverseBadge'
 
 // ---------- helpers ----------
 const fmt = (v, prefix = '₹', decimals = 2) => {
@@ -195,6 +196,7 @@ export default function TradeDetail() {
   const [rec, setRec] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [universes, setUniverses] = useState([])
 
   useEffect(() => {
     setLoading(true)
@@ -207,6 +209,13 @@ export default function TradeDetail() {
           setError('Recommendation not found — the link may be stale.')
         } else {
           setRec(result)
+          // Load universe badges (presentation-only)
+          if (result.symbol) {
+            fetch(`/api/stocks/universe-badges?symbol=${result.symbol}`)
+              .then(r => r.json())
+              .then(j => setUniverses(j.universes || []))
+              .catch(() => {}) // non-critical
+          }
         }
       })
       .catch((err) => {
@@ -320,6 +329,7 @@ export default function TradeDetail() {
             <span style={{ background: 'rgba(168,85,247,0.1)', color: 'var(--accent-purple)', padding: '3px 10px', borderRadius: 4, fontSize: '0.72rem', fontWeight: 700 }}>
               RANK #{rec.rank}
             </span>
+            <UniverseBadge universes={universes} />
           </div>
           <div style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', marginTop: 6, fontWeight: 500 }}>
             {rec.company_name}

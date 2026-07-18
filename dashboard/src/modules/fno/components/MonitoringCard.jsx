@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import MarketCard from '../../../components/MarketCard'
 import TableCard from '../../../components/TableCard'
+import UniverseBadge from '../../../components/UniverseBadge'
 
 export default function MonitoringCard({ symbol, session }) {
   const [viewMode, setViewMode] = useState('beginner') // 'beginner' | 'professional'
@@ -71,8 +72,9 @@ export default function MonitoringCard({ symbol, session }) {
       
       {/* Session Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: '800' }}>{symbol}</h3>
+          <UniverseBadge universes={session.universes} />
           <span className="badge-status" style={{ background: 'rgba(34, 197, 94, 0.12)', color: 'var(--accent-green)' }}>
             {status}
           </span>

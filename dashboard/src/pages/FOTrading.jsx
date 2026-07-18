@@ -7,6 +7,7 @@ import MonitoringToolbar from '../modules/fno/components/MonitoringToolbar'
 import MonitoringCard from '../modules/fno/components/MonitoringCard'
 import { backtester } from '../modules/fno/services/strategy/backtester'
 import { riskService } from '../modules/fno/services/risk/riskService'
+import UniverseBadge from '../components/UniverseBadge'
 
 function OptionChainExplorer({ symbol, optionChains, expiries, spotPrice }) {
   const [selectedExpiry, setSelectedExpiry] = useState(expiries[0] || '')
@@ -276,8 +277,11 @@ export default function FOTrading() {
                           const s = sessions[symbol] || {}
                           return (
                             <div key={symbol} style={{ background: 'rgba(0,0,0,0.15)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                                <span>{symbol}</span>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                  {symbol}
+                                  <UniverseBadge universes={s.universes} size="tiny" />
+                                </span>
                                 <span>Trend: Mean Reverting</span>
                               </div>
                               <div style={{ fontSize: '1.1rem', fontWeight: '800', marginTop: '4px', fontFamily: 'var(--font-mono)' }}>

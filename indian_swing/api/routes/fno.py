@@ -15,7 +15,7 @@ from indian_swing.database.models import (
 )
 from indian_swing.data.validation.integrity_layer import DataIntegrityLayer
 from indian_swing.recommendations.fno_strategy import fno_strategy_engine
-
+from indian_swing.core.universe_badge import badge_lookup
 logger = get_logger(__name__)
 router = APIRouter()
 validator = DataIntegrityLayer(quality_threshold=85.0)
@@ -346,8 +346,25 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
         "structure": saved_rec["structure"],
         "ranked_strategies": rec_obj.get("ranked_strategies", []),
         "option_chains": option_chains_by_expiry,
+        "universes": badge_lookup.get_badges(symbol.upper()),
         "explainability": explainability,
         "developer_audit_logs": audit_logs if audit else []
+    }
+
+@router.get("/universe-badges")
+async def get_universe_badges(symbol: Optional[str] = None):
+    """
+    Presentation-layer only. Returns universe membership badges for a symbol.
+    Does NOT modify any recommendation, strategy, or database record.
+    """
+    if symbol:
+        return {"symbol": symbol.upper(), "universes": badge_lookup.get_badges(symbol)}
+    # Return all loaded universes metadata
+    return {
+        "available_universes": [
+            {"name": name, "size": badge_lookup.universe_size(name)}
+            for name in badge_lookup.all_universes()
+        ]
     }
 
 @router.get("/option-chain")

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import UniverseBadge from '../components/UniverseBadge'
 
 function getConvictionClass(score) {
   if (score >= 0.75) return 'high'
@@ -8,7 +9,7 @@ function getConvictionClass(score) {
   return 'low'
 }
 
-function RecCard({ rec }) {
+function RecCard({ rec, universes }) {
   const navigate = useNavigate()
   const cls = getConvictionClass(rec.confidence_score)
   return (
@@ -20,6 +21,11 @@ function RecCard({ rec }) {
             <span style={{ marginLeft: 8, fontSize: '0.65rem', background: 'rgba(34,197,94,0.1)', color: 'var(--accent-green)', padding: '2px 6px', borderRadius: 3, fontWeight: 600 }}>
               {rec.action}
             </span>
+            {universes && universes.length > 0 && (
+              <span style={{ marginLeft: 6 }}>
+                <UniverseBadge universes={universes} size="tiny" />
+              </span>
+            )}
           </div>
           <div className="rec-name">{rec.company_name}</div>
           <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 2 }}>{rec.exchange} {rec.sector ? `- ${rec.sector}` : ''}</div>
@@ -68,6 +74,7 @@ export default function Dashboard() {
   const [error, setError] = useState(null)
   const [scanning, setScanning] = useState(false)
   const [scanStatus, setScanStatus] = useState(null)
+  const [badgeCache, setBadgeCache] = useState({})
 
   function formatDuration(start, end) {
     if (!start || !end) return null
@@ -77,6 +84,23 @@ export default function Dashboard() {
     const mins = Math.floor(diffSec / 60)
     const secs = diffSec % 60
     return `${mins}m ${secs}s`
+  }
+
+  // Presentation-only: load NIFTY 500 badges for unique symbols
+  const loadBadges = async (recs) => {
+    const symbols = [...new Set(recs.map(r => r.symbol).filter(Boolean))]
+    if (symbols.length === 0) return
+    const badges = {}
+    await Promise.all(
+      symbols.map(async (sym) => {
+        try {
+          const res = await fetch(`/api/stocks/universe-badges?symbol=${sym}`)
+          const json = await res.json()
+          badges[sym] = json.universes || []
+        } catch { badges[sym] = [] }
+      })
+    )
+    setBadgeCache(prev => ({ ...prev, ...badges }))
   }
 
   const loadLatest = async () => {
@@ -90,6 +114,7 @@ export default function Dashboard() {
       
       const recsRes = await axios.get(`/api/recommendations/${scan.scan_uuid}`)
       setRecommendations(recsRes.data)
+      loadBadges(recsRes.data)
 
       setScanStatus({
         status: 'completed',
@@ -121,6 +146,7 @@ export default function Dashboard() {
       
       const recsRes = await axios.get(`/api/recommendations/${scan.scan_uuid}`)
       setRecommendations(recsRes.data)
+      loadBadges(recsRes.data)
 
       setScanStatus({
         status: 'completed',
@@ -384,7 +410,7 @@ export default function Dashboard() {
       ) : (
         <div className="rec-grid">
           {recommendations.map((rec) => (
-            <RecCard key={rec.id} rec={rec} />
+            <RecCard key={rec.id} rec={rec} universes={badgeCache[rec.symbol]} />
           ))}
         </div>
       )}

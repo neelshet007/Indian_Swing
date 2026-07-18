@@ -10,8 +10,25 @@ from indian_swing.database.connection import get_sync_session
 from indian_swing.database.models import Stock
 from indian_swing.database.repositories.stock_repo import StockRepository
 from indian_swing.database.repositories.ohlcv_repo import OHLCVRepository
+from indian_swing.core.universe_badge import badge_lookup
 
 router = APIRouter()
+
+
+@router.get("/universe-badges")
+async def get_universe_badges(symbol: Optional[str] = Query(None)):
+    """
+    Presentation-layer only. Returns universe membership badges for a stock symbol.
+    Does NOT modify any recommendation, strategy, scan, or database record.
+    """
+    if symbol:
+        return {"symbol": symbol.upper().strip(), "universes": badge_lookup.get_badges(symbol)}
+    return {
+        "available_universes": [
+            {"name": name, "size": badge_lookup.universe_size(name)}
+            for name in badge_lookup.all_universes()
+        ]
+    }
 
 
 @router.get("/")

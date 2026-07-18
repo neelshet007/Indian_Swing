@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
+import UniverseBadge from '../components/UniverseBadge'
 
 export default function FnoSavedDetail() {
   const { savedId } = useParams()
@@ -12,6 +13,7 @@ export default function FnoSavedDetail() {
   const [notes, setNotes] = useState('')
   const [status, setStatus] = useState('Pending')
   const [savingNotes, setSavingNotes] = useState(false)
+  const [universes, setUniverses] = useState([])
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -21,6 +23,14 @@ export default function FnoSavedDetail() {
         setData(data)
         setNotes(data.user_notes || '')
         setStatus(data.status || 'Pending')
+        // Load universe badges (presentation-only)
+        if (data.symbol) {
+          try {
+            const bRes = await fetch(`/api/fno/universe-badges?symbol=${data.symbol}`)
+            const bJson = await bRes.json()
+            setUniverses(bJson.universes || [])
+          } catch { /* non-critical */ }
+        }
       } catch (e) {
         console.error(e)
       } finally {
@@ -73,6 +83,7 @@ export default function FnoSavedDetail() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <h1 style={{ fontSize: '1.4rem', fontWeight: '900', color: '#fff' }}>{data.symbol} Forensic Audit Report</h1>
+            <UniverseBadge universes={universes} />
             <span style={{ fontSize: '0.74rem', padding: '3px 8px', borderRadius: '4px', background: 'rgba(99,102,241,0.15)', color: 'var(--accent-blue-bright)', fontWeight: '800' }}>
               SAVED SIGNAL
             </span>

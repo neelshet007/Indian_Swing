@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import UniverseBadge from '../components/UniverseBadge'
 
 export default function FnoSavedList() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
+  const [badgeCache, setBadgeCache] = useState({})
   
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('')
@@ -20,6 +22,19 @@ export default function FnoSavedList() {
       try {
         const { data } = await axios.get('/api/fno/saved-recommendations')
         setItems(data)
+        // Load universe badges (presentation-only)
+        const uniqueSymbols = [...new Set(data.map(d => d.symbol))]
+        const badges = {}
+        await Promise.all(
+          uniqueSymbols.map(async (sym) => {
+            try {
+              const res = await fetch(`/api/fno/universe-badges?symbol=${sym}`)
+              const json = await res.json()
+              badges[sym] = json.universes || []
+            } catch { badges[sym] = [] }
+          })
+        )
+        setBadgeCache(prev => ({ ...prev, ...badges }))
       } catch (e) {
         console.error(e)
       } finally {
@@ -191,8 +206,13 @@ export default function FnoSavedList() {
               {/* Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--accent-blue-bright)' }}>{item.symbol} {item.strategy_type}</h3>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px' }}>Saved: {item.scan_date}</div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--accent-blue-bright)' }}>
+                    {item.symbol} {item.strategy_type}
+                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
+                    <UniverseBadge universes={badgeCache[item.symbol]} size="tiny" />
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Saved: {item.scan_date}</span>
+                  </div>
                 </div>
                 <span style={{ 
                   fontSize: '0.66rem', 
