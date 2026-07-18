@@ -9,6 +9,7 @@ import Settings from './pages/Settings'
 import Logs from './pages/Logs'
 import FnoHistory from './pages/FnoHistory'
 import FnoAnalysis from './pages/FnoAnalysis'
+import HistoricalScan from './pages/HistoricalScan'
 import ErrorBoundary from './components/ErrorBoundary'
 
 const FOTrading = lazy(() => import('./pages/FOTrading'))
@@ -18,6 +19,7 @@ const FnoSavedDetail = lazy(() => import('./pages/FnoSavedDetail'))
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: '⊞' },
   { to: '/', label: 'Recommendation Scanner', icon: '◈' },
+  { to: '/historical', label: 'Historical Terminal', icon: '📈' },
   { to: '/fno-trading', label: 'F&O Trading', icon: '⚡' },
   { to: '/fno-saved', label: 'Saved Forensic Recs', icon: '💾' },
   { to: '/fno-history', label: 'F&O History', icon: '📜' },
@@ -98,6 +100,9 @@ export default function App() {
                 <Route path="/recommendation/:id" element={<TradeDetail />} />
                 <Route path="/analytics" element={<ScanAnalytics />} />
                 <Route path="/analytics/:uuid" element={<ScanAnalytics />} />
+                
+                {/* Historical Terminal */}
+                <Route path="/historical" element={<HistoricalScan />} />
                 
                 {/* F&O Module */}
                 <Route path="/fo-trading" element={<FOTrading />} />

@@ -86,6 +86,150 @@ def scan_run():
     asyncio.run(_scan())
 
 
+@scan_app.command("historical")
+def scan_historical():
+    configure_logging(fmt="console")
+
+    async def _run():
+        from indian_swing.database.connection import get_sync_session, init_db
+        from indian_swing.recommendations.automation import HistoricalScanManager, validate_date
+        import click
+        from datetime import datetime
+
+        await init_db()
+        manager = HistoricalScanManager()
+        
+        # Check active session
+        existing = manager.get_active_session()
+        dates = []
+        start_idx = 0
+        session_obj = None
+
+        if existing:
+            typer.echo("A previous historical scan was found.")
+            typer.echo(f"Completed:\n{existing.completed_days} of {existing.total_days} trading days.")
+            typer.echo("Do you want to:")
+            typer.echo("1 -> Resume")
+            typer.echo("2 -> Start a new historical scan")
+            choice = click.prompt("Enter choice (1 or 2)", type=int, default=1)
+            if choice == 1:
+                session_obj = existing
+                start_idx = existing.completed_days
+                for ds in existing.queue:
+                    dt = datetime.strptime(ds, "%d/%m/%y").date()
+                    dates.append(dt)
+
+        if not dates:
+            num_days = click.prompt("How many trading days do you want to scan?", type=int)
+            typer.echo(f"Please enter {num_days} trading days.")
+            for i in range(num_days):
+                while True:
+                    date_input = click.prompt(f"Please enter Trading Day {i+1} (DD/MM/YY)")
+                    parsed = validate_date(date_input)
+                    if parsed:
+                        dates.append(parsed)
+                        break
+                    else:
+                        typer.echo("Error: Invalid date format. Please use DD/MM/YY (e.g. 11/06/26).")
+            session_obj = manager.create_session(dates)
+            start_idx = 0
+
+        total = len(dates)
+        start_time = datetime.now()
+        
+        for idx in range(start_idx, total):
+            curr_date = dates[idx]
+            date_str = curr_date.strftime("%d/%m/%y")
+            
+            typer.echo("\n" + "="*40)
+            typer.echo(f"Trading Day {idx+1} of {total}")
+            typer.echo(f"Current Date: {date_str}")
+            typer.echo("Status: Scanning...")
+
+            with get_sync_session() as db_session:
+                # Update session info
+                db_session.add(session_obj)
+                session_obj.current_date = date_str
+                session_obj.status = "active"
+                db_session.flush()
+                manager.update_paper_trades(db_session, curr_date)
+            
+            result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
+
+            with get_sync_session() as db_session:
+                from sqlalchemy import select
+                from indian_swing.database.models import PaperTrade
+                trades_created = manager.create_pending_trades(db_session, result.scan_uuid)
+                
+                completed_count = len(db_session.execute(
+                    select(PaperTrade).where(PaperTrade.status == "Closed")
+                ).scalars().all())
+                active_count = len(db_session.execute(
+                    select(PaperTrade).where(PaperTrade.status == "Active")
+                ).scalars().all())
+
+                # Calculate ETA
+                processed = idx + 1 - start_idx
+                elapsed = (datetime.now() - start_time).total_seconds()
+                avg_time = elapsed / processed if processed > 0 else 0
+                remaining = total - (idx + 1)
+                eta_min = (avg_time * remaining) / 60.0
+
+                db_session.add(session_obj)
+                session_obj.completed_days = idx + 1
+                session_obj.stocks_scanned = result.stocks_scanned
+                session_obj.total_stocks = result.stocks_scanned + result.failed_stocks
+                session_obj.recommendations_today = result.recommendations_saved
+                session_obj.paper_trades_created = trades_created
+                session_obj.completed_trades = completed_count
+                session_obj.active_trades = active_count
+                session_obj.eta_minutes = eta_min
+                if idx + 1 == total:
+                    session_obj.status = "completed"
+                db_session.flush()
+
+                # Generate Excel
+                manager.generate_excel_report(db_session)
+
+            typer.echo(f"Recommendations Found: {result.recommendations_saved}")
+            typer.echo("Saved: Yes")
+            typer.echo(f"Paper Trades Created: {trades_created}")
+            typer.echo("Status: Completed")
+
+            if idx + 1 < total:
+                typer.echo("\nTrading Day completed.")
+                typer.echo("Type:")
+                typer.echo("1 -> Continue to next queued date")
+                typer.echo("2 -> Stop and resume later")
+                choice = click.prompt("Enter choice (1 or 2)", type=int, default=1)
+                if choice == 2:
+                    typer.echo("Session paused. You can resume later.")
+                    with get_sync_session() as db_session:
+                        db_session.add(session_obj)
+                        session_obj.status = "paused"
+                    return
+
+        typer.echo("\n" + "="*40)
+        typer.echo("Historical scan and paper trading simulation completed!")
+        report = manager.generate_final_report()
+        
+        typer.echo("\n--- Final Report ---")
+        typer.echo(f"Total Trading Days Processed: {report['total_scans']}")
+        typer.echo(f"Total Recommendations: {report['total_recommendations']}")
+        typer.echo(f"Total Paper Trades: {report['total_trades']}")
+        typer.echo(f"Win Rate: {report['win_rate']}%")
+        typer.echo(f"Loss Rate: {report['loss_rate']}%")
+        typer.echo(f"Profit Factor: {report['profit_factor']}")
+        typer.echo(f"Expectancy: {report['expectancy']}%")
+        typer.echo(f"CAGR: {report['cagr']}%")
+        typer.echo(f"Maximum Drawdown: {report['max_drawdown']}%")
+        typer.echo(f"Average Holding Period: {report['avg_holding_period']} days")
+        typer.echo(f"Average R Multiple: {report['avg_r_multiple']}")
+
+    asyncio.run(_run())
+
+
+
 @app.command("strategies")
 def list_strategies():
     configure_logging(fmt="console")

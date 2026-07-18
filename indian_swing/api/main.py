@@ -123,6 +123,7 @@ from indian_swing.api.routes import (  # noqa: E402
     stocks,
     strategies,
     fno,
+    historical,
 )
 
 app.include_router(stocks.router, prefix="/api/stocks", tags=["Stocks"])
@@ -133,6 +134,7 @@ app.include_router(replay.router, prefix="/api/replay", tags=["Replay"])
 app.include_router(scanner.router, prefix="/api/scanner", tags=["Scanner"])
 app.include_router(strategies.router, prefix="/api/strategies", tags=["Strategies"])
 app.include_router(fno.router, prefix="/api/fno", tags=["F&O"])
+app.include_router(historical.router, prefix="/api/historical", tags=["Historical"])
 
 
 @app.get("/api/health")

@@ -463,3 +463,61 @@ class SavedRecommendation(Base):
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="Pending")
 
 
+class HistoricalScanSession(Base):
+    __tablename__ = "sw_historical_scan_sessions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    total_days: Mapped[int] = mapped_column(Integer, nullable=False)
+    completed_days: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    queue: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    status: Mapped[str] = mapped_column(String(30), default="active", nullable=False) # active, completed, failed
+    current_date: Mapped[Optional[str]] = mapped_column(String(30))
+    current_symbol: Mapped[Optional[str]] = mapped_column(String(30))
+    stocks_scanned: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    total_stocks: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    recommendations_today: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    paper_trades_created: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    completed_trades: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    active_trades: Mapped[Optional[int]] = mapped_column(Integer, default=0)
+    eta_minutes: Mapped[Optional[float]] = mapped_column(Float, default=0.0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+
+class PaperTrade(Base):
+    __tablename__ = "sw_paper_trades"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    recommendation_id: Mapped[str] = mapped_column(
+        ForeignKey("sw_recommendations.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    stock_uuid: Mapped[str] = mapped_column(
+        ForeignKey("sw_stocks.stock_uuid", ondelete="CASCADE"),
+        nullable=False,
+    )
+    symbol: Mapped[str] = mapped_column(String(30), nullable=False)
+    status: Mapped[str] = mapped_column(String(30), default="Pending", nullable=False) # Pending, Active, Closed, Expired
+    entry_date: Mapped[Optional[date]] = mapped_column(Date)
+    entry_price: Mapped[Optional[float]] = mapped_column(Float)
+    exit_date: Mapped[Optional[date]] = mapped_column(Date)
+    exit_price: Mapped[Optional[float]] = mapped_column(Float)
+    exit_reason: Mapped[Optional[str]] = mapped_column(String(50))
+    holding_days: Mapped[Optional[int]] = mapped_column(Integer)
+    risk_reward: Mapped[Optional[float]] = mapped_column(Float)
+    r_multiple: Mapped[Optional[float]] = mapped_column(Float)
+    pnl: Mapped[Optional[float]] = mapped_column(Float)
+    pnl_absolute: Mapped[Optional[float]] = mapped_column(Float)
+    max_drawdown: Mapped[Optional[float]] = mapped_column(Float)
+    max_favorable_excursion: Mapped[Optional[float]] = mapped_column(Float)
+    max_adverse_excursion: Mapped[Optional[float]] = mapped_column(Float)
+    highest_price: Mapped[Optional[float]] = mapped_column(Float)
+    lowest_price: Mapped[Optional[float]] = mapped_column(Float)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    recommendation: Mapped["Recommendation"] = relationship()
+    stock: Mapped["Stock"] = relationship()
+
+
+
