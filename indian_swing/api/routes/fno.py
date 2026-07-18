@@ -44,8 +44,11 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
     audit_logs = []
     audit_logs.append({"step": "API Request Received", "details": f"Symbol: {symbol.upper()}, Audit Mode: {audit}"})
 
+    using_fallback = False
+
     # Resolve target spot & vix
     if not token:
+        using_fallback = True
         base_prices = {"NIFTY": 24350.0, "BANKNIFTY": 52420.0, "SENSEX": 79890.0, "FINNIFTY": 23680.0, "MIDCPNIFTY": 12340.0}
         last_price = base_prices.get(symbol.upper(), 24350.0)
         vix_price = 14.12
@@ -73,10 +76,11 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
                 audit_logs.append({"step": "Spot Price Resolution", "details": f"Successfully retrieved spot {last_price} and VIX {vix_price} from Upstox"})
         except Exception as e:
             logger.error("fno.market_data_api_failed", symbol=symbol, error=str(e))
-            # In production-hardening, fail if live data is not available
-            last_price = 0.0
-            vix_price = 0.0
-            audit_logs.append({"step": "Spot Price Resolution", "details": f"Failed to retrieve spot price: {e}"})
+            using_fallback = True
+            base_prices = {"NIFTY": 24350.0, "BANKNIFTY": 52420.0, "SENSEX": 79890.0, "FINNIFTY": 23680.0, "MIDCPNIFTY": 12340.0}
+            last_price = base_prices.get(symbol.upper(), 24350.0)
+            vix_price = 14.12
+            audit_logs.append({"step": "Spot Price Resolution", "details": f"Failed to retrieve spot price: {e}. Falling back to simulated pricing."})
 
     # Fetch dynamic expiry dates from Upstox (Fix 1)
     expiries_raw = []
@@ -225,6 +229,7 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
     # 6. Recommendation Validation Guard (Fix 8)
     # Reject recommendation if spot price or strikes are invalid/placeholder in live mode
     validation_guard_passed = last_price > 0 and len(strikes_list) > 0
+    
     if not validation_guard_passed:
         passed = False
         score = 0.0
@@ -239,6 +244,17 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
     rec_obj["indicators"]["rv20"] = round(rv20_val, 2)
     rec_obj["indicators"]["ivRvSpread"] = round(vix_price - rv20_val, 2)
     
+    # Flag recommendation as invalid/aborted if using fallback simulated data
+    if using_fallback:
+        rec_obj["is_allowed"] = False
+        if "structure" in rec_obj:
+            rec_obj["structure"]["status"] = "INVALIDATED"
+            rec_obj["structure"]["decision"] = "REJECT"
+            rec_obj["structure"]["verdict"] = "ABORTED"
+            rec_obj["structure"]["executive_summary"] = "Recommendation invalidated: live Upstox data source unavailable. Running in simulated fallback mode."
+            rec_obj["structure"]["cons"] = ["Using simulated fallback data. Live Upstox connection unavailable."]
+        audit_logs.append({"step": "Recommendation Validation", "details": "WARNING: Running in fallback mode. Recommendation invalidated."})
+
     # Save recommendation only if validation guard passes
     saved_rec = {"recommendation_uuid": "validation-aborted", "structure": rec_obj["structure"]}
     if validation_guard_passed:
@@ -263,12 +279,12 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
     # 7. Explainability verification metadata payload (Fix 9)
     now_str = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
     explainability = {
-        "spotPrice": {"source": "✅ Upstox API" if token and last_price > 0 else "⚠️ Simulated/Estimated", "verified": bool(token and last_price > 0), "timestamp": now_str},
-        "optionChain": {"source": "✅ Upstox API" if token and strikes_list else "⚠️ Simulated/Estimated", "verified": bool(token and strikes_list), "timestamp": now_str},
-        "expiry": {"source": "✅ Upstox API" if token and expiries_raw else "⚠️ Simulated/Estimated", "verified": bool(token and expiries_raw), "timestamp": now_str},
+        "spotPrice": {"source": "✅ Upstox API" if token and not using_fallback else "⚠️ Simulated (Fallback)", "verified": bool(token and not using_fallback), "timestamp": now_str},
+        "optionChain": {"source": "✅ Upstox API" if token and not using_fallback else "⚠️ Simulated (Fallback)", "verified": bool(token and not using_fallback), "timestamp": now_str},
+        "expiry": {"source": "✅ Upstox API" if token and not using_fallback else "⚠️ Simulated (Fallback)", "verified": bool(token and not using_fallback), "timestamp": now_str},
         "greeks": {"source": "✅ Calculated (Black-Scholes)", "verified": True, "timestamp": now_str},
         "margin": {"source": "✅ Calculated (SPAN Approximation)", "verified": True, "timestamp": now_str},
-        "iv": {"source": "✅ Upstox API" if token else "⚠️ Simulated", "verified": bool(token), "timestamp": now_str},
+        "iv": {"source": "✅ Upstox API" if token and not using_fallback else "⚠️ Simulated", "verified": bool(token and not using_fallback), "timestamp": now_str},
         "risk": {"source": "✅ Calculated (Probabilistic expectancy)", "verified": True, "timestamp": now_str}
     }
 
