@@ -88,6 +88,15 @@ class FnoStrategyEngine:
         if not strikes or spot_price <= 0:
             return self._get_empty_strategy_response(symbol)
 
+        raw_weekly_strikes = strikes
+        if isinstance(strikes, dict):
+            # Extract first expiry strikes list
+            weekly_label = expiries_list[0]["label"] if expiries_list else ""
+            raw_weekly_strikes = strikes.get(weekly_label, list(strikes.values())[0] if strikes else [])
+
+        if not raw_weekly_strikes:
+            return self._get_empty_strategy_response(symbol)
+
         # 1. DTE calculation (Assume standard weekly expiry = 5 days)
         dte_days = 5.0
         t = dte_days / 365.0
@@ -98,12 +107,12 @@ class FnoStrategyEngine:
         total_gex = 0.0
         
         # Calculate ATM implied volatility from strikes closest to spot
-        atm_strike = min(strikes, key=lambda x: abs(x["strike"] - spot_price))
+        atm_strike = min(raw_weekly_strikes, key=lambda x: abs(x["strike"] - spot_price))
         atm_iv = (atm_strike["ce"]["iv"] + atm_strike["pe"]["iv"]) / 2.0
         if atm_iv <= 0:
             atm_iv = 12.5 # baseline default
 
-        for s in strikes:
+        for s in raw_weekly_strikes:
             strike_val = s["strike"]
             ce_iv = s["ce"]["iv"] / 100.0 if s["ce"]["iv"] > 0 else atm_iv / 100.0
             pe_iv = s["pe"]["iv"] / 100.0 if s["pe"]["iv"] > 0 else atm_iv / 100.0
@@ -388,48 +397,77 @@ class FnoStrategyEngine:
 
                 # Build expiry-specific strikes by dynamically calculating Greeks and scaling premiums (Fix 2 & 3)
                 mapped_strikes = []
-                for s in raw_mapped_strikes:
-                    strike_val = s["strike"]
-                    ce_iv_raw = s.get("ce_iv", 14.0)
-                    pe_iv_raw = s.get("pe_iv", 14.5)
-                    ce_iv = ce_iv_raw / 100.0 if ce_iv_raw > 0 else vix / 100.0
-                    pe_iv = pe_iv_raw / 100.0 if pe_iv_raw > 0 else vix / 100.0
+                
+                target_chain = None
+                if isinstance(raw_mapped_strikes, dict):
+                    target_chain = raw_mapped_strikes.get(label)
                     
-                    ce_delta, ce_gamma, _ = calculate_greeks(spot_price, strike_val, t, ce_iv, r)
-                    pe_delta = ce_delta - 1.0
-                    
-                    weekly_dte = 5.0
-                    time_ratio = math.sqrt(dte_days / weekly_dte)
-                    
-                    ce_ltp_base = s.get("ce_ltp", 0.0)
-                    pe_ltp_base = s.get("pe_ltp", 0.0)
-                    
-                    if ce_ltp_base > 0:
-                        ce_ltp = round(ce_ltp_base * time_ratio, 2)
-                    else:
-                        from indian_swing.recommendations.fno_strategy import normal_cdf
-                        d1 = (math.log(spot_price / strike_val) + (r + 0.5 * ce_iv ** 2) * t) / (ce_iv * math.sqrt(t))
-                        d2 = d1 - ce_iv * math.sqrt(t)
-                        ce_ltp = round(max(0.5, spot_price * normal_cdf(d1) - strike_val * math.exp(-r * t) * normal_cdf(d2)), 2)
+                if target_chain:
+                    # We have a real, live option chain for this expiry date! Use its actual LTP and IV metrics!
+                    for s in target_chain:
+                        strike_val = s["strike"]
+                        ce_iv_raw = s["ce"]["iv"]
+                        pe_iv_raw = s["pe"]["iv"]
+                        ce_iv = ce_iv_raw / 100.0 if ce_iv_raw > 0 else vix / 100.0
+                        pe_iv = pe_iv_raw / 100.0 if pe_iv_raw > 0 else vix / 100.0
                         
-                    if pe_ltp_base > 0:
-                        pe_ltp = round(pe_ltp_base * time_ratio, 2)
-                    else:
-                        from indian_swing.recommendations.fno_strategy import normal_cdf
-                        d1 = (math.log(spot_price / strike_val) + (r + 0.5 * pe_iv ** 2) * t) / (pe_iv * math.sqrt(t))
-                        d2 = d1 - pe_iv * math.sqrt(t)
-                        call_price = spot_price * normal_cdf(d1) - strike_val * math.exp(-r * t) * normal_cdf(d2)
-                        pe_ltp = round(max(0.5, call_price - spot_price + strike_val * math.exp(-r * t)), 2)
-                    
-                    mapped_strikes.append({
-                        "strike": strike_val,
-                        "ce_ltp": ce_ltp,
-                        "pe_ltp": pe_ltp,
-                        "ce_delta": ce_delta,
-                        "pe_delta": pe_delta,
-                        "ce_iv": ce_iv_raw,
-                        "pe_iv": pe_iv_raw
-                    })
+                        ce_delta, ce_gamma, _ = calculate_greeks(spot_price, strike_val, t, ce_iv, r)
+                        pe_delta = ce_delta - 1.0
+                        
+                        mapped_strikes.append({
+                            "strike": strike_val,
+                            "ce_ltp": s["ce"]["ltp"],
+                            "pe_ltp": s["pe"]["ltp"],
+                            "ce_delta": ce_delta,
+                            "pe_delta": pe_delta,
+                            "ce_iv": ce_iv_raw,
+                            "pe_iv": pe_iv_raw
+                        })
+                else:
+                    # Fallback to scaling the weekly strikes (using raw_mapped_strikes or the first value list)
+                    weekly_source = list(raw_mapped_strikes.values())[0] if isinstance(raw_mapped_strikes, dict) else raw_mapped_strikes
+                    for s in weekly_source:
+                        strike_val = s["strike"]
+                        ce_iv_raw = s.get("ce_iv", 14.0)
+                        pe_iv_raw = s.get("pe_iv", 14.5)
+                        ce_iv = ce_iv_raw / 100.0 if ce_iv_raw > 0 else vix / 100.0
+                        pe_iv = pe_iv_raw / 100.0 if pe_iv_raw > 0 else vix / 100.0
+                        
+                        ce_delta, ce_gamma, _ = calculate_greeks(spot_price, strike_val, t, ce_iv, r)
+                        pe_delta = ce_delta - 1.0
+                        
+                        weekly_dte = 5.0
+                        time_ratio = math.sqrt(dte_days / weekly_dte)
+                        
+                        ce_ltp_base = s.get("ce_ltp", 0.0)
+                        pe_ltp_base = s.get("pe_ltp", 0.0)
+                        
+                        if ce_ltp_base > 0:
+                            ce_ltp = round(ce_ltp_base * time_ratio, 2)
+                        else:
+                            from indian_swing.recommendations.fno_strategy import normal_cdf
+                            d1 = (math.log(spot_price / strike_val) + (r + 0.5 * ce_iv ** 2) * t) / (ce_iv * math.sqrt(t))
+                            d2 = d1 - ce_iv * math.sqrt(t)
+                            ce_ltp = round(max(0.5, spot_price * normal_cdf(d1) - strike_val * math.exp(-r * t) * normal_cdf(d2)), 2)
+                            
+                        if pe_ltp_base > 0:
+                            pe_ltp = round(pe_ltp_base * time_ratio, 2)
+                        else:
+                            from indian_swing.recommendations.fno_strategy import normal_cdf
+                            d1 = (math.log(spot_price / strike_val) + (r + 0.5 * pe_iv ** 2) * t) / (pe_iv * math.sqrt(t))
+                            d2 = d1 - pe_iv * math.sqrt(t)
+                            call_price = spot_price * normal_cdf(d1) - strike_val * math.exp(-r * t) * normal_cdf(d2)
+                            pe_ltp = round(max(0.5, call_price - spot_price + strike_val * math.exp(-r * t)), 2)
+                        
+                        mapped_strikes.append({
+                            "strike": strike_val,
+                            "ce_ltp": ce_ltp,
+                            "pe_ltp": pe_ltp,
+                            "ce_delta": ce_delta,
+                            "pe_delta": pe_delta,
+                            "ce_iv": ce_iv_raw,
+                            "pe_iv": pe_iv_raw
+                        })
                 
                 atm_strike_item = min(mapped_strikes, key=lambda x: abs(x["strike"] - spot_price))
                 atm_strike = atm_strike_item["strike"]

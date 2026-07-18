@@ -113,44 +113,65 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
             "delta_mod": max(0.10, 0.18 - (i * 0.02))
         })
 
-    # Fetch Option Chain strikes from Upstox (Fix 2)
-    strikes_list = []
-    if token and last_price > 0:
+    # Fetch Option Chain strikes from Upstox for each expiry contract (Fix 2)
+    option_chains_by_expiry = {}
+    
+    async def fetch_chain(expiry_val):
         try:
-            # Query the closest weekly expiry chain
-            url_chain = f"https://api.upstox.com/v2/option/chain?instrument_key={mapped_symbol}&expiry_date={expiries_raw[0]}"
+            url_chain = f"https://api.upstox.com/v2/option/chain?instrument_key={mapped_symbol}&expiry_date={expiry_val}"
             async with httpx.AsyncClient() as client:
                 response = await client.get(url_chain, headers=get_headers(), timeout=10.0)
-                response.raise_for_status()
-                res_data = response.json()
-                for item in res_data.get("data", []):
-                    ce = item.get("call_options", {})
-                    pe = item.get("put_options", {})
-                    strikes_list.append({
-                        "strike": item.get("strike_price"),
-                        "ce": {
-                            "ltp": ce.get("market_data", {}).get("ltp", 0.0),
-                            "change": ce.get("market_data", {}).get("change", 0.0),
-                            "oi": ce.get("market_data", {}).get("oi", 0),
-                            "iv": ce.get("market_data", {}).get("iv", 12.0)
-                        },
-                        "pe": {
-                            "ltp": pe.get("market_data", {}).get("ltp", 0.0),
-                            "change": pe.get("market_data", {}).get("change", 0.0),
-                            "oi": pe.get("market_data", {}).get("oi", 0),
-                            "iv": pe.get("market_data", {}).get("iv", 12.5)
-                        }
-                    })
-                audit_logs.append({"step": "Option Chain Fetching", "details": f"Successfully fetched weekly chain with {len(strikes_list)} strikes"})
+                if response.status_code == 200:
+                    strikes = []
+                    res_data = response.json()
+                    for item in res_data.get("data", []):
+                        ce = item.get("call_options", {})
+                        pe = item.get("put_options", {})
+                        strikes.append({
+                            "strike": item.get("strike_price"),
+                            "ce": {
+                                "ltp": ce.get("market_data", {}).get("ltp", 0.0),
+                                "change": ce.get("market_data", {}).get("change", 0.0),
+                                "oi": ce.get("market_data", {}).get("oi", 0),
+                                "iv": ce.get("market_data", {}).get("iv", 12.0)
+                            },
+                            "pe": {
+                                "ltp": pe.get("market_data", {}).get("ltp", 0.0),
+                                "change": pe.get("market_data", {}).get("change", 0.0),
+                                "oi": pe.get("market_data", {}).get("oi", 0),
+                                "iv": pe.get("market_data", {}).get("iv", 12.5)
+                            }
+                        })
+                    return expiry_val, strikes
+        except Exception as e:
+            logger.error(f"Failed to fetch option chain for expiry {expiry_val}: {e}")
+        return expiry_val, []
+
+    if token and last_price > 0 and expiries_raw:
+        try:
+            # Query option chains for the first 3 resolved expiries in parallel
+            tasks = [fetch_chain(exp) for exp in expiries_raw[:3]]
+            import asyncio
+            results = await asyncio.gather(*tasks)
+            for exp, strikes in results:
+                if strikes:
+                    option_chains_by_expiry[exp] = strikes
+            audit_logs.append({"step": "Option Chain Fetching", "details": f"Fetched option chains for {len(option_chains_by_expiry)} expiries"})
         except Exception as e:
             logger.error("fno.option_chain_failed", error=str(e))
-            audit_logs.append({"step": "Option Chain Fetching", "details": f"Option chain failed: {e}"})
+            audit_logs.append({"step": "Option Chain Fetching", "details": f"Option chain fetching error: {e}"})
 
-    # If empty, fallback to deterministic simulation
-    if not strikes_list:
-        sim_chain = _simulate_option_chain(symbol.upper())
-        strikes_list = sim_chain["strikes"]
-        audit_logs.append({"step": "Option Chain Fetching", "details": f"Using deterministic option chain simulator ({len(strikes_list)} strikes)"})
+    # If empty/simulation, populate each expiry contract with simulated chain
+    if not option_chains_by_expiry:
+        for i, config_exp in enumerate(expiries_config):
+            lbl = config_exp["label"]
+            tf = config_exp["time_factor"]
+            sim_chain = _simulate_option_chain(symbol.upper(), t_factor=tf)
+            option_chains_by_expiry[lbl] = sim_chain["strikes"]
+        audit_logs.append({"step": "Option Chain Fetching", "details": f"Simulated option chains for {len(option_chains_by_expiry)} expiries"})
+
+    # Extract default weekly strikes list for baseline metrics (GEX, ATM IV, PCR)
+    strikes_list = list(option_chains_by_expiry.values())[0] if option_chains_by_expiry else []
 
     # 4. Compute changePct from last two DB ticks (A2)
     change_pct = 0.0
@@ -227,8 +248,7 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
     passed, score, errs = validator.validate_packet(symbol.upper(), spot_packet, chain_packet)
 
     # 6. Recommendation Validation Guard (Fix 8)
-    # Reject recommendation if spot price or strikes are invalid/placeholder in live mode
-    validation_guard_passed = last_price > 0 and len(strikes_list) > 0
+    validation_guard_passed = last_price > 0 and len(option_chains_by_expiry) > 0
     
     if not validation_guard_passed:
         passed = False
@@ -236,8 +256,8 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
         errs.append("Critical API connection error: Live quote or options chain could not be resolved.")
         audit_logs.append({"step": "Recommendation Validation", "details": "FAILED: Missing live quote/chain"})
 
-    # Evaluate strategies dynamically using the computed indicators and expiries
-    rec_obj = fno_strategy_engine.evaluate_and_build(symbol.upper(), last_price, vix_price, strikes_list, expiries_config)
+    # Evaluate strategies dynamically using the computed indicators and expiries (passing dict)
+    rec_obj = fno_strategy_engine.evaluate_and_build(symbol.upper(), last_price, vix_price, option_chains_by_expiry, expiries_config)
     
     # Overwrite IV Percentile/RV with database backed ones
     rec_obj["indicators"]["ivPercentile"] = round(iv_perc, 2)
@@ -859,7 +879,7 @@ def _log_chain_to_db(symbol: str, strikes: list):
     except Exception as e:
         logger.warning("fno.db_chain_log_failed", error=str(e))
 
-def _simulate_option_chain(symbol: str):
+def _simulate_option_chain(symbol: str, t_factor: float = 1.0):
     """
     A1 — Deterministic synthetic option chain.
     Generates LTP values from a simplified Black-Scholes approximation seeded
@@ -881,7 +901,7 @@ def _simulate_option_chain(symbol: str):
     interval  = config["interval"]
     sigma     = config["atm_iv"] / 100.0
     r         = 0.07
-    t         = 5.0 / 365.0   # weekly expiry
+    t         = (5.0 * t_factor) / 365.0   # weekly/monthly/quarterly expiry
     base_strike = round(S / interval) * interval
 
     def _bs_call(spot, strike, t, sigma, r):

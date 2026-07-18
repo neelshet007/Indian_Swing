@@ -44,8 +44,11 @@ export default function MonitoringCard({ symbol, session }) {
   }, [session])
 
   const recommendedStrategies = React.useMemo(() => {
+    if (session && session.regimeResults && !session.regimeResults.isAllowed) {
+      return []
+    }
     return rankedStrategies.filter(s => s.status?.includes('Recommended') || s.status?.includes('✅'))
-  }, [rankedStrategies])
+  }, [rankedStrategies, session])
 
   if (!session || session.status === 'Stopped') {
     return (
