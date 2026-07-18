@@ -5,6 +5,7 @@ import TableCard from '../../../components/TableCard'
 export default function MonitoringCard({ symbol, session }) {
   const [viewMode, setViewMode] = useState('beginner') // 'beginner' | 'professional'
   const [showEdu, setShowEdu] = useState(false)
+  const [showAudit, setShowAudit] = useState(false)
 
   // Parse strategies list
   const rankedStrategies = React.useMemo(() => {
@@ -309,8 +310,51 @@ export default function MonitoringCard({ symbol, session }) {
             })}
           </div>
         )}
-
       </div>
+
+      {/* Explainability Verification Panel (Fix 9) */}
+      {session.explainability && (
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <h4 style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800' }}>Data Source Verification Audit</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', fontSize: '0.68rem' }}>
+            {Object.entries(session.explainability).map(([key, info]) => (
+              <div key={key} style={{ background: 'rgba(255,255,255,0.02)', padding: '6px 8px', borderRadius: '4px', border: '1px solid var(--border)' }}>
+                <div style={{ color: 'var(--text-secondary)', textTransform: 'capitalize' }}>{key.replace(/([A-Z])/g, ' $1')}</div>
+                <div style={{ fontWeight: '800', marginTop: '2px', color: info.verified ? 'var(--accent-green)' : 'var(--accent-amber)' }}>{info.source}</div>
+                <div style={{ fontSize: '0.55rem', color: 'var(--text-muted)', marginTop: '2px' }}>{info.timestamp}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Developer Audit Mode Panel (Fix 10) */}
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h4 style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800' }}>Developer Audit Panel</h4>
+          <button
+            onClick={() => setShowAudit(!showAudit)}
+            className="btn btn-ghost"
+            style={{ fontSize: '0.66rem', padding: '4px 8px', cursor: 'pointer', background: 'transparent' }}
+          >
+            {showAudit ? 'Hide Audit Log' : 'Show Audit Log'}
+          </button>
+        </div>
+        {showAudit && (
+          <div style={{ background: '#090d16', border: '1px solid var(--border)', padding: '10px', borderRadius: '6px', maxHeight: '180px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px', fontFamily: 'var(--font-mono)', fontSize: '0.68rem' }}>
+            {session.developer_audit_logs && session.developer_audit_logs.length > 0 ? (
+              session.developer_audit_logs.map((log, idx) => (
+                <div key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px' }}>
+                  <span style={{ color: 'var(--accent-blue-bright)', fontWeight: '700' }}>[{log.step}]</span> {log.details}
+                </div>
+              ))
+            ) : (
+              <div style={{ color: 'var(--text-muted)' }}>No audit logs. Start scanner or query in audit mode to collect trace logs.</div>
+            )}
+          </div>
+        )}
+      </div>
+
     </div>
   )
 }
