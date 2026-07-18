@@ -125,21 +125,38 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
                     strikes = []
                     res_data = response.json()
                     for item in res_data.get("data", []):
+                        item_expiry = item.get("expiry", item.get("expiry_date", ""))
+                        # Verify we match the target expiry (standard string comparison)
+                        if item_expiry and item_expiry != expiry_val:
+                            continue
+                            
                         ce = item.get("call_options", {})
                         pe = item.get("put_options", {})
+                        
+                        ce_greeks = ce.get("option_greeks", {})
+                        pe_greeks = pe.get("option_greeks", {})
+                        
                         strikes.append({
                             "strike": item.get("strike_price"),
                             "ce": {
                                 "ltp": ce.get("market_data", {}).get("ltp", 0.0),
                                 "change": ce.get("market_data", {}).get("change", 0.0),
                                 "oi": ce.get("market_data", {}).get("oi", 0),
-                                "iv": ce.get("market_data", {}).get("iv", 12.0)
+                                "iv": ce_greeks.get("iv", 12.0),
+                                "delta": ce_greeks.get("delta", 0.0),
+                                "gamma": ce_greeks.get("gamma", 0.0),
+                                "theta": ce_greeks.get("theta", 0.0),
+                                "vega": ce_greeks.get("vega", 0.0)
                             },
                             "pe": {
                                 "ltp": pe.get("market_data", {}).get("ltp", 0.0),
                                 "change": pe.get("market_data", {}).get("change", 0.0),
                                 "oi": pe.get("market_data", {}).get("oi", 0),
-                                "iv": pe.get("market_data", {}).get("iv", 12.5)
+                                "iv": pe_greeks.get("iv", 12.5),
+                                "delta": pe_greeks.get("delta", 0.0),
+                                "gamma": pe_greeks.get("gamma", 0.0),
+                                "theta": pe_greeks.get("theta", 0.0),
+                                "vega": pe_greeks.get("vega", 0.0)
                             }
                         })
                     return expiry_val, strikes
