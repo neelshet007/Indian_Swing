@@ -8,6 +8,88 @@ import MonitoringCard from '../modules/fno/components/MonitoringCard'
 import { backtester } from '../modules/fno/services/strategy/backtester'
 import { riskService } from '../modules/fno/services/risk/riskService'
 
+function OptionChainExplorer({ symbol, optionChains, expiries, spotPrice }) {
+  const [selectedExpiry, setSelectedExpiry] = useState(expiries[0] || '')
+
+  useEffect(() => {
+    if (expiries.length > 0 && !expiries.includes(selectedExpiry)) {
+      setSelectedExpiry(expiries[0])
+    }
+  }, [expiries, selectedExpiry])
+
+  const chain = optionChains[selectedExpiry] || []
+
+  return (
+    <section className="fo-section card" style={{ padding: '24px', marginTop: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '12px', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+        <div>
+          <h2 style={{ fontSize: '0.9rem', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
+            Option Chain Dashboard ({symbol})
+          </h2>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Spot price: <strong style={{ color: 'var(--accent-blue-bright)' }}>₹{spotPrice}</strong></span>
+        </div>
+        
+        {/* Expiry Selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Expiry Contract:</span>
+          <select
+            value={selectedExpiry}
+            onChange={(e) => setSelectedExpiry(e.target.value)}
+            style={{ padding: '6px 12px', background: 'var(--bg-primary)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '4px', fontSize: '0.72rem' }}
+          >
+            {expiries.map((exp) => (
+              <option key={exp} value={exp}>{exp}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.74rem', textAlign: 'center' }}>
+          <thead>
+            <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '2px solid var(--border)', color: 'var(--text-secondary)' }}>
+              <th colSpan="4" style={{ padding: '8px', borderRight: '1px solid var(--border)', color: 'var(--accent-blue-bright)' }}>CALL OPTIONS (CE)</th>
+              <th style={{ padding: '8px', borderRight: '1px solid var(--border)' }}>STRIKE</th>
+              <th colSpan="4" style={{ padding: '8px', color: 'var(--accent-amber)' }}>PUT OPTIONS (PE)</th>
+            </tr>
+            <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.66rem' }}>
+              <th style={{ padding: '6px' }}>OI</th>
+              <th style={{ padding: '6px' }}>Change</th>
+              <th style={{ padding: '6px' }}>IV</th>
+              <th style={{ padding: '6px', borderRight: '1px solid var(--border)' }}>LTP</th>
+              <th style={{ padding: '6px', borderRight: '1px solid var(--border)', fontWeight: '900', color: '#fff' }}>STRIKE PRICE</th>
+              <th style={{ padding: '6px' }}>LTP</th>
+              <th style={{ padding: '6px' }}>IV</th>
+              <th style={{ padding: '6px' }}>Change</th>
+              <th style={{ padding: '6px' }}>OI</th>
+            </tr>
+          </thead>
+          <tbody>
+            {chain.map((row, idx) => {
+              const isAtm = Math.abs(row.strike - spotPrice) <= 100
+              return (
+                <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.02)', background: isAtm ? 'rgba(99, 155, 255, 0.04)' : (idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent') }}>
+                  <td style={{ padding: '6px', color: 'var(--text-secondary)' }}>{row.ce?.oi?.toLocaleString() || 0}</td>
+                  <td style={{ padding: '6px', color: row.ce?.change >= 0 ? 'var(--accent-green)' : 'var(--accent-red)' }}>{row.ce?.change >= 0 ? `+${row.ce?.change}%` : `${row.ce?.change}%`}</td>
+                  <td style={{ padding: '6px', color: 'var(--text-muted)' }}>{row.ce?.iv?.toFixed(1)}%</td>
+                  <td style={{ padding: '6px', borderRight: '1px solid var(--border)', fontWeight: '700', color: '#fff' }}>₹{row.ce?.ltp?.toFixed(2)}</td>
+                  
+                  <td style={{ padding: '6px', borderRight: '1px solid var(--border)', fontWeight: '800', background: 'rgba(255,255,255,0.02)' }}>{row.strike}</td>
+                  
+                  <td style={{ padding: '6px', fontWeight: '700', color: '#fff' }}>₹{row.pe?.ltp?.toFixed(2)}</td>
+                  <td style={{ padding: '6px', color: 'var(--text-muted)' }}>{row.pe?.iv?.toFixed(1)}%</td>
+                  <td style={{ padding: '6px', color: row.pe?.change >= 0 ? 'var(--accent-green)' : 'var(--accent-red)' }}>{row.pe?.change >= 0 ? `+${row.pe?.change}%` : `${row.pe?.change}%`}</td>
+                  <td style={{ padding: '6px', color: 'var(--text-secondary)' }}>{row.pe?.oi?.toLocaleString() || 0}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )
+}
+
 export default function FOTrading() {
   const {
     monitoringMode,
@@ -362,6 +444,25 @@ export default function FOTrading() {
                 ))}
               </div>
             </section>
+
+            {/* Option Chain Explorer Dashboard Section */}
+            {(() => {
+              const activeSymbol = selectedIndices[0] || 'NIFTY'
+              const activeSession = sessions[activeSymbol] || {}
+              const optionChains = activeSession.option_chains || {}
+              const expiries = Object.keys(optionChains)
+              
+              if (expiries.length === 0) return null
+              
+              return (
+                <OptionChainExplorer 
+                  symbol={activeSymbol} 
+                  optionChains={optionChains} 
+                  expiries={expiries} 
+                  spotPrice={activeSession.spotPrice || 24350} 
+                />
+              )
+            })()}
 
             {/* Live Portfolio */}
             <div className="flex-row-grid">

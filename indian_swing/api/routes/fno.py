@@ -328,6 +328,7 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
         "selectedStrikes": rec_obj["selectedStrikes"],
         "structure": saved_rec["structure"],
         "ranked_strategies": rec_obj.get("ranked_strategies", []),
+        "option_chains": option_chains_by_expiry,
         "explainability": explainability,
         "developer_audit_logs": audit_logs if audit else []
     }
