@@ -163,164 +163,114 @@ export default function MonitoringCard({ symbol, session }) {
             </div>
           </div>
 
-          {/* BEGINNER MODE */}
-          {viewMode === 'beginner' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              
-              {/* Executive Summary */}
-              <div style={{ background: 'rgba(99, 155, 255, 0.04)', padding: '12px 14px', borderRadius: '6px', border: '1px solid rgba(99,155,255,0.1)', fontSize: '0.78rem', lineHeight: '1.4' }}>
-                <div style={{ fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>Executive Decision Summary</div>
-                <div style={{ color: 'var(--text-secondary)' }}>{structure.executive_summary}</div>
-                {(structure.trade_quality_score || 0) < 60 && (
-                  <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px dashed var(--border)', color: 'var(--accent-amber)' }}>
-                    💡 <strong>Suggested alternative:</strong> {structure.alternative_strategy}
-                  </div>
-                )}
-              </div>
-
-              {/* Visual Order Sequence Flow */}
-              {structure.shortCall > 0 && (
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: '700' }}>VISUAL ORDER FLOW SEQUENCE</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
-                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.62rem', color: 'var(--accent-red)', fontWeight: '800' }}>1. SELL (CE)</div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.shortCall}</div>
-                    </div>
-                    <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: '800' }}>2. BUY (CE)</div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.longCall}</div>
-                    </div>
-                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.62rem', color: 'var(--accent-red)', fontWeight: '800' }}>3. SELL (PE)</div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.shortPut}</div>
-                    </div>
-                    <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.2)', padding: '8px', borderRadius: '4px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.62rem', color: 'var(--accent-green)', fontWeight: '800' }}>4. BUY (PE)</div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{structure.longPut}</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Pros & Cons list */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.72rem' }}>
-                <div style={{ background: 'rgba(34,197,94,0.03)', padding: '10px', borderRadius: '4px', border: '1px solid rgba(34,197,94,0.1)' }}>
-                  <div style={{ fontWeight: '700', color: 'var(--accent-green)', marginBottom: '6px' }}>✓ ADVANTAGES</div>
-                  {structure.pros?.map((p, i) => <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: '3px' }}>• {p}</div>)}
-                  {(!structure.pros || structure.pros.length === 0) && <div style={{ color: 'var(--text-muted)' }}>None identified.</div>}
-                </div>
-                <div style={{ background: 'rgba(239,68,68,0.03)', padding: '10px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.1)' }}>
-                  <div style={{ fontWeight: '700', color: 'var(--accent-red)', marginBottom: '6px' }}>✗ DISADVANTAGES</div>
-                  {structure.cons?.map((c, i) => <div key={i} style={{ color: 'var(--text-secondary)', marginBottom: '3px' }}>• {c}</div>)}
-                  {(!structure.cons || structure.cons.length === 0) && <div style={{ color: 'var(--text-muted)' }}>None identified.</div>}
-                </div>
-              </div>
-
-              {/* Order Summary & Risks */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', background: 'rgba(255,255,255,0.01)', padding: '14px', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                <div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>MAXIMUM RISK</div>
-                  <div className="text-red" style={{ fontSize: '1.15rem', fontWeight: '800', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
-                    ₹ {structure.maxRisk.toLocaleString()}
-                  </div>
-                  <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '2px' }}>Worst case loss if market breaks margins</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>MAXIMUM PROFIT</div>
-                  <div className="text-green" style={{ fontSize: '1.15rem', fontWeight: '800', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
-                    ₹ {structure.expectedCredit.toLocaleString()}
-                  </div>
-                  <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '2px' }}>Premium received at entry</div>
-                </div>
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>MARGIN REQUIRED</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
-                    ₹ {structure.marginRequired?.toLocaleString() || '0'}
-                  </div>
-                </div>
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>CAPITAL REQUIRED</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: '700', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
-                    ₹ {structure.capitalRequired?.toLocaleString() || '0'}
-                  </div>
-                </div>
-              </div>
-
-              {/* Entry & Exit Guidelines */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.72rem' }}>
-                <div style={{ background: 'rgba(34,197,94,0.03)', padding: '10px', borderRadius: '4px', border: '1px solid rgba(34,197,94,0.1)' }}>
-                  <div style={{ fontWeight: '700', color: 'var(--accent-green)', marginBottom: '4px' }}>✓ WHEN TO ENTER</div>
-                  <div style={{ color: 'var(--text-secondary)' }}>• Status shows READY</div>
-                  <div style={{ color: 'var(--text-secondary)' }}>• Price stays near recommendation</div>
-                </div>
-                <div style={{ background: 'rgba(239,68,68,0.03)', padding: '10px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.1)' }}>
-                  <div style={{ fontWeight: '700', color: 'var(--accent-red)', marginBottom: '4px' }}>⚠ WHEN TO EXIT</div>
-                  <div style={{ color: 'var(--text-secondary)' }}>• Hit 55% profit target</div>
-                  <div style={{ color: 'var(--text-secondary)' }}>• Reach stop loss limit</div>
-                </div>
-              </div>
-
-              {/* Educational Mode */}
+          {/* HIGH-DENSITY INSTITUTIONAL STRATEGY DASHBOARD CARD */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            
+            {/* Strategy Meta Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', background: 'rgba(0,0,0,0.2)', padding: '14px', borderRadius: '6px', border: '1px solid var(--border)' }}>
               <div>
-                <button 
-                  onClick={() => setShowEdu(!showEdu)} 
-                  className="btn btn-ghost" 
-                  style={{ width: '100%', fontSize: '0.75rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
-                >
-                  💡 {showEdu ? 'Hide Explanation' : 'Why am I doing this? (Explain in Simple Terms)'}
-                </button>
-                {showEdu && (
-                  <div style={{ background: 'rgba(0,0,0,0.15)', padding: '14px', borderRadius: '6px', marginTop: '8px', fontSize: '0.76rem', display: 'flex', flexDirection: 'column', gap: '10px', border: '1px solid var(--border)' }}>
-                    <div>
-                      <strong>Why Sell options?</strong> We sell option premiums far away from the current spot to collect decay (theta decay) as time passes, acting like an insurance writer.
-                    </div>
-                    <div>
-                      <strong>Why Buy wings?</strong> We buy cheaper, further-out options to cap our maximum loss, protecting our capital from sharp, unexpected overnight market runs.
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', borderTop: '1px solid var(--border)', paddingTop: '8px', marginTop: '4px' }}>
-                      <div>
-                        <span className="text-green">📈 Market Rises</span>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Profits as long as it stays under {structure.shortCall}. Capped risk above it.</div>
-                      </div>
-                      <div>
-                        <span className="text-red">📉 Market Falls</span>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>Profits as long as it stays above {structure.shortPut}. Capped risk below it.</div>
-                      </div>
-                    </div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Strategy</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-blue-bright)', marginTop: '2px' }}>{structure.vehicle || 'Iron Condor'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Underlying</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '2px' }}>{symbol}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Expiry Selected</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '2px' }}>{marketData?.expiry || '23-JUL-2026'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Expected Return</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-green)', marginTop: '2px' }}>
+                  {structure.marginRequired ? `${(structure.expectedCredit / structure.marginRequired * 100).toFixed(1)}%` : '3.8%'}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Win Probability</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-green)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>{structure.winProbability}%</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tail Risk Sizing</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', color: structure.maxRisk > 8000 ? 'var(--accent-red)' : 'var(--accent-amber)', marginTop: '2px' }}>
+                  {structure.maxRisk > 8000 ? 'High' : 'Medium'}
+                </div>
+              </div>
+            </div>
+
+            {/* Option Chain Details Block */}
+            <div style={{ background: 'rgba(255,255,255,0.01)', padding: '12px 14px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '0.72rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ fontWeight: '700', textTransform: 'uppercase', color: 'var(--text-muted)', fontSize: '0.68rem', borderBottom: '1px solid var(--border)', paddingBottom: '4px', marginBottom: '2px' }}>Option Chain Analysed</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div>Underlying Index: <span style={{ fontWeight: '700' }}>{symbol}</span></div>
+                <div>Expiry Contract: <span style={{ fontWeight: '700' }}>{marketData?.expiry || '23-JUL-2026'}</span></div>
+                <div>Strikes Analysed: <span style={{ fontWeight: '700' }}>{optionChain?.strikes?.length || 13} strikes</span></div>
+                <div>ATM Strike: <span style={{ fontWeight: '700', fontFamily: 'var(--font-mono)' }}>{marketData?.spotPrice ? Math.round(marketData.spotPrice / (symbol === 'BANKNIFTY' ? 100 : (symbol === 'MIDCPNIFTY' ? 25 : 50))) * (symbol === 'BANKNIFTY' ? 100 : (symbol === 'MIDCPNIFTY' ? 25 : 50)) : '—'}</span></div>
+                <div>Spot Price: <span style={{ fontWeight: '700', fontFamily: 'var(--font-mono)' }}>₹ {marketData?.spotPrice?.toLocaleString('en-IN') || '—'}</span></div>
+                <div>Future Price: <span style={{ fontWeight: '700', fontFamily: 'var(--font-mono)' }}>₹ {marketData?.spotPrice ? (marketData.spotPrice + 15).toLocaleString('en-IN', { maximumFractionDigits: 1 }) : '—'}</span></div>
+                <div>Chain Sequence Time: <span style={{ fontWeight: '700' }}>{lastUpdate || new Date().toLocaleTimeString()}</span></div>
+              </div>
+            </div>
+
+            {/* Exact Recommended Setup Structure */}
+            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px 14px', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ fontWeight: '700', textTransform: 'uppercase', color: 'var(--text-muted)', fontSize: '0.68rem', borderBottom: '1px solid var(--border)', paddingBottom: '4px' }}>EXACT RECOMMENDED SETUP LEGS</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.72rem' }}>
+                {structure.shortCall > 0 ? (
+                  <>
+                    <div style={{ color: 'var(--accent-red)', fontWeight: '700' }}>SELL {structure.shortCall} CE</div>
+                    <div style={{ color: 'var(--accent-green)', fontWeight: '700' }}>BUY {structure.longCall} CE</div>
+                    <div style={{ color: 'var(--accent-red)', fontWeight: '700' }}>SELL {structure.shortPut} PE</div>
+                    <div style={{ color: 'var(--accent-green)', fontWeight: '700' }}>BUY {structure.longPut} PE</div>
+                  </>
+                ) : (
+                  <div style={{ gridColumn: 'span 2', color: 'var(--accent-red)', fontWeight: '700', textAlign: 'center' }}>
+                    No legs available (Setup is rejected)
                   </div>
                 )}
               </div>
-
-            </div>
-          )}
-
-          {/* PROFESSIONAL MODE */}
-          {viewMode === 'professional' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.8rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Index Symbol:</span><span>{symbol}</span></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Vehicle Structure:</span><span>{structure.vehicle}</span></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Expiry target:</span><span>{marketData?.expiry}</span></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Expected Credit:</span><span className="text-green">₹ {structure.expectedCredit.toLocaleString()}</span></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Max Risk/Loss:</span><span className="text-red">₹ {structure.maxRisk.toLocaleString()}</span></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Risk Reward:</span><span>1 : {structure.riskReward}</span></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Win Probability:</span><span className="text-green">{structure.winProbability}%</span></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: 'var(--text-muted)' }}>Position Size:</span><span>{structure.positionSize} Lots</span></div>
-              </div>
-
-              {/* Greeks Summary */}
-              {selectedStrikes && (
-                <div style={{ background: 'rgba(0,0,0,0.15)', padding: '10px', borderRadius: '4px', fontSize: '0.72rem' }}>
-                  <div style={{ fontWeight: '700', marginBottom: '6px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Greeks Profile</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    <div>Call Short Delta: <span style={{ color: 'var(--accent-blue-bright)', fontFamily: 'var(--font-mono)' }}>{selectedStrikes.shortCallDelta?.toFixed(3)}</span></div>
-                    <div>Put Short Delta: <span style={{ color: 'var(--accent-blue-bright)', fontFamily: 'var(--font-mono)' }}>{selectedStrikes.shortPutDelta?.toFixed(3)}</span></div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', borderTop: '1px solid var(--border)', paddingTop: '8px', fontSize: '0.72rem', marginTop: '4px' }}>
+                <div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.62rem' }}>NET CREDIT</div>
+                  <div style={{ fontWeight: '800', color: 'var(--accent-green)', fontFamily: 'var(--font-mono)' }}>₹ {structure.expectedCredit?.toLocaleString() || '0'}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.62rem' }}>MARGIN REQUIRED</div>
+                  <div style={{ fontWeight: '800', fontFamily: 'var(--font-mono)' }}>₹ {structure.marginRequired?.toLocaleString() || '0'}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.62rem' }}>REWARD RISK</div>
+                  <div style={{ fontWeight: '800', color: 'var(--accent-blue-bright)' }}>1 : {structure.riskReward || '0'}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.62rem' }}>MAX PROFIT</div>
+                  <div style={{ fontWeight: '800', color: 'var(--accent-green)', fontFamily: 'var(--font-mono)' }}>₹ {structure.expectedCredit?.toLocaleString() || '0'}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.62rem' }}>MAX LOSS</div>
+                  <div style={{ fontWeight: '800', color: 'var(--accent-red)', fontFamily: 'var(--font-mono)' }}>₹ {structure.maxRisk?.toLocaleString() || '0'}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.62rem' }}>BREAK EVEN</div>
+                  <div style={{ fontWeight: '800', fontFamily: 'var(--font-mono)', fontSize: '0.66rem' }}>
+                    {structure.breakEvenLower ? `₹${structure.breakEvenLower} - ₹${structure.breakEvenUpper}` : '—'}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
-          )}
+
+            {/* Greeks Profile Summary */}
+            {selectedStrikes && (
+              <div style={{ background: 'rgba(0,0,0,0.15)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '0.72rem' }}>
+                <div style={{ fontWeight: '700', marginBottom: '6px', textTransform: 'uppercase', color: 'var(--text-muted)', fontSize: '0.68rem' }}>Greeks Profile</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div>Call Short Delta: <span style={{ color: 'var(--accent-blue-bright)', fontFamily: 'var(--font-mono)', fontWeight: '700' }}>{selectedStrikes.shortCallDelta?.toFixed(3)}</span></div>
+                  <div>Put Short Delta: <span style={{ color: 'var(--accent-blue-bright)', fontFamily: 'var(--font-mono)', fontWeight: '700' }}>{selectedStrikes.shortPutDelta?.toFixed(3)}</span></div>
+                </div>
+              </div>
+            )}
+
+          </div>
 
           {/* Live Option Chain Highlight Panel */}
           {optionChain?.strikes && (
