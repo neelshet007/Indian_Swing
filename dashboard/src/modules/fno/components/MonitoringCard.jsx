@@ -6,34 +6,9 @@ export default function MonitoringCard({ symbol, session }) {
   const [viewMode, setViewMode] = useState('beginner') // 'beginner' | 'professional'
   const [showEdu, setShowEdu] = useState(false)
 
-  if (!session || session.status === 'Stopped') {
-    return (
-      <div className="monitoring-session-card card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }}>{symbol}</h3>
-          <span className="badge-status inactive">STOPPED</span>
-        </div>
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-          Monitoring session is idle. Click [Start Monitoring] to activate data feed and strategy engine.
-        </div>
-      </div>
-    )
-  }
-
-  const { marketData, optionChain, connectionStatus, lastUpdate, latency, status, indicators, regimeResults, selectedStrikes, structure } = session
-
-  // Status mapping explanations
-  const statusExplanations = {
-    READY: "Ready to place this trade now.",
-    WAITING: "Conditions are close, but not yet suitable.",
-    INVALIDATED: "Market conditions changed. Do not enter this trade.",
-    EXECUTED: "Trade has been placed.",
-    CLOSED: "Trade has ended.",
-    EXPIRED: "Recommendation is no longer valid."
-  }
-
   // Parse strategies list
   const rankedStrategies = React.useMemo(() => {
+    if (!session) return []
     const raw = session.ranked_strategies || session.structure?.ranked_strategies || []
     if (raw.length > 0) return raw
 
@@ -70,6 +45,22 @@ export default function MonitoringCard({ symbol, session }) {
   const recommendedStrategies = React.useMemo(() => {
     return rankedStrategies.filter(s => s.status?.includes('Recommended') || s.status?.includes('✅'))
   }, [rankedStrategies])
+
+  if (!session || session.status === 'Stopped') {
+    return (
+      <div className="monitoring-session-card card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: '700' }}>{symbol}</h3>
+          <span className="badge-status inactive">STOPPED</span>
+        </div>
+        <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+          Monitoring session is idle. Click [Start Monitoring] to activate data feed and strategy engine.
+        </div>
+      </div>
+    )
+  }
+
+  const { marketData, optionChain, connectionStatus, lastUpdate, latency, status, indicators, regimeResults, selectedStrikes, structure } = session
 
   return (
     <div className="monitoring-session-card card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
