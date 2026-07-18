@@ -162,7 +162,7 @@ async def test_scan_persistence_is_deterministic_across_reruns(configured_db, mo
         return None
 
     monkeypatch.setattr(scanner.pipeline, "run_incremental", _skip_pipeline)
-    monkeypatch.setattr(scanner, "_load_universe_and_stocks", lambda: [stock])
+    monkeypatch.setattr(scanner, "_load_universe_and_stocks", lambda: ([stock], []))
     monkeypatch.setattr(
         scanner.strategy,
         "_detect_vcp",

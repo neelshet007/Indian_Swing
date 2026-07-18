@@ -15,11 +15,6 @@ data:
 
 provider:
   default: upstox
-  yfinance:
-    threads: 4
-    rate_limit_delay: 0.5
-    retry_attempts: 3
-    retry_wait: 2.0
 
 pipeline:
   lookback_years: 10

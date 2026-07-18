@@ -92,7 +92,7 @@ class OHLCV(Base):
     close: Mapped[float] = mapped_column(Float, nullable=False)
     volume: Mapped[int] = mapped_column(BigInteger, nullable=False)
     is_adjusted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    source: Mapped[str] = mapped_column(String(40), nullable=False, default="yfinance")
+    source: Mapped[str] = mapped_column(String(40), nullable=False, default="upstox")
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
     stock: Mapped["Stock"] = relationship(back_populates="ohlcv_records")

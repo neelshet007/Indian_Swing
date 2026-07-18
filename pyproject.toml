@@ -19,7 +19,6 @@ dependencies = [
     "psycopg2-binary>=2.9.9",
     "asyncpg>=0.29.0",
     # Data
-    "yfinance>=0.2.40",
     "pandas>=2.2.0",
     "numpy>=1.26.0",
     "pandas-ta>=0.3.14b",
