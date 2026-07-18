@@ -419,3 +419,47 @@ class FnoAuditLog(Base):
     symbol: Mapped[Optional[str]] = mapped_column(String(30))
     payload: Mapped[dict] = mapped_column(JSON, nullable=False)
 
+
+class SavedRecommendation(Base):
+    __tablename__ = "fno_saved_recommendations"
+    __table_args__ = (
+        Index("ix_fno_saved_recs_sym_time", "symbol", "timestamp"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    scan_date: Mapped[str] = mapped_column(String(30), nullable=False)
+    symbol: Mapped[str] = mapped_column(String(30), nullable=False)
+    expiry: Mapped[str] = mapped_column(String(30), nullable=False)
+    strategy_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    
+    spot_price: Mapped[float] = mapped_column(Float, nullable=False)
+    atm_strike: Mapped[float] = mapped_column(Float, nullable=False)
+    short_call: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    long_call: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    short_put: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    long_put: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    
+    net_credit: Mapped[float] = mapped_column(Float, nullable=False)
+    max_risk: Mapped[float] = mapped_column(Float, nullable=False)
+    max_profit: Mapped[float] = mapped_column(Float, nullable=False)
+    risk_reward: Mapped[float] = mapped_column(Float, nullable=False)
+    expected_value: Mapped[float] = mapped_column(Float, nullable=False)
+    win_probability: Mapped[str] = mapped_column(String(20), nullable=False)
+    margin_required: Mapped[float] = mapped_column(Float, nullable=False)
+    
+    quality_score: Mapped[float] = mapped_column(Float, nullable=False)
+    confidence: Mapped[str] = mapped_column(String(20), nullable=False)
+    reasoning: Mapped[str] = mapped_column(String(1000), nullable=False)
+    
+    regime_filters: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    greeks: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    volatility_analysis: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    strike_selection: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    risk_analysis: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    historical_setups: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    
+    user_notes: Mapped[str] = mapped_column(String(1000), nullable=False, default="")
+    status: Mapped[str] = mapped_column(String(30), nullable=False, default="Pending")
+
+

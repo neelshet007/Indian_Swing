@@ -264,15 +264,44 @@ export default function MonitoringCard({ symbol, session }) {
                     <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>
                       Status: <span style={{ color: 'var(--accent-green)', fontWeight: '700' }}>QUALIFIED</span>
                     </div>
-                    <a
-                      href={`/fno-analysis/${symbol}${session.recommendation_uuid ? `?rec_id=${session.recommendation_uuid}` : ''}&strat=${encodeURIComponent(strat.name)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-ghost"
-                      style={{ fontSize: '0.72rem', padding: '6px 12px', textDecoration: 'none', color: 'var(--accent-blue-bright)', borderColor: 'var(--border)' }}
-                    >
-                      View Detailed Forensic Analysis
-                    </a>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await fetch('/api/fno/saved-recommendations', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                recommendation_uuid: session.recommendation_uuid,
+                                strategy_name: strat.name
+                              })
+                            })
+                            const d = await res.json()
+                            if (d.status === 'success') {
+                              alert(`Recommendation saved successfully! Saved ID: ${d.saved_id}`)
+                            } else {
+                              alert('Failed to save recommendation.')
+                            }
+                          } catch (err) {
+                            console.error(err)
+                            alert('Error saving recommendation.')
+                          }
+                        }}
+                        className="btn btn-ghost"
+                        style={{ fontSize: '0.72rem', padding: '6px 12px', color: 'var(--accent-green)', borderColor: 'var(--border)', cursor: 'pointer', background: 'transparent' }}
+                      >
+                        ✓ Save Recommendation
+                      </button>
+                      <a
+                        href={`/fno-analysis/${symbol}${session.recommendation_uuid ? `?rec_id=${session.recommendation_uuid}` : ''}&strat=${encodeURIComponent(strat.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-ghost"
+                        style={{ fontSize: '0.72rem', padding: '6px 12px', textDecoration: 'none', color: 'var(--accent-blue-bright)', borderColor: 'var(--border)' }}
+                      >
+                        View Detailed Forensic Analysis
+                      </a>
+                    </div>
                   </div>
 
                 </div>

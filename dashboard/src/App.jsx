@@ -12,11 +12,14 @@ import FnoAnalysis from './pages/FnoAnalysis'
 import ErrorBoundary from './components/ErrorBoundary'
 
 const FOTrading = lazy(() => import('./pages/FOTrading'))
+const FnoSavedList = lazy(() => import('./pages/FnoSavedList'))
+const FnoSavedDetail = lazy(() => import('./pages/FnoSavedDetail'))
 
 const NAV = [
   { to: '/dashboard', label: 'Dashboard', icon: '⊞' },
   { to: '/', label: 'Recommendation Scanner', icon: '◈' },
   { to: '/fno-trading', label: 'F&O Trading', icon: '⚡' },
+  { to: '/fno-saved', label: 'Saved Forensic Recs', icon: '💾' },
   { to: '/fno-history', label: 'F&O History', icon: '📜' },
   { to: '/settings', label: 'Settings', icon: '⚙' },
   { to: '/logs', label: 'Logs', icon: '📋' },
@@ -101,6 +104,8 @@ export default function App() {
                 <Route path="/fno-trading" element={<FOTrading />} />
                 <Route path="/fno-analysis/:symbol" element={<FnoAnalysis />} />
                 <Route path="/fno-history" element={<FnoHistory />} />
+                <Route path="/fno-saved" element={<FnoSavedList />} />
+                <Route path="/fno-saved/:savedId" element={<FnoSavedDetail />} />
                 
                 {/* Settings & Logs */}
                 <Route path="/settings" element={<Settings />} />
