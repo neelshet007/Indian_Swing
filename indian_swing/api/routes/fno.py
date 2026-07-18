@@ -164,16 +164,16 @@ async def get_market_data(symbol: str, audit: Optional[bool] = Query(False)):
             logger.error(f"Failed to fetch option chain for expiry {expiry_val}: {e}")
         return expiry_val, []
 
-    if token and last_price > 0 and expiries_raw:
+    if token and last_price > 0 and expiries_config:
         try:
-            # Query option chains for the first 3 resolved expiries in parallel
-            tasks = [fetch_chain(exp) for exp in expiries_raw[:3]]
+            # Query option chains for all configured target expiries in parallel (no partial shortcuts!)
+            tasks = [fetch_chain(exp["label"]) for exp in expiries_config]
             import asyncio
             results = await asyncio.gather(*tasks)
             for exp, strikes in results:
                 if strikes:
                     option_chains_by_expiry[exp] = strikes
-            audit_logs.append({"step": "Option Chain Fetching", "details": f"Fetched option chains for {len(option_chains_by_expiry)} expiries"})
+            audit_logs.append({"step": "Option Chain Fetching", "details": f"Fetched option chains for {len(option_chains_by_expiry)} target expiries"})
         except Exception as e:
             logger.error("fno.option_chain_failed", error=str(e))
             audit_logs.append({"step": "Option Chain Fetching", "details": f"Option chain fetching error: {e}"})
