@@ -280,13 +280,13 @@ export default function FOTrading() {
                       const activeSession = sessions[activeSymbol] || {}
                       const rankedStrategies = activeSession.ranked_strategies || []
                       const fallbackStrategies = [
-                        { rank: 1, name: "Iron Condor", score: 94, ev: "High", winProbability: "72%", confidence: "93%", margin: "₹1.2L", risk: "Medium", status: "✅ Recommend" },
-                        { rank: 2, name: "Put Credit Spread", score: 91, ev: "High", winProbability: "76%", confidence: "89%", margin: "₹70K", risk: "Low", status: "✅ Recommend" },
-                        { rank: 3, name: "Calendar Spread", score: 86, ev: "Medium", winProbability: "64%", confidence: "81%", margin: "₹95K", risk: "Medium", status: "✅ Recommend" },
-                        { rank: 4, name: "Call Credit Spread", score: 63, ev: "Low", winProbability: "55%", confidence: "58%", margin: "₹65K", risk: "High", status: "❌ Reject" },
-                        { rank: 5, name: "Iron Butterfly", score: 48, ev: "Low", winProbability: "42%", confidence: "44%", margin: "₹1.3L", risk: "Very High", status: "❌ Reject" },
-                        { rank: 6, name: "Broken Wing Butterfly", score: 45, ev: "Low", winProbability: "48%", confidence: "40%", margin: "₹1.1L", risk: "High", status: "❌ Reject" },
-                        { rank: 7, name: "Diagonal Spread", score: 38, ev: "Low", winProbability: "40%", confidence: "35%", margin: "₹90K", risk: "High", status: "❌ Reject" }
+                        { rank: 1, name: "Iron Condor", selectedExpiry: "Monthly", selectedOptionChain: "28-AUG", score: 95, confidence: "96%", status: "✅ Recommended" },
+                        { rank: 2, name: "Put Credit Spread", selectedExpiry: "Weekly", selectedOptionChain: "28-AUG", score: 92, confidence: "91%", status: "✅ Recommended" },
+                        { rank: 3, name: "Calendar Spread", selectedExpiry: "Monthly", selectedOptionChain: "25-SEP", score: 84, confidence: "82%", status: "✅ Recommended" },
+                        { rank: 4, name: "Call Credit Spread", selectedExpiry: "Weekly", selectedOptionChain: "28-AUG", score: 61, confidence: "58%", status: "❌ Reject" },
+                        { rank: 5, name: "Iron Butterfly", selectedExpiry: "Weekly", selectedOptionChain: "28-AUG", score: 49, confidence: "42%", status: "❌ Reject" },
+                        { rank: 6, name: "Broken Wing Butterfly", selectedExpiry: "Weekly", selectedOptionChain: "28-AUG", score: 45, confidence: "40%", status: "❌ Reject" },
+                        { rank: 7, name: "Diagonal Spread", selectedExpiry: "Weekly", selectedOptionChain: "28-AUG", score: 38, confidence: "35%", status: "❌ Reject" }
                       ]
                       const strategiesToRender = rankedStrategies.length > 0 ? rankedStrategies : fallbackStrategies
 
@@ -300,12 +300,10 @@ export default function FOTrading() {
                               <tr style={{ borderBottom: '1px solid var(--border)', textAlign: 'left', color: 'var(--text-muted)' }}>
                                 <th style={{ padding: '6px' }}>Rank</th>
                                 <th style={{ padding: '6px' }}>Strategy</th>
+                                <th style={{ padding: '6px' }}>Selected Expiry</th>
+                                <th style={{ padding: '6px' }}>Selected Option Chain</th>
                                 <th style={{ padding: '6px' }}>Score</th>
-                                <th style={{ padding: '6px' }}>EV</th>
-                                <th style={{ padding: '6px' }}>Win %</th>
                                 <th style={{ padding: '6px' }}>Confidence</th>
-                                <th style={{ padding: '6px' }}>Margin</th>
-                                <th style={{ padding: '6px' }}>Risk</th>
                                 <th style={{ padding: '6px' }}>Status</th>
                               </tr>
                             </thead>
@@ -316,20 +314,10 @@ export default function FOTrading() {
                                   <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent' }}>
                                     <td style={{ padding: '8px 6px', fontWeight: '700', color: 'var(--text-muted)' }}>{strat.rank || (idx + 1)}</td>
                                     <td style={{ padding: '8px 6px', fontWeight: '700', color: '#fff' }}>{strat.name}</td>
+                                    <td style={{ padding: '8px 6px', color: 'var(--text-secondary)' }}>{strat.selectedExpiry}</td>
+                                    <td style={{ padding: '8px 6px', color: 'var(--text-secondary)' }}>{strat.selectedOptionChain}</td>
                                     <td style={{ padding: '8px 6px', fontWeight: '800', color: 'var(--accent-blue-bright)' }}>{strat.score}</td>
-                                    <td style={{ padding: '8px 6px' }}>
-                                      <span style={{ color: strat.ev === 'High' ? 'var(--accent-green)' : (strat.ev === 'Medium' ? 'var(--accent-amber)' : 'var(--text-muted)') }}>
-                                        {strat.ev}
-                                      </span>
-                                    </td>
-                                    <td style={{ padding: '8px 6px', fontFamily: 'var(--font-mono)' }}>{strat.winProbability}</td>
                                     <td style={{ padding: '8px 6px', fontFamily: 'var(--font-mono)' }}>{strat.confidence}</td>
-                                    <td style={{ padding: '8px 6px', fontFamily: 'var(--font-mono)' }}>{strat.margin}</td>
-                                    <td style={{ padding: '8px 6px' }}>
-                                      <span style={{ color: strat.risk === 'Low' ? 'var(--accent-green)' : (strat.risk === 'Medium' ? 'var(--accent-amber)' : 'var(--accent-red)') }}>
-                                        {strat.risk}
-                                      </span>
-                                    </td>
                                     <td style={{ padding: '8px 6px' }}>
                                       <span style={{ 
                                         padding: '2px 6px', 

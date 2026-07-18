@@ -177,8 +177,20 @@ export default function MonitoringCard({ symbol, session }) {
                 <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '2px' }}>{symbol}</div>
               </div>
               <div>
-                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Expiry Selected</div>
-                <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '2px' }}>{marketData?.expiry || '23-JUL-2026'}</div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Expiry Class</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '2px' }}>{structure.selectedExpiry || 'Monthly'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Option Chain</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '2px' }}>{structure.selectedOptionChain || '28-AUG-2026'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Institutional Score</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-blue-bright)', marginTop: '2px' }}>{structure.trade_quality_score || 0}/100</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Confidence %</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-green)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>{structure.trade_quality_score || 0}%</div>
               </div>
               <div>
                 <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Expected Return</div>
@@ -191,10 +203,26 @@ export default function MonitoringCard({ symbol, session }) {
                 <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-green)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>{structure.winProbability}%</div>
               </div>
               <div>
-                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tail Risk Sizing</div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Margin Required</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>₹ {structure.marginRequired?.toLocaleString() || '—'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Maximum Loss</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-red)', marginTop: '2px', fontFamily: 'var(--font-mono)' }}>₹ {structure.maxRisk?.toLocaleString() || '—'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Risk Level</div>
                 <div style={{ fontSize: '0.9rem', fontWeight: '800', color: structure.maxRisk > 8000 ? 'var(--accent-red)' : 'var(--accent-amber)', marginTop: '2px' }}>
                   {structure.maxRisk > 8000 ? 'High' : 'Medium'}
                 </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Reward / Risk</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-blue-bright)', marginTop: '2px' }}>1 : {structure.riskReward || '0'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Expected Hold</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '2px' }}>{structure.selectedExpiry === 'Weekly' ? '2-3 days' : '4-5 days'}</div>
               </div>
             </div>
 

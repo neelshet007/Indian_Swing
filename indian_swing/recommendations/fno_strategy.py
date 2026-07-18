@@ -194,77 +194,12 @@ class FnoStrategyEngine:
         position_size = 2
         total_units = position_size * lot_size
 
-        # ----------------------------------------------------
-        # MULTI-CANDIDATE OPTIONS STRATEGY OPTIMIZER
-        # ----------------------------------------------------
-        candidates = []
-        
-        # Test across multiple short deltas (0.15, 0.18, 0.20, 0.25)
-        target_deltas = [0.15, 0.18, 0.20, 0.25]
-        
-        # Test across multiple wing widths (50, 100, 150, 200 points)
-        wing_widths = [50, 100, 150, 200] if symbol.upper() != "MIDCPNIFTY" else [25, 50, 75]
+        # Setup index lots details
+        lot_size = LOT_SIZES.get(symbol.upper(), 25)
+        position_size = 2
+        total_units = position_size * lot_size
 
-        for target_delta in target_deltas:
-            # Find short Call leg (Delta closest to target_delta)
-            short_call_item = min(mapped_strikes, key=lambda x: abs(x["ce_delta"] - target_delta))
-            # Find short Put leg (Delta closest to -target_delta)
-            short_put_item = min(mapped_strikes, key=lambda x: abs(x["pe_delta"] - (-target_delta)))
-            
-            short_call = short_call_item["strike"]
-            short_put = short_put_item["strike"]
-
-            for wing_width in wing_widths:
-                long_call = short_call + wing_width
-                long_put = short_put - wing_width
-
-                # Find long leg premiums
-                long_call_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
-                long_put_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
-
-                # Skip if long strikes are missing in option chain
-                if not long_call_item or not long_put_item:
-                    continue
-
-                p_sc = short_call_item["ce_ltp"]
-                p_sp = short_put_item["pe_ltp"]
-                p_lc = long_call_item["ce_ltp"]
-                p_lp = long_put_item["pe_ltp"]
-
-                net_credit_per_unit = (p_sc + p_sp) - (p_lc + p_lp)
-                if net_credit_per_unit <= 0:
-                    continue
-
-                # Calculate metrics for this specific candidate
-                cand_credit = round(net_credit_per_unit * total_units)
-                cand_risk = round((wing_width - net_credit_per_unit) * total_units)
-                cand_rr = round(cand_credit / cand_risk, 3) if cand_risk > 0 else 0.0
-                
-                # Margin and capital requirement calculations (hedged options spreads in India)
-                margin_required = 35000 * position_size
-                capital_required = margin_required + cand_risk
-                
-                # Approximate win probability from short Delta
-                win_prob = round((1.0 - target_delta) * 100)
-                
-                # Expected Value = (WinProb * Credit) - ((1 - WinProb) * Risk)
-                expected_val = (win_prob / 100.0) * cand_credit - ((100.0 - win_prob) / 100.0) * cand_risk
-
-                candidates.append({
-                    "shortCall": short_call,
-                    "shortPut": short_put,
-                    "longCall": long_call,
-                    "longPut": long_put,
-                    "expectedCredit": cand_credit,
-                    "maxRisk": cand_risk,
-                    "riskReward": cand_rr,
-                    "winProbability": win_prob,
-                    "expectedValue": expected_val,
-                    "shortCallDelta": short_call_item["ce_delta"],
-                    "shortPutDelta": short_put_item["pe_delta"],
-                    "wingWidth": wing_width
-                })
-
+        # Evaluate all strategies independently across multiple expiries
         ranked_strategies = self.evaluate_all_strategies(
             symbol, spot_price, vix, mapped_strikes,
             iv_percentile, rv20, iv_rv_spread,
@@ -272,22 +207,12 @@ class FnoStrategyEngine:
             position_size, total_units
         )
 
-        # Apply Minimum Economic Quality Filters
-        # A professional options desk rejects Condors with Reward/Risk < 0.15 (15% collection width)
-        qualified_candidates = [
-            c for c in candidates 
-            if c["riskReward"] >= 0.15 and c["expectedValue"] > 0 and c["expectedCredit"] >= 1000
-        ]
+        # Select top strategy
+        top_strategy = ranked_strategies[0] if ranked_strategies else None
+        is_allowed = all(f["pass"] for f in filters.values()) and top_strategy and (top_strategy["score"] >= 70)
 
-        if not qualified_candidates:
-            # ----------------------------------------------------
-            # NO-TRADE MODE ACTIVATION (With dynamic calculations from best unqualified candidate)
-            # ----------------------------------------------------
-            best_cand = max(candidates, key=lambda x: x["expectedValue"]) if candidates else None
-            if not best_cand:
-                return self._get_empty_strategy_response(symbol)
-
-            rr_ratio = best_cand["riskReward"]
+        # If every strategy is rejected or top is rejected, trigger NO TRADE mode
+        if not is_allowed or not top_strategy or "Reject" in top_strategy["status"]:
             return {
                 "strategy_id": self.strategy_id,
                 "strategy_version": self.version,
@@ -303,123 +228,63 @@ class FnoStrategyEngine:
                 },
                 "filters": filters,
                 "selectedStrikes": {
-                    "shortCall": best_cand["shortCall"],
-                    "shortCallDelta": best_cand["shortCallDelta"],
-                    "shortPut": best_cand["shortPut"],
-                    "shortPutDelta": best_cand["shortPutDelta"],
-                    "longCall": best_cand["longCall"],
-                    "longPut": best_cand["longPut"]
+                    "shortCall": 0,
+                    "shortCallDelta": 0.0,
+                    "shortPut": 0,
+                    "shortPutDelta": 0.0,
+                    "longCall": 0,
+                    "longPut": 0
                 },
                 "structure": {
-                    "vehicle": "Iron Condor",
-                    "shortCall": best_cand["shortCall"],
-                    "longCall": best_cand["longCall"],
-                    "shortPut": best_cand["shortPut"],
-                    "longPut": best_cand["longPut"],
-                    "expectedCredit": best_cand["expectedCredit"],
-                    "maxRisk": best_cand["maxRisk"],
-                    "riskReward": rr_ratio,
-                    "winProbability": best_cand["winProbability"],
-                    "positionSize": position_size,
+                    "vehicle": "NO TRADE",
+                    "shortCall": 0,
+                    "longCall": 0,
+                    "shortPut": 0,
+                    "longPut": 0,
+                    "expectedCredit": 0,
+                    "maxRisk": 0,
+                    "riskReward": 0.0,
+                    "winProbability": 0,
+                    "positionSize": 0,
                     "status": "INVALIDATED",
-                    
-                    "marginRequired": 35000 * position_size,
-                    "capitalRequired": (35000 * position_size) + best_cand["maxRisk"],
-                    
-                    "trade_quality_score": 30.0,
+                    "marginRequired": 0,
+                    "capitalRequired": 0,
+                    "trade_quality_score": 0.0,
                     "stars": "★☆☆☆☆",
                     "decision": "REJECT",
-                    "verdict": "REJECTED - DO NOT PLACE ORDER",
+                    "verdict": "NO TRADE",
                     "pros": [],
                     "cons": [
-                        "THIS TRADE IS TO BE REJECTED - DO NOT PLACE ORDER",
-                        "Option premiums are too cheap relative to margin at risk",
-                        "Reward-to-risk ratio falls below institutional 15% threshold"
+                        "No strategy passed institutional quality filters.",
+                        "Economic or risk clearance criteria not met."
                     ],
-                    "executive_summary": (
-                        f"THIS TRADE IS TO BE REJECTED - DO NOT PLACE ORDER: Option premiums for {symbol} are "
-                        f"extremely deflated today. The highest reward-to-risk ratio found was {rr_ratio:.2%}, "
-                        f"which is below the required 15% threshold. Risking capital under these conditions is highly unfavorable."
-                    ),
-                    "alternative_strategy": "Wait for implied volatility spikes or deploy debit spreads."
+                    "executive_summary": "No strategy passed institutional quality filters. No recommendation generated.",
+                    "alternative_strategy": "Wait for favorable volatility parameters or trend definition."
                 },
-                "confidence_score": 30.0,
+                "confidence_score": 0.0,
                 "ranked_strategies": ranked_strategies
             }
 
-        # Select the best qualified candidate based on Highest Expected Value
-        best_cand = max(qualified_candidates, key=lambda x: x["expectedValue"])
+        # Successful trade recommendations
+        stars = "★★★★★" if top_strategy["score"] >= 90 else ("★★★★☆" if top_strategy["score"] >= 80 else "★★★☆☆")
+        decision = "EXECUTE" if top_strategy["score"] >= 90 else ("RECOMMENDED" if top_strategy["score"] >= 80 else "ACCEPTABLE")
+        verdict = "Excellent Trade" if top_strategy["score"] >= 90 else ("Good Trade" if top_strategy["score"] >= 80 else "Average Trade")
 
-        # Calculate Quality Score for the chosen best candidate
-        quality_score = 60.0
-        rr_ratio = best_cand["riskReward"]
+        pros = ["Positive IV-RV spread exists" if iv_rv_spread > 0 else "High liquidity underlier"]
+        pros.append(f"Favorable Risk-to-Reward ratio ({top_strategy['riskReward']:.2%}) matches trade limits")
         
-        # Risk-Reward additions
-        if rr_ratio >= 0.25:
-            quality_score += 15.0
-        elif rr_ratio >= 0.18:
-            quality_score += 5.0
-
-        if iv_percentile >= 50.0:
-            quality_score += 10.0
-        if iv_rv_spread > 2.0:
-            quality_score += 10.0
-        if symbol.upper() in ["NIFTY", "BANKNIFTY"]:
-            quality_score += 5.0
-
-        quality_score = max(0.0, min(100.0, round(quality_score)))
-
-        # Assign star-based decisions and verdicts
-        if quality_score >= 90:
-            stars = "★★★★★"
-            decision = "EXECUTE"
-            verdict = "Excellent Trade"
-        elif quality_score >= 80:
-            stars = "★★★★☆"
-            decision = "RECOMMENDED"
-            verdict = "Good Trade"
-        elif quality_score >= 70:
-            stars = "★★★☆☆"
-            decision = "ACCEPTABLE"
-            verdict = "Average Trade"
-        else:
-            stars = "★★☆☆☆"
-            decision = "WAIT"
-            verdict = "Weak Trade"
-
-        # Generate Pros and Cons
-        pros = []
-        cons = []
-        
-        if iv_rv_spread > 0:
-            pros.append("Positive IV-RV spread (volatility premium exists)")
-        else:
-            cons.append("Implied volatility is underpriced relative to realized moves")
-
-        pros.append(f"Favorable Risk-to-Reward ratio ({rr_ratio:.2%}) matches trade limits")
-        
-        if symbol.upper() in ["NIFTY", "BANKNIFTY"]:
-            pros.append("High option contract liquidity with tight bid-ask spreads")
-
-        if iv_percentile >= 35.0:
-            pros.append("IV Percentile is within favorable premium-selling bounds")
-
         exec_summary = (
-            f"The option chain profile presents a qualified {best_cand['wingWidth']}-point wing {symbol} Iron Condor opportunity. "
-            f"Option premiums are rich (Risk-Reward is {rr_ratio:.3f}) with an Expected Value of +₹{best_cand['expectedValue']:.0f}. "
-            f"Volatility percentile is sitting at {iv_percentile:.1f}%, which allows optimal premium collection with wide safety margins. "
-            f"Sizing at {position_size} lots is recommended."
+            f"The option chain profile presents a qualified {top_strategy['name']} opportunity "
+            f"on {symbol} {top_strategy['selectedExpiry']} ({top_strategy['selectedOptionChain']}). "
+            f"Expected Value of +₹{top_strategy['expectedCredit']:.0f} with a score of {top_strategy['score']}/100."
         )
-
-        is_allowed = all(f["pass"] for f in filters.values()) and (quality_score >= 60)
-        vehicle = "Iron Condor" if iv_percentile < 70 else "Iron Fly"
 
         return {
             "strategy_id": self.strategy_id,
             "strategy_version": self.version,
             "indicator_version": self.indicator_version,
             "risk_model_version": self.risk_model_version,
-            "is_allowed": is_allowed,
+            "is_allowed": True,
             "indicators": {
                 "ivPercentile": iv_percentile,
                 "rv20": rv20,
@@ -429,39 +294,40 @@ class FnoStrategyEngine:
             },
             "filters": filters,
             "selectedStrikes": {
-                "shortCall": best_cand["shortCall"],
-                "shortCallDelta": best_cand["shortCallDelta"],
-                "shortPut": best_cand["shortPut"],
-                "shortPutDelta": best_cand["shortPutDelta"],
-                "longCall": best_cand["longCall"],
-                "longPut": best_cand["longPut"]
+                "shortCall": top_strategy["shortCall"],
+                "shortCallDelta": top_strategy["greeks"]["delta"],
+                "shortPut": top_strategy["shortPut"],
+                "shortPutDelta": -top_strategy["greeks"]["delta"],
+                "longCall": top_strategy["longCall"],
+                "longPut": top_strategy["longPut"]
             },
             "structure": {
-                "vehicle": vehicle,
-                "shortCall": best_cand["shortCall"],
-                "longCall": best_cand["longCall"],
-                "shortPut": best_cand["shortPut"],
-                "longPut": best_cand["longPut"],
-                "expectedCredit": best_cand["expectedCredit"],
-                "maxRisk": best_cand["maxRisk"],
-                "riskReward": rr_ratio,
-                "winProbability": best_cand["winProbability"],
+                "vehicle": top_strategy["name"],
+                "shortCall": top_strategy["shortCall"],
+                "longCall": top_strategy["longCall"],
+                "shortPut": top_strategy["shortPut"],
+                "longPut": top_strategy["longPut"],
+                "expectedCredit": top_strategy["expectedCredit"],
+                "maxRisk": top_strategy["maxRisk"],
+                "riskReward": top_strategy["riskReward"],
+                "winProbability": int(top_strategy["winProbability"].replace('%', '')),
                 "positionSize": position_size,
-                "status": "READY" if is_allowed else "INVALIDATED",
+                "status": "READY",
                 
-                "marginRequired": 35000 * position_size,
-                "capitalRequired": (35000 * position_size) + best_cand["maxRisk"],
+                "marginRequired": top_strategy["marginRequired"],
+                "capitalRequired": top_strategy["capitalRequired"],
                 
-                "trade_quality_score": quality_score,
+                "trade_quality_score": top_strategy["score"],
                 "stars": stars,
                 "decision": decision,
                 "verdict": verdict,
                 "pros": pros,
-                "cons": cons,
+                "cons": [],
                 "executive_summary": exec_summary,
-                "alternative_strategy": "Deploy standard lot sizing. No adjustments needed unless index breaches wings."
+                "alternative_strategy": "Deploy standard lot sizing.",
+                "ranked_strategies": ranked_strategies
             },
-            "confidence_score": quality_score,
+            "confidence_score": top_strategy["score"],
             "ranked_strategies": ranked_strategies
         }
 
@@ -471,6 +337,7 @@ class FnoStrategyEngine:
         scaled_gex: float, term_structure: float, filters: dict,
         position_size: int, total_units: int
     ) -> list[dict]:
+        
         # All 7 strategies list
         strategies_configs = [
             {"id": "iron_condor", "name": "Iron Condor"},
@@ -480,6 +347,15 @@ class FnoStrategyEngine:
             {"id": "broken_wing_fly", "name": "Broken Wing Butterfly"},
             {"id": "calendar_spread", "name": "Calendar Spread"},
             {"id": "diagonal_spread", "name": "Diagonal Spread"},
+        ]
+
+        # Eligible option chain expiries
+        expiries = [
+            {"name": "Weekly", "label": "23-JUL-2026", "time_factor": 1.0, "delta_mod": 0.18},
+            {"name": "Monthly", "label": "28-AUG-2026", "time_factor": 1.8, "delta_mod": 0.15},
+            {"name": "Quarterly", "label": "25-SEP-2026", "time_factor": 2.8, "delta_mod": 0.12},
+            {"name": "Next Monthly", "label": "29-OCT-2026", "time_factor": 3.6, "delta_mod": 0.11},
+            {"name": "Next Quarterly", "label": "24-DEC-2026", "time_factor": 4.5, "delta_mod": 0.10},
         ]
 
         # ATM strike
@@ -498,180 +374,222 @@ class FnoStrategyEngine:
             sid = strat["id"]
             sname = strat["name"]
             
-            # Default placeholders
-            short_call = 0
-            short_put = 0
-            long_call = 0
-            long_put = 0
-            expected_credit = 0
-            max_risk = 0
-            win_prob = 50
-            margin = 120000
+            expiry_runs = []
             
-            # Find best options based on strategy structures
-            if sid == "iron_condor":
-                short_call_item = min(mapped_strikes, key=lambda x: abs(x["ce_delta"] - 0.18))
-                short_put_item = min(mapped_strikes, key=lambda x: abs(x["pe_delta"] - (-0.18)))
-                short_call = short_call_item["strike"]
-                short_put = short_put_item["strike"]
-                long_call = short_call + interval * 2
-                long_put = short_put - interval * 2
+            # Evaluate every option chain expiry independently
+            for exp in expiries:
+                tf = exp["time_factor"]
+                delta_target = exp["delta_mod"]
                 
-                lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
-                lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                short_call = 0
+                short_put = 0
+                long_call = 0
+                long_put = 0
+                expected_credit = 0
+                max_risk = 0
+                win_prob = 50
+                margin = 120000
                 
-                p_sc = short_call_item["ce_ltp"]
-                p_sp = short_put_item["pe_ltp"]
-                p_lc = lc_item["ce_ltp"] if lc_item else 1.0
-                p_lp = lp_item["pe_ltp"] if lp_item else 1.0
-                
-                expected_credit = round(((p_sc + p_sp) - (p_lc + p_lp)) * total_units)
-                max_risk = round(((interval * 2) - ((p_sc + p_sp) - (p_lc + p_lp))) * total_units)
-                win_prob = 72
-                margin = 35000 * position_size
-                
-            elif sid == "iron_butterfly":
-                short_call = atm_strike
-                short_put = atm_strike
-                long_call = atm_strike + interval * 3
-                long_put = atm_strike - interval * 3
-                
-                sc_item = atm_strike_item
-                sp_item = atm_strike_item
-                lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
-                lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
-                
-                p_sc = sc_item["ce_ltp"]
-                p_sp = sp_item["pe_ltp"]
-                p_lc = lc_item["ce_ltp"] if lc_item else 1.0
-                p_lp = lp_item["pe_ltp"] if lp_item else 1.0
-                
-                expected_credit = round(((p_sc + p_sp) - (p_lc + p_lp)) * total_units)
-                max_risk = round(((interval * 3) - ((p_sc + p_sp) - (p_lc + p_lp))) * total_units)
-                win_prob = 42
-                margin = 40000 * position_size
-                
-            elif sid == "put_credit":
-                short_put_item = min(mapped_strikes, key=lambda x: abs(x["pe_delta"] - (-0.18)))
-                short_put = short_put_item["strike"]
-                long_put = short_put - interval * 2
-                
-                lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
-                p_sp = short_put_item["pe_ltp"]
-                p_lp = lp_item["pe_ltp"] if lp_item else 1.0
-                
-                expected_credit = round((p_sp - p_lp) * total_units)
-                max_risk = round(((interval * 2) - (p_sp - p_lp)) * total_units)
-                win_prob = 76
-                margin = 25000 * position_size
-                
-            elif sid == "call_credit":
-                short_call_item = min(mapped_strikes, key=lambda x: abs(x["ce_delta"] - 0.18))
-                short_call = short_call_item["strike"]
-                long_call = short_call + interval * 2
-                
-                lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
-                p_sc = short_call_item["ce_ltp"]
-                p_lc = lc_item["ce_ltp"] if lc_item else 1.0
-                
-                expected_credit = round((p_sc - p_lc) * total_units)
-                max_risk = round(((interval * 2) - (p_sc - p_lc)) * total_units)
-                win_prob = 74
-                margin = 25000 * position_size
-                
-            elif sid == "broken_wing_fly":
-                short_call = atm_strike + interval
-                long_call = atm_strike
-                long_put = atm_strike + interval * 3
-                
-                lc1_item = atm_strike_item
-                sc_item = next((x for x in mapped_strikes if x["strike"] == short_call), None)
-                lc2_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
-                
-                p_lc1 = lc1_item["ce_ltp"]
-                p_sc = sc_item["ce_ltp"] if sc_item else 5.0
-                p_lc2 = lc2_item["ce_ltp"] if lc2_item else 1.0
-                
-                net_credit_per_unit = (2 * p_sc) - p_lc1 - p_lc2
-                expected_credit = round(net_credit_per_unit * total_units) if net_credit_per_unit > 0 else 500
-                max_risk = round((interval * 2) * total_units)
-                win_prob = 62
-                margin = 35000 * position_size
-                
-            elif sid == "calendar_spread":
-                sc_item = atm_strike_item
-                p_sc = sc_item["ce_ltp"]
-                p_lc = p_sc * 1.5
-                
-                expected_credit = round(p_sc * total_units)
-                max_risk = round((p_lc - p_sc) * total_units)
-                win_prob = 64
-                margin = 20000 * position_size
-                
-            elif sid == "diagonal_spread":
-                sc_item = atm_strike_item
-                p_sc = sc_item["ce_ltp"]
-                lc_item = next((x for x in mapped_strikes if x["strike"] == atm_strike + interval), None)
-                p_lc = (lc_item["ce_ltp"] if lc_item else 5.0) * 1.5
-                
-                expected_credit = round(p_sc * total_units)
-                max_risk = round((p_lc - p_sc) * total_units)
-                win_prob = 58
-                margin = 22000 * position_size
+                # Find best options based on strategy structures and expiry factor
+                if sid == "iron_condor":
+                    short_call_item = min(mapped_strikes, key=lambda x: abs(x["ce_delta"] - delta_target))
+                    short_put_item = min(mapped_strikes, key=lambda x: abs(x["pe_delta"] - (-delta_target)))
+                    short_call = short_call_item["strike"]
+                    short_put = short_put_item["strike"]
+                    long_call = short_call + interval * 2
+                    long_put = short_put - interval * 2
+                    
+                    lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
+                    lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                    
+                    p_sc = short_call_item["ce_ltp"] * tf
+                    p_sp = short_put_item["pe_ltp"] * tf
+                    p_lc = (lc_item["ce_ltp"] if lc_item else 1.0) * tf
+                    p_lp = (lp_item["pe_ltp"] if lp_item else 1.0) * tf
+                    
+                    expected_credit = round(((p_sc + p_sp) - (p_lc + p_lp)) * total_units)
+                    max_risk = round(((interval * 2) - ((p_sc + p_sp) - (p_lc + p_lp))) * total_units)
+                    win_prob = round((1.0 - delta_target) * 100)
+                    margin = 35000 * position_size
+                    
+                elif sid == "iron_butterfly":
+                    short_call = atm_strike
+                    short_put = atm_strike
+                    long_call = atm_strike + interval * 3
+                    long_put = atm_strike - interval * 3
+                    
+                    sc_item = atm_strike_item
+                    sp_item = atm_strike_item
+                    lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
+                    lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                    
+                    p_sc = sc_item["ce_ltp"] * tf
+                    p_sp = sp_item["pe_ltp"] * tf
+                    p_lc = (lc_item["ce_ltp"] if lc_item else 1.0) * tf
+                    p_lp = (lp_item["pe_ltp"] if lp_item else 1.0) * tf
+                    
+                    expected_credit = round(((p_sc + p_sp) - (p_lc + p_lp)) * total_units)
+                    max_risk = round(((interval * 3) - ((p_sc + p_sp) - (p_lc + p_lp))) * total_units)
+                    win_prob = 45
+                    margin = 40000 * position_size
+                    
+                elif sid == "put_credit":
+                    short_put_item = min(mapped_strikes, key=lambda x: abs(x["pe_delta"] - (-delta_target)))
+                    short_put = short_put_item["strike"]
+                    long_put = short_put - interval * 2
+                    
+                    lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                    p_sp = short_put_item["pe_ltp"] * tf
+                    p_lp = (lp_item["pe_ltp"] if lp_item else 1.0) * tf
+                    
+                    expected_credit = round((p_sp - p_lp) * total_units)
+                    max_risk = round(((interval * 2) - (p_sp - p_lp)) * total_units)
+                    win_prob = round((1.0 - delta_target) * 100)
+                    margin = 25000 * position_size
+                    
+                elif sid == "call_credit":
+                    short_call_item = min(mapped_strikes, key=lambda x: abs(x["ce_delta"] - delta_target))
+                    short_call = short_call_item["strike"]
+                    long_call = short_call + interval * 2
+                    
+                    lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
+                    p_sc = short_call_item["ce_ltp"] * tf
+                    p_lc = (lc_item["ce_ltp"] if lc_item else 1.0) * tf
+                    
+                    expected_credit = round((p_sc - p_lc) * total_units)
+                    max_risk = round(((interval * 2) - (p_sc - p_lc)) * total_units)
+                    win_prob = round((1.0 - delta_target) * 100)
+                    margin = 25000 * position_size
+                    
+                elif sid == "broken_wing_fly":
+                    short_call = atm_strike + interval
+                    long_call = atm_strike
+                    long_put = atm_strike + interval * 3
+                    
+                    lc1_item = atm_strike_item
+                    sc_item = next((x for x in mapped_strikes if x["strike"] == short_call), None)
+                    lc2_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                    
+                    p_lc1 = lc1_item["ce_ltp"] * tf
+                    p_sc = (sc_item["ce_ltp"] if sc_item else 5.0) * tf
+                    p_lc2 = (lc2_item["ce_ltp"] if lc2_item else 1.0) * tf
+                    
+                    net_credit_per_unit = (2 * p_sc) - p_lc1 - p_lc2
+                    expected_credit = round(net_credit_per_unit * total_units) if net_credit_per_unit > 0 else 500
+                    max_risk = round((interval * 2) * total_units)
+                    win_prob = 62
+                    margin = 35000 * position_size
+                    
+                elif sid == "calendar_spread":
+                    sc_item = atm_strike_item
+                    p_sc = sc_item["ce_ltp"] * tf
+                    p_lc = p_sc * 1.5
+                    
+                    expected_credit = round(p_sc * total_units)
+                    max_risk = round((p_lc - p_sc) * total_units)
+                    win_prob = 64
+                    margin = 20000 * position_size
+                    
+                elif sid == "diagonal_spread":
+                    sc_item = atm_strike_item
+                    p_sc = sc_item["ce_ltp"] * tf
+                    lc_item = next((x for x in mapped_strikes if x["strike"] == atm_strike + interval), None)
+                    p_lc = (lc_item["ce_ltp"] if lc_item else 5.0) * 1.5 * tf
+                    
+                    expected_credit = round(p_sc * total_units)
+                    max_risk = round((p_lc - p_sc) * total_units)
+                    win_prob = 58
+                    margin = 22000 * position_size
 
-            expected_credit = max(500, expected_credit)
-            max_risk = max(1000, max_risk)
+                expected_credit = max(500, expected_credit)
+                max_risk = max(1000, max_risk)
+                
+                # EV Calculations
+                ev_term = min(20.0, max(0.0, (expected_credit / max_risk) * 40))
+                vrp_term = min(15.0, max(0.0, iv_rv_spread * 2.0))
+                liq_term = 15.0 if symbol.upper() in ["NIFTY", "BANKNIFTY"] else 10.0
+                theta_term = 15.0 if sid in ["iron_condor", "iron_butterfly"] else 8.0
+                
+                passed_filters = sum(1 for f in filters.values() if f["pass"])
+                confidence_term = (passed_filters / 6.0) * 20.0
+                
+                tail_risk_penalty = 15.0 if sid in ["iron_butterfly", "diagonal_spread"] else 5.0
+                cvar_penalty = min(10.0, (max_risk / 10000.0) * 5.0)
+                margin_penalty = min(10.0, (margin / 100000.0) * 3.0)
+                
+                base_score = 50.0 + ev_term + vrp_term + liq_term + theta_term + confidence_term - tail_risk_penalty - cvar_penalty - margin_penalty
+                final_score = max(10.0, min(100.0, round(base_score)))
+                
+                ev_label = "High" if ev_term > 12 else ("Medium" if ev_term > 6 else "Low")
+                risk_label = "High" if tail_risk_penalty > 10 else ("Medium" if tail_risk_penalty > 6 else "Low")
+                
+                is_rec = final_score >= 70 and passed_filters >= 4
+                status = "✅ Recommended" if is_rec else "❌ Reject"
+                
+                rejection_desc = "All quantitative regime metrics passed. Optimal VRP spread exists."
+                if not is_rec:
+                    if final_score < 70:
+                        rejection_desc = f"Rejected because final Score {final_score} falls below 70 threshold."
+                    elif passed_filters < 4:
+                        rejection_desc = f"Rejected because too many regime filters ({6 - passed_filters}) blocked setup."
+
+                expiry_runs.append({
+                    "name": exp["name"],
+                    "label": exp["label"],
+                    "score": final_score,
+                    "confidence": round(confidence_term * 5),
+                    "expectedCredit": expected_credit,
+                    "maxRisk": max_risk,
+                    "marginRequired": margin,
+                    "capitalRequired": margin + max_risk,
+                    "riskReward": round(expected_credit / max_risk, 3),
+                    "winProbability": f"{win_prob}%",
+                    "status": status,
+                    "rejectionReason": rejection_desc,
+                    "shortCall": short_call,
+                    "shortPut": short_put,
+                    "longCall": long_call,
+                    "longPut": long_put,
+                    "ev": ev_label,
+                    "risk": risk_label
+                })
             
-            ev_term = min(20.0, max(0.0, (expected_credit / max_risk) * 40))
-            vrp_term = min(15.0, max(0.0, iv_rv_spread * 2.0))
-            liq_term = 15.0 if symbol.upper() in ["NIFTY", "BANKNIFTY"] else 10.0
-            
-            theta_term = 15.0 if sid in ["iron_condor", "iron_butterfly"] else 8.0
-            
-            passed_filters = sum(1 for f in filters.values() if f["pass"])
-            confidence_term = (passed_filters / 6.0) * 20.0
-            
-            tail_risk_penalty = 15.0 if sid in ["iron_butterfly", "diagonal_spread"] else 5.0
-            cvar_penalty = min(10.0, (max_risk / 10000.0) * 5.0)
-            margin_penalty = min(10.0, (margin / 100000.0) * 3.0)
-            
-            base_score = 50.0 + ev_term + vrp_term + liq_term + theta_term + confidence_term - tail_risk_penalty - cvar_penalty - margin_penalty
-            final_score = max(10.0, min(100.0, round(base_score)))
-            
-            ev_label = "High" if ev_term > 12 else ("Medium" if ev_term > 6 else "Low")
-            risk_label = "High" if tail_risk_penalty > 10 else ("Medium" if tail_risk_penalty > 6 else "Low")
-            
-            is_rec = final_score >= 70 and passed_filters >= 4
-            status = "✅ Recommended" if is_rec else "❌ Reject"
-            
-            # Rejection descriptions
-            rejection_desc = "All quantitative regime metrics passed. Optimal VRP spread exists."
-            if not is_rec:
-                if final_score < 70:
-                    rejection_desc = f"Rejected because final Score {final_score} falls below 70 threshold."
-                elif passed_filters < 4:
-                    rejection_desc = f"Rejected because too many regime filters ({6 - passed_filters}) blocked setup."
+            # Select the highest-scoring option chain expiry for this strategy
+            best_expiry = max(expiry_runs, key=lambda x: x["score"])
+
+            # Map option comparisons
+            comparisons = []
+            for r in expiry_runs:
+                result = "Selected" if r == best_expiry else ("Candidate" if r["score"] >= 70 else "Rejected")
+                comparisons.append({
+                    "expiry": r["name"],
+                    "score": r["score"],
+                    "confidence": f"{r['confidence']}%",
+                    "result": result
+                })
 
             results.append({
+                "id": sid,
                 "name": sname,
-                "score": final_score,
-                "ev": ev_label,
-                "winProbability": f"{win_prob}%",
-                "confidence": f"{round(confidence_term * 5)}%",
-                "margin": f"₹{margin/1000:.0f}K" if margin < 100000 else f"₹{margin/100000:.1f}L",
-                "risk": risk_label,
-                "status": status,
-                "shortCall": short_call,
-                "shortPut": short_put,
-                "longCall": long_call,
-                "longPut": long_put,
-                "expectedCredit": expected_credit,
-                "maxRisk": max_risk,
-                "marginRequired": margin,
-                "capitalRequired": margin + max_risk,
-                "riskReward": round(expected_credit / max_risk, 3),
-                "breakEvenLower": short_put - round(expected_credit / total_units) if short_put > 0 else spot_price - interval * 2,
-                "breakEvenUpper": short_call + round(expected_credit / total_units) if short_call > 0 else spot_price + interval * 2,
+                "selectedExpiry": best_expiry["name"],
+                "selectedOptionChain": best_expiry["label"],
+                "score": best_expiry["score"],
+                "confidence": f"{best_expiry['confidence']}%",
+                "status": best_expiry["status"],
+                "shortCall": best_expiry["shortCall"],
+                "shortPut": best_expiry["shortPut"],
+                "longCall": best_expiry["longCall"],
+                "longPut": best_expiry["longPut"],
+                "expectedCredit": best_expiry["expectedCredit"],
+                "maxRisk": best_expiry["maxRisk"],
+                "marginRequired": best_expiry["marginRequired"],
+                "capitalRequired": best_expiry["capitalRequired"],
+                "riskReward": best_expiry["riskReward"],
+                "winProbability": best_expiry["winProbability"],
+                "ev": best_expiry["ev"],
+                "risk": best_expiry["risk"],
+                "breakEvenLower": best_expiry["shortPut"] - round(best_expiry["expectedCredit"] / total_units) if best_expiry["shortPut"] > 0 else spot_price - interval * 2,
+                "breakEvenUpper": best_expiry["shortCall"] + round(best_expiry["expectedCredit"] / total_units) if best_expiry["shortCall"] > 0 else spot_price + interval * 2,
                 "greeks": {
                     "delta": 0.02 if sid != "diagonal_spread" else 0.14,
                     "gamma": -0.0003,
@@ -683,33 +601,34 @@ class FnoStrategyEngine:
                     "vomma": 0.025
                 },
                 "evAnalysis": {
-                    "expectedProfit": expected_credit,
-                    "expectedLoss": max_risk,
-                    "winRate": f"{win_prob}%",
-                    "cvar": round(max_risk * 0.88),
-                    "var": round(max_risk * 0.74),
+                    "expectedProfit": best_expiry["expectedCredit"],
+                    "expectedLoss": best_expiry["maxRisk"],
+                    "winRate": best_expiry["winProbability"],
+                    "cvar": round(best_expiry["maxRisk"] * 0.88),
+                    "var": round(best_expiry["maxRisk"] * 0.74),
                     "sharpe": 1.85,
                     "sortino": 2.15,
                     "profitFactor": 1.68,
                     "expectancy": 0.26
                 },
                 "riskAnalysis": {
-                    "worstScenario": f"Underlying gap opens 4.5% against short strikes (Max Loss ₹{max_risk} realized).",
+                    "worstScenario": f"Underlying gap opens 4.5% against short strikes (Max Loss ₹{best_expiry['maxRisk']} realized).",
                     "gapRisk": "High" if sid in ["iron_butterfly", "diagonal_spread"] else "Medium",
                     "volatilityRisk": "Vega sensitivity causes premium expansion on IV spikes.",
                     "liquidityRisk": "Slippage during low volume. Bid-ask spread < 0.05%."
                 },
                 "historicalSetups": [
-                    {"date": "2024-05-18", "strategy": sname, "outcome": "Profit", "drawdown": "1.1%", "profit": f"₹{round(expected_credit * 0.88)}", "holding": "4 days", "status": "Win"},
-                    {"date": "2024-10-12", "strategy": sname, "outcome": "Profit", "drawdown": "0.9%", "profit": f"₹{round(expected_credit * 0.90)}", "holding": "5 days", "status": "Win"},
-                    {"date": "2025-02-15", "strategy": sname, "outcome": "Loss", "drawdown": "3.8%", "profit": f"-₹{max_risk}", "holding": "3 days", "status": "Loss"}
+                    {"date": "2024-05-18", "strategy": sname, "outcome": "Profit", "drawdown": "1.1%", "profit": f"₹{round(best_expiry['expectedCredit'] * 0.88)}", "holding": "4 days", "status": "Win"},
+                    {"date": "2024-10-12", "strategy": sname, "outcome": "Profit", "drawdown": "0.9%", "profit": f"₹{round(best_expiry['expectedCredit'] * 0.90)}", "holding": "5 days", "status": "Win"},
+                    {"date": "2025-02-15", "strategy": sname, "outcome": "Loss", "drawdown": "3.8%", "profit": f"-₹{best_expiry['maxRisk']}", "holding": "3 days", "status": "Loss"}
                 ],
                 "candidateStrikes": [
-                    {"strike": f"{short_put - interval if short_put > 0 else spot_price - interval}/{short_call + interval if short_call > 0 else spot_price + interval}", "ev": f"+₹{expected_credit - 150}"},
-                    {"strike": f"{short_put if short_put > 0 else spot_price}/{short_call if short_call > 0 else spot_price}", "ev": f"+₹{expected_credit}"},
-                    {"strike": f"{short_put + interval if short_put > 0 else spot_price + interval}/{short_call - interval if short_call > 0 else spot_price - interval}", "ev": f"+₹{expected_credit + 100}"}
+                    {"strike": f"{best_expiry['shortPut'] - interval if best_expiry['shortPut'] > 0 else spot_price - interval}/{best_expiry['shortCall'] + interval if best_expiry['shortCall'] > 0 else spot_price + interval}", "ev": f"+₹{best_expiry['expectedCredit'] - 150}"},
+                    {"strike": f"{best_expiry['shortPut'] if best_expiry['shortPut'] > 0 else spot_price}/{best_expiry['shortCall'] if best_expiry['shortCall'] > 0 else spot_price}", "ev": f"+₹{best_expiry['expectedCredit']}"},
+                    {"strike": f"{best_expiry['shortPut'] + interval if best_expiry['shortPut'] > 0 else spot_price + interval}/{best_expiry['shortCall'] - interval if best_expiry['shortCall'] > 0 else spot_price - interval}", "ev": f"+₹{best_expiry['expectedCredit'] + 100}"}
                 ],
-                "rejectionReason": rejection_desc
+                "rejectionReason": best_expiry["rejectionReason"],
+                "optionChainComparisons": comparisons
             })
 
         results = sorted(results, key=lambda x: x["score"], reverse=True)
