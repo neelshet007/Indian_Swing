@@ -335,6 +335,12 @@ export default function FnoAnalysis() {
 
   // Selected recommendation strategy details
   const activeStrategy = useMemo(() => {
+    const searchParams = new URLSearchParams(window.location.search)
+    const stratName = searchParams.get('strat')
+    if (stratName) {
+      const found = rankedStrategies.find(s => s.name.toLowerCase() === stratName.toLowerCase())
+      if (found) return found
+    }
     return rankedStrategies[0] || {}
   }, [rankedStrategies])
 
