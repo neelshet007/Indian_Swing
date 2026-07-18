@@ -121,6 +121,7 @@ export default function FnoAnalysis() {
   }
 
   const { marketData, optionChain, indicators, regimeResults, selectedStrikes, structure, riskChecks } = data
+  const isRejected = !data.is_allowed || structure.decision === 'REJECT' || structure.verdict?.includes('REJECT')
 
   return (
     <div className="fno-analysis-page" style={{ padding: '32px' }}>
@@ -136,6 +137,32 @@ export default function FnoAnalysis() {
           <span className="badge-status watching" style={{ background: 'rgba(99, 155, 255, 0.15)', color: 'var(--accent-blue-bright)', fontSize: '0.7rem' }}>PROPRIETARY</span>
         </div>
       </div>
+
+      {isRejected && (
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.12)',
+          border: '2px solid var(--accent-red)',
+          padding: '16px',
+          borderRadius: '8px',
+          color: 'var(--accent-red)',
+          fontWeight: '800',
+          textAlign: 'center',
+          fontSize: '1.1rem',
+          marginBottom: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 0 15px rgba(239, 68, 68, 0.15)'
+        }}>
+          <span style={{ fontSize: '1.8rem' }}>🚨</span>
+          <div style={{ letterSpacing: '0.05em' }}>THIS TRADE IS TO BE REJECTED - DO NOT PLACE ORDER</div>
+          <div style={{ fontSize: '0.85rem', fontWeight: '500', color: 'var(--text-secondary)' }}>
+            Institutional security warning: The quantitative metrics for this setup are unfavorable. Reject directly.
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
@@ -167,7 +194,9 @@ export default function FnoAnalysis() {
               </div>
               <div style={{ marginTop: '8px' }}>
                 <div style={{ color: 'var(--text-muted)' }}>Directional Bias</div>
-                <div style={{ fontWeight: '700', marginTop: '4px', color: 'var(--accent-green)' }}>NEUTRAL (THETA INGRESS)</div>
+                <div style={{ fontWeight: '700', marginTop: '4px', color: isRejected ? 'var(--accent-red)' : 'var(--accent-green)' }}>
+                  {isRejected ? 'REJECTED Spread' : 'NEUTRAL (THETA INGRESS)'}
+                </div>
               </div>
             </div>
           </div>
@@ -175,11 +204,11 @@ export default function FnoAnalysis() {
           {/* Section 9: Confidence Score */}
           <div className="card" style={{ padding: '20px', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <h3 className="section-title" style={{ marginBottom: '8px', textAlign: 'left' }}>Section 9: Confidence</h3>
-            <div style={{ fontSize: '2.5rem', fontWeight: '800', fontFamily: 'var(--font-mono)', color: 'var(--accent-green)' }}>
-              91 <span style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>/ 100</span>
+            <div style={{ fontSize: '2.5rem', fontWeight: '800', fontFamily: 'var(--font-mono)', color: isRejected ? 'var(--accent-red)' : 'var(--accent-green)' }}>
+              {data.confidence_score || (isRejected ? 30 : 91)} <span style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>/ 100</span>
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700', marginTop: '4px' }}>
-              Institutional Quality: <span style={{ color: 'var(--accent-green)' }}>HIGH</span>
+              Institutional Quality: <span style={{ color: isRejected ? 'var(--accent-red)' : 'var(--accent-green)' }}>{isRejected ? 'REJECT / LOW' : 'HIGH'}</span>
             </div>
           </div>
         </div>

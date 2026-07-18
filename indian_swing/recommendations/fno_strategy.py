@@ -274,8 +274,13 @@ class FnoStrategyEngine:
 
         if not qualified_candidates:
             # ----------------------------------------------------
-            # NO-TRADE MODE ACTIVATION
+            # NO-TRADE MODE ACTIVATION (With dynamic calculations from best unqualified candidate)
             # ----------------------------------------------------
+            best_cand = max(candidates, key=lambda x: x["expectedValue"]) if candidates else None
+            if not best_cand:
+                return self._get_empty_strategy_response(symbol)
+
+            rr_ratio = best_cand["riskReward"]
             return {
                 "strategy_id": self.strategy_id,
                 "strategy_version": self.version,
@@ -291,42 +296,43 @@ class FnoStrategyEngine:
                 },
                 "filters": filters,
                 "selectedStrikes": {
-                    "shortCall": 0,
-                    "shortCallDelta": 0.0,
-                    "shortPut": 0,
-                    "shortPutDelta": 0.0,
-                    "longCall": 0,
-                    "longPut": 0
+                    "shortCall": best_cand["shortCall"],
+                    "shortCallDelta": best_cand["shortCallDelta"],
+                    "shortPut": best_cand["shortPut"],
+                    "shortPutDelta": best_cand["shortPutDelta"],
+                    "longCall": best_cand["longCall"],
+                    "longPut": best_cand["longPut"]
                 },
                 "structure": {
                     "vehicle": "Iron Condor",
-                    "shortCall": 0,
-                    "longCall": 0,
-                    "shortPut": 0,
-                    "longPut": 0,
-                    "expectedCredit": 0,
-                    "maxRisk": 0,
-                    "riskReward": 0.0,
-                    "winProbability": 0,
+                    "shortCall": best_cand["shortCall"],
+                    "longCall": best_cand["longCall"],
+                    "shortPut": best_cand["shortPut"],
+                    "longPut": best_cand["longPut"],
+                    "expectedCredit": best_cand["expectedCredit"],
+                    "maxRisk": best_cand["maxRisk"],
+                    "riskReward": rr_ratio,
+                    "winProbability": best_cand["winProbability"],
                     "positionSize": position_size,
                     "status": "INVALIDATED",
                     
                     "marginRequired": 35000 * position_size,
-                    "capitalRequired": 35000 * position_size,
+                    "capitalRequired": (35000 * position_size) + best_cand["maxRisk"],
                     
                     "trade_quality_score": 30.0,
                     "stars": "★☆☆☆☆",
                     "decision": "REJECT",
-                    "verdict": "No Trade Today",
+                    "verdict": "REJECTED - DO NOT PLACE ORDER",
                     "pros": [],
                     "cons": [
+                        "THIS TRADE IS TO BE REJECTED - DO NOT PLACE ORDER",
                         "Option premiums are too cheap relative to margin at risk",
                         "Reward-to-risk ratio falls below institutional 15% threshold"
                     ],
                     "executive_summary": (
-                        f"No Premium-Selling Opportunity Available: Option premiums for {symbol} are "
-                        f"extremely deflated today. The highest reward-to-risk ratio found was below the "
-                        f"required 15% threshold. Risking capital under these conditions is unfavorable."
+                        f"THIS TRADE IS TO BE REJECTED - DO NOT PLACE ORDER: Option premiums for {symbol} are "
+                        f"extremely deflated today. The highest reward-to-risk ratio found was {rr_ratio:.2%}, "
+                        f"which is below the required 15% threshold. Risking capital under these conditions is highly unfavorable."
                     ),
                     "alternative_strategy": "Wait for implied volatility spikes or deploy debit spreads."
                 },

@@ -116,6 +116,32 @@ export default function MonitoringCard({ symbol, session }) {
             </div>
           </div>
 
+          {/* Rejection Alert Banner */}
+          {(structure.decision === 'REJECT' || structure.verdict?.includes('REJECT')) && (
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '2px solid var(--accent-red)',
+              padding: '16px',
+              borderRadius: '8px',
+              color: 'var(--accent-red)',
+              fontWeight: '800',
+              textAlign: 'center',
+              fontSize: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 15px rgba(239, 68, 68, 0.15)'
+            }}>
+              <span style={{ fontSize: '1.6rem' }}>🚨</span>
+              <div style={{ letterSpacing: '0.05em' }}>THIS TRADE IS TO BE REJECTED - DO NOT PLACE ORDER</div>
+              <div style={{ fontSize: '0.75rem', fontWeight: '500', color: 'var(--text-secondary)' }}>
+                This strategy setup does not meet safety or economic clearance criteria. Reject directly.
+              </div>
+            </div>
+          )}
+
           {/* Trade Quality Score Widget */}
           <div style={{ background: 'rgba(0,0,0,0.15)', padding: '14px', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
@@ -293,6 +319,63 @@ export default function MonitoringCard({ symbol, session }) {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Live Option Chain Highlight Panel */}
+          {optionChain?.strikes && (
+            <div style={{ background: 'rgba(0,0,0,0.15)', padding: '12px 16px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '8px', fontWeight: '700', textTransform: 'uppercase' }}>
+                Option Chain & Strategy Selection
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', fontSize: '0.72rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                      <th style={{ padding: '4px' }}>CE LTP</th>
+                      <th style={{ padding: '4px', textAlign: 'center' }}>Strike</th>
+                      <th style={{ padding: '4px', textAlign: 'right' }}>PE LTP</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const middleIdx = Math.floor(optionChain.strikes.length / 2)
+                      const slice = optionChain.strikes.slice(Math.max(0, middleIdx - 3), Math.min(optionChain.strikes.length, middleIdx + 4))
+                      return slice.map((row, idx) => {
+                        const isShortCall = row.strike === selectedStrikes?.shortCall
+                        const isShortPut = row.strike === selectedStrikes?.shortPut
+                        const isLongCall = row.strike === selectedStrikes?.longCall
+                        const isLongPut = row.strike === selectedStrikes?.longPut
+                        
+                        let highlightStyle = {}
+                        if (isShortCall || isShortPut) {
+                          highlightStyle = { background: 'rgba(99, 155, 255, 0.15)', fontWeight: '700' }
+                        } else if (isLongCall || isLongPut) {
+                          highlightStyle = { background: 'rgba(255, 255, 255, 0.05)' }
+                        }
+
+                        return (
+                          <tr key={idx} style={{ ...highlightStyle, borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                            <td style={{ padding: '5px 4px', color: 'var(--accent-green)' }}>
+                              ₹ {row.ce?.ltp?.toFixed(1) || '—'}
+                              {isShortCall && <span style={{ marginLeft: '4px', fontSize: '0.55rem', background: 'var(--accent-blue-bright)', color: '#000', padding: '1px 3px', borderRadius: '2px', fontWeight: 'bold' }}>SELL</span>}
+                              {isLongCall && <span style={{ marginLeft: '4px', fontSize: '0.55rem', background: 'rgba(255,255,255,0.1)', color: 'var(--text-secondary)', padding: '1px 3px', borderRadius: '2px' }}>BUY</span>}
+                            </td>
+                            <td style={{ padding: '5px 4px', textAlign: 'center', fontWeight: '700', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)' }}>
+                              {row.strike}
+                            </td>
+                            <td style={{ padding: '5px 4px', textAlign: 'right', color: 'var(--accent-red)' }}>
+                              {isLongPut && <span style={{ marginRight: '4px', fontSize: '0.55rem', background: 'rgba(255,255,255,0.1)', color: 'var(--text-secondary)', padding: '1px 3px', borderRadius: '2px' }}>BUY</span>}
+                              {isShortPut && <span style={{ marginRight: '4px', fontSize: '0.55rem', background: 'var(--accent-blue-bright)', color: '#000', padding: '1px 3px', borderRadius: '2px', fontWeight: 'bold' }}>SELL</span>}
+                              ₹ {row.pe?.ltp?.toFixed(1) || '—'}
+                            </td>
+                          </tr>
+                        )
+                      })
+                    })()}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
