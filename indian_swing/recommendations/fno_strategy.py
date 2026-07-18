@@ -445,7 +445,6 @@ class FnoStrategyEngine:
                         if ce_ltp_base > 0:
                             ce_ltp = round(ce_ltp_base * time_ratio, 2)
                         else:
-                            from indian_swing.recommendations.fno_strategy import normal_cdf
                             d1 = (math.log(spot_price / strike_val) + (r + 0.5 * ce_iv ** 2) * t) / (ce_iv * math.sqrt(t))
                             d2 = d1 - ce_iv * math.sqrt(t)
                             ce_ltp = round(max(0.5, spot_price * normal_cdf(d1) - strike_val * math.exp(-r * t) * normal_cdf(d2)), 2)
@@ -453,7 +452,6 @@ class FnoStrategyEngine:
                         if pe_ltp_base > 0:
                             pe_ltp = round(pe_ltp_base * time_ratio, 2)
                         else:
-                            from indian_swing.recommendations.fno_strategy import normal_cdf
                             d1 = (math.log(spot_price / strike_val) + (r + 0.5 * pe_iv ** 2) * t) / (pe_iv * math.sqrt(t))
                             d2 = d1 - pe_iv * math.sqrt(t)
                             call_price = spot_price * normal_cdf(d1) - strike_val * math.exp(-r * t) * normal_cdf(d2)
