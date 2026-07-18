@@ -109,7 +109,7 @@ class RecommendationScanner:
 
         # Add inactive stock warnings to errors so they surface in the UI
         inactive_errors = [
-            f"[INACTIVE] {s.symbol} ({s.company_name or 'Unknown'}): marked inactive — delisted or no valid history"
+            f"[INACTIVE] {s.symbol} ({s.name or 'Unknown'}): marked inactive — delisted or no valid history"
             for s in inactive_stocks
         ]
         result.errors.extend(inactive_errors)
