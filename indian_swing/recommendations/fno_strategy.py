@@ -265,6 +265,13 @@ class FnoStrategyEngine:
                     "wingWidth": wing_width
                 })
 
+        ranked_strategies = self.evaluate_all_strategies(
+            symbol, spot_price, vix, mapped_strikes,
+            iv_percentile, rv20, iv_rv_spread,
+            scaled_gex, term_structure, filters,
+            position_size, total_units
+        )
+
         # Apply Minimum Economic Quality Filters
         # A professional options desk rejects Condors with Reward/Risk < 0.15 (15% collection width)
         qualified_candidates = [
@@ -336,7 +343,8 @@ class FnoStrategyEngine:
                     ),
                     "alternative_strategy": "Wait for implied volatility spikes or deploy debit spreads."
                 },
-                "confidence_score": 30.0
+                "confidence_score": 30.0,
+                "ranked_strategies": ranked_strategies
             }
 
         # Select the best qualified candidate based on Highest Expected Value
@@ -453,8 +461,205 @@ class FnoStrategyEngine:
                 "executive_summary": exec_summary,
                 "alternative_strategy": "Deploy standard lot sizing. No adjustments needed unless index breaches wings."
             },
-            "confidence_score": quality_score
+            "confidence_score": quality_score,
+            "ranked_strategies": ranked_strategies
         }
+
+    def evaluate_all_strategies(
+        self, symbol: str, spot_price: float, vix: float, mapped_strikes: list,
+        iv_percentile: float, rv20: float, iv_rv_spread: float,
+        scaled_gex: float, term_structure: float, filters: dict,
+        position_size: int, total_units: int
+    ) -> list[dict]:
+        # All 7 strategies list
+        strategies_configs = [
+            {"id": "iron_condor", "name": "Iron Condor"},
+            {"id": "iron_butterfly", "name": "Iron Butterfly"},
+            {"id": "put_credit", "name": "Put Credit Spread"},
+            {"id": "call_credit", "name": "Call Credit Spread"},
+            {"id": "broken_wing_fly", "name": "Broken Wing Butterfly"},
+            {"id": "calendar_spread", "name": "Calendar Spread"},
+            {"id": "diagonal_spread", "name": "Diagonal Spread"},
+        ]
+
+        # ATM strike
+        atm_strike_item = min(mapped_strikes, key=lambda x: abs(x["strike"] - spot_price))
+        atm_strike = atm_strike_item["strike"]
+        
+        # Sells/Wings interval helper
+        interval = 50 if symbol.upper() != "MIDCPNIFTY" else 25
+        if symbol.upper() == "BANKNIFTY":
+            interval = 100
+        elif symbol.upper() == "SENSEX":
+            interval = 100
+
+        results = []
+        for strat in strategies_configs:
+            sid = strat["id"]
+            sname = strat["name"]
+            
+            # Default placeholders
+            short_call = 0
+            short_put = 0
+            long_call = 0
+            long_put = 0
+            expected_credit = 0
+            max_risk = 0
+            win_prob = 50
+            margin = 120000
+            
+            # Find best options based on strategy structures
+            if sid == "iron_condor":
+                short_call_item = min(mapped_strikes, key=lambda x: abs(x["ce_delta"] - 0.18))
+                short_put_item = min(mapped_strikes, key=lambda x: abs(x["pe_delta"] - (-0.18)))
+                short_call = short_call_item["strike"]
+                short_put = short_put_item["strike"]
+                long_call = short_call + interval * 2
+                long_put = short_put - interval * 2
+                
+                lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
+                lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                
+                p_sc = short_call_item["ce_ltp"]
+                p_sp = short_put_item["pe_ltp"]
+                p_lc = lc_item["ce_ltp"] if lc_item else 1.0
+                p_lp = lp_item["pe_ltp"] if lp_item else 1.0
+                
+                expected_credit = round(((p_sc + p_sp) - (p_lc + p_lp)) * total_units)
+                max_risk = round(((interval * 2) - ((p_sc + p_sp) - (p_lc + p_lp))) * total_units)
+                win_prob = 72
+                margin = 35000 * position_size
+                
+            elif sid == "iron_butterfly":
+                short_call = atm_strike
+                short_put = atm_strike
+                long_call = atm_strike + interval * 3
+                long_put = atm_strike - interval * 3
+                
+                sc_item = atm_strike_item
+                sp_item = atm_strike_item
+                lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
+                lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                
+                p_sc = sc_item["ce_ltp"]
+                p_sp = sp_item["pe_ltp"]
+                p_lc = lc_item["ce_ltp"] if lc_item else 1.0
+                p_lp = lp_item["pe_ltp"] if lp_item else 1.0
+                
+                expected_credit = round(((p_sc + p_sp) - (p_lc + p_lp)) * total_units)
+                max_risk = round(((interval * 3) - ((p_sc + p_sp) - (p_lc + p_lp))) * total_units)
+                win_prob = 42
+                margin = 40000 * position_size
+                
+            elif sid == "put_credit":
+                short_put_item = min(mapped_strikes, key=lambda x: abs(x["pe_delta"] - (-0.18)))
+                short_put = short_put_item["strike"]
+                long_put = short_put - interval * 2
+                
+                lp_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                p_sp = short_put_item["pe_ltp"]
+                p_lp = lp_item["pe_ltp"] if lp_item else 1.0
+                
+                expected_credit = round((p_sp - p_lp) * total_units)
+                max_risk = round(((interval * 2) - (p_sp - p_lp)) * total_units)
+                win_prob = 76
+                margin = 25000 * position_size
+                
+            elif sid == "call_credit":
+                short_call_item = min(mapped_strikes, key=lambda x: abs(x["ce_delta"] - 0.18))
+                short_call = short_call_item["strike"]
+                long_call = short_call + interval * 2
+                
+                lc_item = next((x for x in mapped_strikes if x["strike"] == long_call), None)
+                p_sc = short_call_item["ce_ltp"]
+                p_lc = lc_item["ce_ltp"] if lc_item else 1.0
+                
+                expected_credit = round((p_sc - p_lc) * total_units)
+                max_risk = round(((interval * 2) - (p_sc - p_lc)) * total_units)
+                win_prob = 74
+                margin = 25000 * position_size
+                
+            elif sid == "broken_wing_fly":
+                short_call = atm_strike + interval
+                long_call = atm_strike
+                long_put = atm_strike + interval * 3
+                
+                lc1_item = atm_strike_item
+                sc_item = next((x for x in mapped_strikes if x["strike"] == short_call), None)
+                lc2_item = next((x for x in mapped_strikes if x["strike"] == long_put), None)
+                
+                p_lc1 = lc1_item["ce_ltp"]
+                p_sc = sc_item["ce_ltp"] if sc_item else 5.0
+                p_lc2 = lc2_item["ce_ltp"] if lc2_item else 1.0
+                
+                net_credit_per_unit = (2 * p_sc) - p_lc1 - p_lc2
+                expected_credit = round(net_credit_per_unit * total_units) if net_credit_per_unit > 0 else 500
+                max_risk = round((interval * 2) * total_units)
+                win_prob = 62
+                margin = 35000 * position_size
+                
+            elif sid == "calendar_spread":
+                sc_item = atm_strike_item
+                p_sc = sc_item["ce_ltp"]
+                p_lc = p_sc * 1.5
+                
+                expected_credit = round(p_sc * total_units)
+                max_risk = round((p_lc - p_sc) * total_units)
+                win_prob = 64
+                margin = 20000 * position_size
+                
+            elif sid == "diagonal_spread":
+                sc_item = atm_strike_item
+                p_sc = sc_item["ce_ltp"]
+                lc_item = next((x for x in mapped_strikes if x["strike"] == atm_strike + interval), None)
+                p_lc = (lc_item["ce_ltp"] if lc_item else 5.0) * 1.5
+                
+                expected_credit = round(p_sc * total_units)
+                max_risk = round((p_lc - p_sc) * total_units)
+                win_prob = 58
+                margin = 22000 * position_size
+
+            expected_credit = max(500, expected_credit)
+            max_risk = max(1000, max_risk)
+            
+            ev_term = min(20.0, max(0.0, (expected_credit / max_risk) * 40))
+            vrp_term = min(15.0, max(0.0, iv_rv_spread * 2.0))
+            liq_term = 15.0 if symbol.upper() in ["NIFTY", "BANKNIFTY"] else 10.0
+            
+            theta_term = 15.0 if sid in ["iron_condor", "iron_butterfly"] else 8.0
+            
+            passed_filters = sum(1 for f in filters.values() if f["pass"])
+            confidence_term = (passed_filters / 6.0) * 20.0
+            
+            tail_risk_penalty = 15.0 if sid in ["iron_butterfly", "diagonal_spread"] else 5.0
+            cvar_penalty = min(10.0, (max_risk / 10000.0) * 5.0)
+            margin_penalty = min(10.0, (margin / 100000.0) * 3.0)
+            
+            base_score = 50.0 + ev_term + vrp_term + liq_term + theta_term + confidence_term - tail_risk_penalty - cvar_penalty - margin_penalty
+            final_score = max(10.0, min(100.0, round(base_score)))
+            
+            ev_label = "High" if ev_term > 12 else ("Medium" if ev_term > 6 else "Low")
+            risk_label = "High" if tail_risk_penalty > 10 else ("Medium" if tail_risk_penalty > 6 else "Low")
+            
+            is_rec = final_score >= 70 and passed_filters >= 4
+            status = "✅ Recommend" if is_rec else "❌ Reject"
+
+            results.append({
+                "name": sname,
+                "score": final_score,
+                "ev": ev_label,
+                "winProbability": f"{win_prob}%",
+                "confidence": f"{round(confidence_term * 5)}%",
+                "margin": f"₹{margin/1000:.0f}K" if margin < 100000 else f"₹{margin/100000:.1f}L",
+                "risk": risk_label,
+                "status": status
+            })
+
+        results = sorted(results, key=lambda x: x["score"], reverse=True)
+        for i, item in enumerate(results):
+            item["rank"] = i + 1
+            
+        return results
 
     def _get_empty_strategy_response(self, symbol: str) -> dict:
         return {
@@ -467,7 +672,8 @@ class FnoStrategyEngine:
             "filters": {},
             "selectedStrikes": {"shortCall": 0, "shortCallDelta": 0.0, "shortPut": 0, "shortPutDelta": 0.0, "longCall": 0, "longPut": 0},
             "structure": {"vehicle": "Iron Condor", "shortCall": 0, "longCall": 0, "shortPut": 0, "longPut": 0, "expectedCredit": 0, "maxRisk": 0, "riskReward": 0.0, "winProbability": 0, "positionSize": 0, "status": "INVALIDATED", "marginRequired": 0, "capitalRequired": 0, "trade_quality_score": 0, "stars": "★☆☆☆☆", "decision": "REJECT", "verdict": "No Trade Today", "pros": [], "cons": [], "executive_summary": "Empty options chain. Strategy aborted.", "alternative_strategy": "Wait"},
-            "confidence_score": 0
+            "confidence_score": 0,
+            "ranked_strategies": []
         }
 
 fno_strategy_engine = FnoStrategyEngine()

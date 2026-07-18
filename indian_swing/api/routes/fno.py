@@ -134,7 +134,8 @@ async def get_market_data(symbol: str):
             "filters": rec_obj["filters"]
         },
         "selectedStrikes": rec_obj["selectedStrikes"],
-        "structure": saved_rec["structure"]
+        "structure": saved_rec["structure"],
+        "ranked_strategies": rec_obj.get("ranked_strategies", [])
     }
 
 @router.get("/option-chain")
@@ -362,6 +363,7 @@ def _save_or_update_recommendation(symbol: str, rec: dict) -> dict:
     time_window = now - timedelta(minutes=10)
     
     struct = rec["structure"]
+    struct["ranked_strategies"] = rec.get("ranked_strategies", [])
     # Add status flag
     struct["status"] = "READY"
 
