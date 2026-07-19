@@ -14,6 +14,31 @@ export default function HistoricalScan() {
   const [tradeFilter, setTradeFilter] = useState('all')
   const [performanceTab, setPerformanceTab] = useState('overall')
   const [selectedTrade, setSelectedTrade] = useState(null)
+  
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+  const [isStarting, setIsStarting] = useState(false)
+
+  const handleStartNewScan = async (e) => {
+    e.preventDefault()
+    if (!fromDate || !toDate) {
+      alert('Please select both From and To dates.')
+      return
+    }
+    setIsStarting(true)
+    try {
+      await axios.post('/api/historical/start', {
+        from_date: fromDate,
+        to_date: toDate
+      })
+      alert('Historical scan started in background!')
+      fetchData()
+    } catch (err) {
+      alert('Failed to start scan: ' + (err.response?.data?.detail || err.message))
+    } finally {
+      setIsStarting(false)
+    }
+  }
 
   // Fetch status, report, and scans/trades list
   const fetchData = async () => {
@@ -127,6 +152,66 @@ export default function HistoricalScan() {
           )}
         </div>
       </div>
+
+      {/* Date Range Scan Initiator Card */}
+      {(!progress || progress.status !== 'active') && (
+        <div className="card" style={{ padding: '24px', marginBottom: '24px', border: '1px solid var(--border)' }}>
+          <h3 style={{ marginBottom: '16px', color: 'var(--text-primary)' }}>Start New Historical Scan</h3>
+          <form onSubmit={handleStartNewScan} style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>From Date</label>
+              <input 
+                type="date" 
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: '#fff',
+                  padding: '8px 12px',
+                  fontSize: '0.9rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>To Date</label>
+              <input 
+                type="date" 
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: '#fff',
+                  padding: '8px 12px',
+                  fontSize: '0.9rem',
+                  outline: 'none'
+                }}
+              />
+            </div>
+            <button 
+              type="submit"
+              disabled={isStarting}
+              className="card-hover"
+              style={{
+                background: 'var(--accent-blue)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                color: '#fff',
+                padding: '9px 20px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                height: '38px'
+              }}
+            >
+              {isStarting ? 'Starting...' : '🚀 Start Scan'}
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Live Progress Bar Card */}
       {progress && progress.status === 'active' && (

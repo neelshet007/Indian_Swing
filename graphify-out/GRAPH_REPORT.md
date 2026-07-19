@@ -1,12 +1,12 @@
 # Graph Report - C:\Indian_Swing  (2026-07-19)
 
 ## Corpus Check
-- 142 files · ~180,341 words
+- 142 files · ~174,394 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 842 nodes · 1865 edges · 88 communities detected
-- Extraction: 48% EXTRACTED · 52% INFERRED · 0% AMBIGUOUS · INFERRED: 962 edges (avg confidence: 0.64)
+- 844 nodes · 1892 edges · 88 communities detected
+- Extraction: 48% EXTRACTED · 52% INFERRED · 0% AMBIGUOUS · INFERRED: 988 edges (avg confidence: 0.64)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -100,16 +100,16 @@
 - [[_COMMUNITY_Community 87|Community 87]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `get_sync_session()` - 51 edges
+1. `get_sync_session()` - 52 edges
 2. `OHLCVRepository` - 50 edges
-3. `Stock` - 42 edges
+3. `Stock` - 49 edges
 4. `RecommendationScanner` - 42 edges
-5. `ScanJob` - 36 edges
-6. `Recommendation` - 35 edges
-7. `BaseIndicator` - 30 edges
-8. `HistoricalScanManager` - 29 edges
-9. `StockRepository` - 28 edges
-10. `HistoricalScanSession` - 25 edges
+5. `ScanJob` - 37 edges
+6. `Recommendation` - 36 edges
+7. `StockRepository` - 36 edges
+8. `BaseIndicator` - 30 edges
+9. `HistoricalScanManager` - 30 edges
+10. `HistoricalScanSession` - 26 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `check_rules()` --calls--> `InstitutionalVCP`  [INFERRED]
@@ -126,72 +126,72 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.07
-Nodes (57): HistoricalScanManager, Evaluate exit triggers for an active trade., Create pending paper trades for all recommendations generated in scan_uuid., Create pending paper trades for all recommendations generated in scan_uuid., Compute final statistics and metrics for completed runs., Validate date format DD/MM/YY and return date object., Generate a professionally formatted Excel workbook representing the trading jour, Compute final statistics and metrics for completed runs. (+49 more)
+Cohesion: 0.04
+Nodes (50): data_requirements(), IndicatorRequirement, StrategyContext, StrategyDataRequirements, StrategySignal, BaseStrategy, analyze_breakout(), BreakoutAnalyzer (+42 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.04
-Nodes (46): data_requirements(), IndicatorRequirement, StrategyContext, StrategyDataRequirements, BaseStrategy, analyze_breakout(), BreakoutAnalyzer, Enum (+38 more)
+Cohesion: 0.08
+Nodes (55): HistoricalScanManager, Evaluate exit triggers for an active trade., Create pending paper trades for all recommendations generated in scan_uuid., Create pending paper trades for all recommendations generated in scan_uuid., Compute final statistics and metrics for completed runs., Validate date format DD/MM/YY and return date object., Generate a professionally formatted Excel workbook representing the trading jour, Compute final statistics and metrics for completed runs. (+47 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.06
-Nodes (42): BaseIndicator, All indicators extend this.     Subclasses implement compute() using vectorized, BaseIndicator, Replay Engine — sync DB version., ReplayEngine, ReplaySession, ReplayState, CCI (+34 more)
+Cohesion: 0.05
+Nodes (38): _calculate_metrics(), BaseRepository, check_db_rows(), check(), check_jobs(), check_pfc(), check_pfc_history(), check() (+30 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.05
-Nodes (43): _calculate_metrics(), check_db_rows(), check(), check_jobs(), check_pfc(), check_pfc_history(), check(), check_rules() (+35 more)
+Cohesion: 0.06
+Nodes (43): list_saved_results(), BaseIndicator, All indicators extend this.     Subclasses implement compute() using vectorized, BaseIndicator, Replay Engine — sync DB version., ReplayEngine, ReplaySession, ReplayState (+35 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.05
-Nodes (49): DataProvider, Provider-agnostic interface for fetching OHLCV data and stock metadata.     Impl, Return True if provider is reachable. Default implementation always True., DataProvider, Exception, BacktestError, ConfigurationError, DatabaseError (+41 more)
+Nodes (41): BacktestRequest, run_backtest(), BaseStrategy, data_download(), db_init(), list_strategies(), scan_historical(), scan_run() (+33 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.06
-Nodes (36): BacktestRequest, list_saved_results(), run_backtest(), BaseStrategy, StrategySignal, data_download(), db_init(), list_strategies() (+28 more)
+Nodes (46): DataProvider, Provider-agnostic interface for fetching OHLCV data and stock metadata.     Impl, Return True if provider is reachable. Default implementation always True., DataProvider, Exception, BacktestError, ConfigurationError, DatabaseError (+38 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.08
-Nodes (16): ABC, aggregate_monthly(), aggregate_weekly(), DataAggregator, DataFetcher, Fetches ONLY missing daily data from Yahoo Finance.         Handles provider-spe, MarketDataRepository, SIVCSScanner (+8 more)
+Cohesion: 0.06
+Nodes (20): ABC, aggregate_monthly(), aggregate_weekly(), DataAggregator, compute(), name(), Base indicator with result caching. All indicators are stateless, vectorized, an, DataFetcher (+12 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.11
-Nodes (18): OHLCVCleaner, OHLCVResampler, Data cleaning and corporate action adjustment. All timeframes are derived intern, Clean and adjust raw OHLCV data., Fill gaps in trading days (holidays etc.) using forward fill — max 3 days., Replace negative or zero volume with NaN then ffill., Derive weekly, monthly, quarterly, yearly candles from daily data.     Never cal, DataValidationError (+10 more)
+Cohesion: 0.08
+Nodes (27): add_daily_indicators(), add_relative_strength(), add_weekly_indicators(), build(), IndicatorBundle, IndicatorCalculator, _require_length(), validate_required_columns() (+19 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.25
-Nodes (24): BaseModel, DeclarativeBase, _log_tick_to_db(), Presentation-layer only. Returns universe membership badges for a symbol.     D, Returns only active, ready, or open recommendations from the database., Retrieve full paginated history for audit screens., Saves a recommendation. Prevents duplicates by verifying Symbol, Expiry,     St, Persist market tick. atm_iv stored in payload for future historical IV percentil (+16 more)
+Cohesion: 0.22
+Nodes (24): BaseModel, DeclarativeBase, Presentation-layer only. Returns universe membership badges for a symbol.     D, Returns only active, ready, or open recommendations from the database., Retrieve full paginated history for audit screens., Saves a recommendation. Prevents duplicates by verifying Symbol, Expiry,     St, Persist market tick. atm_iv stored in payload for future historical IV percentil, A1 — Deterministic synthetic option chain.     Generates LTP values from a simp (+16 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.09
-Nodes (6): BaseRepository, compute(), name(), Base indicator with result caching. All indicators are stateless, vectorized, an, RecommendationRepository, SignalRepository
-
-### Community 10 - "Community 10"
-Cohesion: 0.14
-Nodes (19): add_daily_indicators(), add_relative_strength(), add_weekly_indicators(), build(), IndicatorBundle, _require_length(), validate_required_columns(), InsufficientDataError (+11 more)
-
-### Community 11 - "Community 11"
 Cohesion: 0.11
 Nodes (11): get_universe_badges(), get_ohlcv(), get_universe_badges(), Universe Badge Lookup — Presentation-layer only.  Loads market universe CSVs o, Check if symbol belongs to a specific universe., List all loaded universe names., Return count of symbols in a universe., Singleton-pattern badge lookup.     Loads all configured CSVs once at construct (+3 more)
 
-### Community 12 - "Community 12"
+### Community 10 - "Community 10"
 Cohesion: 0.12
 Nodes (14): _confidence_label(), _escape_html(), NotificationChannel, notify_recommendations(), Telegram notification channel for IndianSwing.  Architecture ------------ Th, Send recommendations to Telegram.  Never raises., Split a long message at newline boundaries, respecting the 4096-char limit., POST a single message chunk to the Telegram Bot API. (+6 more)
 
-### Community 13 - "Community 13"
+### Community 11 - "Community 11"
 Cohesion: 0.13
 Nodes (16): add_column(), validate_date(), dispose_engine(), get_engine(), get_session(), get_session_factory(), _get_sync_url(), init_db() (+8 more)
 
-### Community 14 - "Community 14"
+### Community 12 - "Community 12"
 Cohesion: 0.14
 Nodes (12): BaseSettings, APISettings, BacktestSettings, DatabaseSettings, get_settings(), _merge_yaml_into_env(), PipelineSettings, ProviderSettings (+4 more)
 
-### Community 15 - "Community 15"
+### Community 13 - "Community 13"
+Cohesion: 0.24
+Nodes (7): DataValidationError, Downloaded or stored data failed validation., OHLCVValidator, Data validation layer. Checks OHLCV DataFrames before they enter the database., Run all validation checks. Raises DataValidationError on hard failures., Remove rows where high < low or close is outside [low, high]., Remove rows with price changes > max_gap_pct (likely data errors).
+
+### Community 14 - "Community 14"
 Cohesion: 0.22
 Nodes (10): calculate_greeks(), FnoStrategyEngine, _is_macro_event_day(), normal_cdf(), normal_pdf(), Returns (is_safe, reason). True means market is safe to trade., High-precision numerical approximation of standard normal CDF., Standard normal probability density function. (+2 more)
 
-### Community 16 - "Community 16"
+### Community 15 - "Community 15"
 Cohesion: 0.27
 Nodes (6): fmt(), fmtCr(), fmtK(), fmtNum(), fmtPct(), TradeDetail()
+
+### Community 16 - "Community 16"
+Cohesion: 0.33
+Nodes (7): generate_mock_data(), Generates a mock dataframe of daily stock candles representing specified VCP con, test_vcp_erratic_no_tightening(), test_vcp_insufficient_data(), test_vcp_valid_pattern(), InstitutionalVCPDetector, Detects Volatility Contraction Pattern (VCP) using institutional-grade swing ana
 
 ### Community 17 - "Community 17"
 Cohesion: 0.25
@@ -614,17 +614,17 @@ Nodes (0):
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `get_sync_session()` connect `Community 3` to `Community 0`, `Community 1`, `Community 6`, `Community 8`, `Community 13`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `OHLCVRepository` connect `Community 0` to `Community 1`, `Community 2`, `Community 5`, `Community 7`, `Community 9`?**
-  _High betweenness centrality (0.067) - this node is a cross-community bridge._
-- **Why does `Stock` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 6`, `Community 7`, `Community 8`?**
-  _High betweenness centrality (0.050) - this node is a cross-community bridge._
-- **Are the 49 inferred relationships involving `get_sync_session()` (e.g. with `check_rules()` and `_heal_stale_scan_jobs()`) actually correct?**
-  _`get_sync_session()` has 49 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `get_sync_session()` connect `Community 2` to `Community 0`, `Community 1`, `Community 11`, `Community 6`?**
+  _High betweenness centrality (0.070) - this node is a cross-community bridge._
+- **Why does `OHLCVRepository` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 6`?**
+  _High betweenness centrality (0.063) - this node is a cross-community bridge._
+- **Why does `Stock` connect `Community 1` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 8`?**
+  _High betweenness centrality (0.056) - this node is a cross-community bridge._
+- **Are the 50 inferred relationships involving `get_sync_session()` (e.g. with `check_rules()` and `_heal_stale_scan_jobs()`) actually correct?**
+  _`get_sync_session()` has 50 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 41 inferred relationships involving `OHLCVRepository` (e.g. with `Presentation-layer only. Returns universe membership badges for a stock symbol.` and `BacktestConfig`) actually correct?**
   _`OHLCVRepository` has 41 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 47 inferred relationships involving `Stock` (e.g. with `Get progress of the active historical scan session.` and `List completed historical scans.`) actually correct?**
+  _`Stock` has 47 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 42 inferred relationships involving `str` (e.g. with `health()` and `list_saved_results()`) actually correct?**
   _`str` has 42 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 40 inferred relationships involving `Stock` (e.g. with `Presentation-layer only. Returns universe membership badges for a stock symbol.` and `BacktestConfig`) actually correct?**
-  _`Stock` has 40 INFERRED edges - model-reasoned connections that need verification._

@@ -216,6 +216,121 @@ async def download_excel_report():
     raise HTTPException(status_code=404, detail="Excel file not generated yet")
 
 
+@router.post("/start")
+async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks):
+    global _active_task
+    if _active_task is not None and not _active_task.done():
+        raise HTTPException(status_code=409, detail="A scan session is already running")
+
+    from_date_str = payload.get("from_date")
+    to_date_str = payload.get("to_date")
+    
+    if not from_date_str or not to_date_str:
+        raise HTTPException(status_code=400, detail="Missing from_date or to_date")
+        
+    from datetime import datetime
+    try:
+        from_date = datetime.strptime(from_date_str, "%Y-%m-%d").date()
+        to_date = datetime.strptime(to_date_str, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+
+    if from_date > to_date:
+        raise HTTPException(status_code=400, detail="from_date must be before or equal to to_date")
+
+    from indian_swing.database.repositories.stock_repo import StockRepository
+    from indian_swing.config.settings import settings
+    from indian_swing.database.models import Stock, OHLCVData
+    
+    benchmark_symbol = settings.scanner.benchmark_symbol
+    lookback = 282
+    try:
+        await _manager.scanner.pipeline.run_incremental(
+            [benchmark_symbol],
+            required_daily_bars=lookback,
+            end=to_date,
+            force_refresh=False
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch benchmark data: {exc}")
+
+    with get_sync_session() as session:
+        benchmark_stock = StockRepository(session).get_by_symbol(
+            benchmark_symbol,
+            exchange=settings.scanner.benchmark_exchange
+        )
+        if not benchmark_stock:
+            raise HTTPException(status_code=400, detail="Benchmark stock metadata not found")
+
+        candles = session.execute(
+            select(OHLCVData)
+            .where(OHLCVData.stock_uuid == benchmark_stock.stock_uuid)
+            .where(OHLCVData.timeframe == "1d")
+            .where(OHLCVData.date >= from_date)
+            .where(OHLCVData.date <= to_date)
+            .order_by(OHLCVData.date)
+        ).scalars().all()
+        trading_dates = [c.date for c in candles]
+
+    if not trading_dates:
+        raise HTTPException(status_code=400, detail="No active trading days found in the selected date range")
+
+    session_obj = _manager.create_session(trading_dates)
+
+    async def _run():
+        total = len(trading_dates)
+        start_time = datetime.now()
+        
+        for idx in range(0, total):
+            curr_date = trading_dates[idx]
+            result = await _manager.scanner.scan(scan_date=curr_date, force_refresh=False)
+
+            with get_sync_session() as db_session:
+                s_obj = db_session.get(HistoricalScanSession, session_obj.id)
+                if s_obj:
+                    s_obj.current_date = curr_date.strftime("%d/%m/%y")
+                    s_obj.status = "active"
+                    db_session.flush()
+
+            with get_sync_session() as db_session:
+                _manager.update_paper_trades(db_session, curr_date)
+
+            with get_sync_session() as db_session:
+                trades_created = _manager.create_pending_trades(db_session, result.scan_uuid)
+                
+                completed_count = len(db_session.execute(
+                    select(PaperTrade).where(PaperTrade.status == "Closed")
+                ).scalars().all())
+                active_count = len(db_session.execute(
+                    select(PaperTrade).where(PaperTrade.status == "Active")
+                ).scalars().all())
+
+                processed = idx + 1
+                elapsed = (datetime.now() - start_time).total_seconds()
+                avg_time = elapsed / processed if processed > 0 else 0
+                remaining = total - (idx + 1)
+                eta_min = (avg_time * remaining) / 60.0
+
+                s_obj = db_session.get(HistoricalScanSession, session_obj.id)
+                if s_obj:
+                    s_obj.completed_days = idx + 1
+                    s_obj.stocks_scanned = result.stocks_scanned
+                    s_obj.total_stocks = result.stocks_scanned + result.failed_stocks
+                    s_obj.recommendations_today = result.recommendations_saved
+                    s_obj.paper_trades_created = trades_created
+                    s_obj.completed_trades = completed_count
+                    s_obj.active_trades = active_count
+                    s_obj.eta_minutes = eta_min
+                    if idx + 1 == total:
+                        s_obj.status = "completed"
+                    db_session.flush()
+
+                _manager.generate_excel_report(db_session)
+
+    _active_task = asyncio.create_task(_run())
+    return {"status": "started", "total_days": len(trading_dates)}
+
+
 @router.post("/resume")
 async def resume_historical_scan(background_tasks: BackgroundTasks):
     """Resume historical scan in the background."""
