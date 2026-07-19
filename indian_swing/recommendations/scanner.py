@@ -139,6 +139,7 @@ class RecommendationScanner:
                     required_daily_bars=lookback,
                     end=scan_date,
                     force_refresh=force_refresh,
+                    progress_callback=lambda p: self.progress_state.update(p),
                 )
             except Exception as exc:
                 logger.error("scanner.benchmark_fetch_failed", symbol=benchmark_symbol, error=str(exc))
@@ -153,6 +154,7 @@ class RecommendationScanner:
                     required_daily_bars=lookback,
                     end=scan_date,
                     force_refresh=force_refresh,
+                    progress_callback=lambda p: self.progress_state.update(p),
                 )
             except Exception as exc:
                 logger.error("scanner.universe_fetch_failed", error=str(exc))

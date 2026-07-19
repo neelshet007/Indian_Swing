@@ -42,7 +42,7 @@ junit*.xml
 .ruff_cache/
 
 # ── Project Data & Database ───────────────────────────────────────────────────
-data/
+/data/
 *.db
 *.db-shm
 *.db-wal

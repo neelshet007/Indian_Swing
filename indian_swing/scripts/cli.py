@@ -35,10 +35,13 @@ def data_download(
     symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols to download."),
     force: bool = typer.Option(False, "--force", help="Force complete refresh of all data."),
     bars: Optional[int] = typer.Option(None, "--bars", help="Number of historical daily bars to download (e.g. 1150 to go back to Jan 2022)."),
+    start: Optional[str] = typer.Option(None, "--start", help="Start date to download (YYYY-MM-DD)."),
+    end: Optional[str] = typer.Option(None, "--end", help="End date to download (YYYY-MM-DD)."),
 ):
     configure_logging(fmt="console")
 
     async def _download():
+        from datetime import datetime
         from indian_swing.config.settings import settings
         from indian_swing.core.lookback_engine import DynamicLookbackEngine
         from indian_swing.data.pipeline import DataPipeline
@@ -61,7 +64,13 @@ def data_download(
         if settings.scanner.benchmark_symbol not in selected:
             selected.append(settings.scanner.benchmark_symbol)
 
-        summary = await DataPipeline().run_incremental(selected, required_daily_bars=lookback, end=date.today(), force_refresh=force)
+        start_date = datetime.strptime(start, "%Y-%m-%d").date() if start else None
+        end_date = datetime.strptime(end, "%Y-%m-%d").date() if end else date.today()
+
+        if start_date:
+            summary = await DataPipeline().run_full(selected, start=start_date, end=end_date, force_refresh=force)
+        else:
+            summary = await DataPipeline().run_incremental(selected, required_daily_bars=lookback, end=end_date, force_refresh=force)
         typer.echo(f"Download complete. Succeeded: {summary.succeeded}, failed: {summary.failed}, records: {summary.records_added}")
         for error in summary.errors[:10]:
             typer.echo(f"- {error}")
