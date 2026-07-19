@@ -1,12 +1,12 @@
 # Graph Report - C:\Indian_Swing  (2026-07-19)
 
 ## Corpus Check
-- 133 files · ~169,954 words
+- 135 files · ~176,588 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 800 nodes · 1801 edges · 83 communities detected
-- Extraction: 48% EXTRACTED · 52% INFERRED · 0% AMBIGUOUS · INFERRED: 930 edges (avg confidence: 0.64)
+- 811 nodes · 1822 edges · 85 communities detected
+- Extraction: 48% EXTRACTED · 52% INFERRED · 0% AMBIGUOUS · INFERRED: 940 edges (avg confidence: 0.64)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -93,6 +93,8 @@
 - [[_COMMUNITY_Community 80|Community 80]]
 - [[_COMMUNITY_Community 81|Community 81]]
 - [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 83|Community 83]]
+- [[_COMMUNITY_Community 84|Community 84]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `get_sync_session()` - 51 edges
@@ -107,70 +109,70 @@
 10. `HistoricalScanSession` - 25 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Performance metrics engine. All institutional-grade metrics: CAGR, Sharpe, Sorti` --uses--> `Trade`  [INFERRED]
+  C:\Indian_Swing\indian_swing\backtesting\metrics.py → C:\Indian_Swing\indian_swing\backtesting\trade.py
+- `Compute all backtest performance metrics from trade list and equity curve.` --uses--> `Trade`  [INFERRED]
+  C:\Indian_Swing\indian_swing\backtesting\metrics.py → C:\Indian_Swing\indian_swing\backtesting\trade.py
+- `Returns {YYYY-MM: return_pct} for each month.` --uses--> `Trade`  [INFERRED]
+  C:\Indian_Swing\indian_swing\backtesting\metrics.py → C:\Indian_Swing\indian_swing\backtesting\trade.py
 - `check_rules()` --calls--> `InstitutionalVCP`  [INFERRED]
   C:\Indian_Swing\check_rules_stats.py → C:\Indian_Swing\indian_swing\strategies\institutional_vcp.py
 - `check_rules()` --calls--> `add_daily_indicators()`  [INFERRED]
   C:\Indian_Swing\check_rules_stats.py → C:\Indian_Swing\indian_swing\indicators\calculator.py
-- `_heal_stale_scan_jobs()` --calls--> `get_sync_session()`  [INFERRED]
-  C:\Indian_Swing\indian_swing\api\main.py → C:\Indian_Swing\indian_swing\database\connection.py
-- `get_recommendation_detail()` --calls--> `get_sync_session()`  [INFERRED]
-  C:\Indian_Swing\indian_swing\api\routes\fno.py → C:\Indian_Swing\indian_swing\database\connection.py
-- `update_recommendation_status()` --calls--> `FnoAuditLog`  [INFERRED]
-  C:\Indian_Swing\indian_swing\api\routes\fno.py → C:\Indian_Swing\indian_swing\database\models.py
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.04
-Nodes (72): BaseIndicator, All indicators extend this.     Subclasses implement compute() using vectorized, BaseIndicator, Replay Engine — sync DB version., ReplayEngine, ReplaySession, ReplayState, Exception (+64 more)
+Cohesion: 0.05
+Nodes (57): BaseIndicator, All indicators extend this.     Subclasses implement compute() using vectorized, BaseIndicator, Replay Engine — sync DB version., ReplayEngine, ReplaySession, ReplayState, DatabaseError (+49 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.04
-Nodes (48): _calculate_metrics(), list_saved_results(), check_db_rows(), check(), check_jobs(), check_pfc(), check_pfc_history(), check() (+40 more)
+Nodes (45): _calculate_metrics(), BaseRepository, check_db_rows(), check(), check_jobs(), check_pfc(), check_pfc_history(), check() (+37 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.05
-Nodes (43): data_requirements(), IndicatorRequirement, StrategyContext, StrategyDataRequirements, StrategySignal, BaseStrategy, IndicatorCalculator, Enum (+35 more)
+Cohesion: 0.06
+Nodes (38): BacktestRequest, list_saved_results(), run_backtest(), BaseStrategy, data_requirements(), IndicatorRequirement, StrategyContext, StrategyDataRequirements (+30 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.05
-Nodes (41): BacktestRequest, run_backtest(), BaseStrategy, data_download(), db_init(), list_strategies(), scan_historical(), scan_run() (+33 more)
+Cohesion: 0.09
+Nodes (51): HistoricalScanManager, Evaluate exit triggers for an active trade., Create pending paper trades for all recommendations generated in scan_uuid., Create pending paper trades for all recommendations generated in scan_uuid., Compute final statistics and metrics for completed runs., Validate date format DD/MM/YY and return date object., Generate a professionally formatted Excel workbook representing the trading jour, Compute final statistics and metrics for completed runs. (+43 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.11
-Nodes (44): HistoricalScanManager, Evaluate exit triggers for an active trade., Create pending paper trades for all recommendations generated in scan_uuid., Create pending paper trades for all recommendations generated in scan_uuid., Compute final statistics and metrics for completed runs., Validate date format DD/MM/YY and return date object., Generate a professionally formatted Excel workbook representing the trading jour, Compute final statistics and metrics for completed runs. (+36 more)
+Cohesion: 0.07
+Nodes (23): OHLCVCleaner, OHLCVResampler, Data cleaning and corporate action adjustment. All timeframes are derived intern, Clean and adjust raw OHLCV data., Fill gaps in trading days (holidays etc.) using forward fill — max 3 days., Replace negative or zero volume with NaN then ffill., Derive weekly, monthly, quarterly, yearly candles from daily data.     Never cal, DataValidationError (+15 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.06
 Nodes (19): ABC, aggregate_monthly(), aggregate_weekly(), DataAggregator, compute(), name(), Base indicator with result caching. All indicators are stateless, vectorized, an, DataFetcher (+11 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.1
-Nodes (17): OHLCVCleaner, OHLCVResampler, Data cleaning and corporate action adjustment. All timeframes are derived intern, Clean and adjust raw OHLCV data., Fill gaps in trading days (holidays etc.) using forward fill — max 3 days., Replace negative or zero volume with NaN then ffill., Derive weekly, monthly, quarterly, yearly candles from daily data.     Never cal, DataValidationError (+9 more)
+Cohesion: 0.08
+Nodes (26): DataProvider, Provider-agnostic interface for fetching OHLCV data and stock metadata.     Impl, Return True if provider is reachable. Default implementation always True., DataProvider, Exception, BacktestError, ConfigurationError, DataError (+18 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.1
-Nodes (18): DataProvider, Provider-agnostic interface for fetching OHLCV data and stock metadata.     Impl, Return True if provider is reachable. Default implementation always True., DataProvider, ConfigurationError, DataProviderError, Platform misconfiguration detected., External data provider failed to return data. (+10 more)
+Cohesion: 0.09
+Nodes (21): data_download(), db_init(), list_strategies(), scan_historical(), scan_run(), Base for strategy errors., Requested strategy is not registered., Strategy received invalid configuration. (+13 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.22
-Nodes (26): BaseModel, DeclarativeBase, Presentation-layer only. Returns universe membership badges for a symbol.     D, Returns only active, ready, or open recommendations from the database., Retrieve full paginated history for audit screens., Saves a recommendation. Prevents duplicates by verifying Symbol, Expiry,     St, Persist market tick. atm_iv stored in payload for future historical IV percentil, A1 — Deterministic synthetic option chain.     Generates LTP values from a simp (+18 more)
+Cohesion: 0.1
+Nodes (13): get_universe_badges(), get_ohlcv(), get_universe_badges(), Metadata, Arbitrary key-value bag attached to signals and recommendations., Universe Badge Lookup — Presentation-layer only.  Loads market universe CSVs o, Check if symbol belongs to a specific universe., List all loaded universe names. (+5 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.11
-Nodes (14): _confidence_label(), _escape_html(), NotificationChannel, notify_recommendations(), Telegram notification channel for IndianSwing.  Architecture ------------ Th, Send recommendations to Telegram.  Never raises., Split a long message at newline boundaries, respecting the 4096-char limit., POST a single message chunk to the Telegram Bot API. (+6 more)
+Cohesion: 0.25
+Nodes (24): BaseModel, DeclarativeBase, _log_tick_to_db(), Presentation-layer only. Returns universe membership badges for a symbol.     D, Returns only active, ready, or open recommendations from the database., Retrieve full paginated history for audit screens., Saves a recommendation. Prevents duplicates by verifying Symbol, Expiry,     St, Persist market tick. atm_iv stored in payload for future historical IV percentil (+16 more)
 
 ### Community 10 - "Community 10"
+Cohesion: 0.12
+Nodes (14): _confidence_label(), _escape_html(), NotificationChannel, notify_recommendations(), Telegram notification channel for IndianSwing.  Architecture ------------ Th, Send recommendations to Telegram.  Never raises., Split a long message at newline boundaries, respecting the 4096-char limit., POST a single message chunk to the Telegram Bot API. (+6 more)
+
+### Community 11 - "Community 11"
 Cohesion: 0.14
 Nodes (12): BaseSettings, APISettings, BacktestSettings, DatabaseSettings, get_settings(), _merge_yaml_into_env(), PipelineSettings, ProviderSettings (+4 more)
 
-### Community 11 - "Community 11"
+### Community 12 - "Community 12"
 Cohesion: 0.18
 Nodes (14): add_column(), dispose_engine(), get_engine(), get_session(), get_session_factory(), _get_sync_url(), init_db(), _heal_stale_scan_jobs() (+6 more)
-
-### Community 12 - "Community 12"
-Cohesion: 0.15
-Nodes (3): BaseRepository, RecommendationRepository, SignalRepository
 
 ### Community 13 - "Community 13"
 Cohesion: 0.22
@@ -182,42 +184,42 @@ Nodes (10): calculate_greeks(), FnoStrategyEngine, _is_macro_event_day(), normal
 
 ### Community 15 - "Community 15"
 Cohesion: 0.27
-Nodes (6): fmt(), fmtCr(), fmtK(), fmtNum(), fmtPct(), TradeDetail()
+Nodes (9): _detect_vcp(), test_vcp_slicing_length_no_not_enough_data(), generate_mock_data(), Generates a mock dataframe of daily stock candles representing specified VCP con, test_vcp_erratic_no_tightening(), test_vcp_insufficient_data(), test_vcp_valid_pattern(), InstitutionalVCPDetector (+1 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.29
-Nodes (0): 
+Cohesion: 0.27
+Nodes (11): compute_metrics(), compute_monthly_returns(), _empty_metrics(), _equity_series(), _max_drawdown(), _profit_factor(), Performance metrics engine. All institutional-grade metrics: CAGR, Sharpe, Sorti, Compute all backtest performance metrics from trade list and equity curve. (+3 more)
 
 ### Community 17 - "Community 17"
+Cohesion: 0.27
+Nodes (6): fmt(), fmtCr(), fmtK(), fmtNum(), fmtPct(), TradeDetail()
+
+### Community 18 - "Community 18"
+Cohesion: 0.25
+Nodes (1): _serialize_scan()
+
+### Community 19 - "Community 19"
 Cohesion: 0.33
 Nodes (1): ErrorBoundary
 
-### Community 18 - "Community 18"
+### Community 20 - "Community 20"
 Cohesion: 0.33
 Nodes (1): _serialize_recommendation()
 
-### Community 19 - "Community 19"
+### Community 21 - "Community 21"
 Cohesion: 0.4
 Nodes (2): FOTrading(), useFnoEngine()
 
-### Community 20 - "Community 20"
+### Community 22 - "Community 22"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 21 - "Community 21"
+### Community 23 - "Community 23"
 Cohesion: 0.67
 Nodes (2): getConvictionClass(), RecCard()
 
-### Community 22 - "Community 22"
-Cohesion: 0.67
-Nodes (0): 
-
-### Community 23 - "Community 23"
-Cohesion: 1.0
-Nodes (0): 
-
 ### Community 24 - "Community 24"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 25 - "Community 25"
@@ -346,59 +348,59 @@ Nodes (0):
 
 ### Community 56 - "Community 56"
 Cohesion: 1.0
-Nodes (1): Convert a canonical internal symbol to the provider's specific format.
+Nodes (0): 
 
 ### Community 57 - "Community 57"
 Cohesion: 1.0
-Nodes (1): Name of the provider (e.g., 'yahoo', 'groww').
+Nodes (0): 
 
 ### Community 58 - "Community 58"
 Cohesion: 1.0
-Nodes (1): Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)
+Nodes (1): Convert a canonical internal symbol to the provider's specific format.
 
 ### Community 59 - "Community 59"
 Cohesion: 1.0
-Nodes (1): Gets the provider-specific symbol, utilizing caching to prevent redundant format
+Nodes (1): Name of the provider (e.g., 'yahoo', 'groww').
 
 ### Community 60 - "Community 60"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)
 
 ### Community 61 - "Community 61"
 Cohesion: 1.0
-Nodes (1): Converts daily OHLCV DataFrame to Weekly.
+Nodes (1): Gets the provider-specific symbol, utilizing caching to prevent redundant format
 
 ### Community 62 - "Community 62"
 Cohesion: 1.0
-Nodes (1): Converts daily OHLCV DataFrame to Monthly.
+Nodes (0): 
 
 ### Community 63 - "Community 63"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Converts daily OHLCV DataFrame to Weekly.
 
 ### Community 64 - "Community 64"
 Cohesion: 1.0
-Nodes (1): Unique provider identifier e.g. 'yfinance'.
+Nodes (1): Converts daily OHLCV DataFrame to Monthly.
 
 ### Community 65 - "Community 65"
 Cohesion: 1.0
-Nodes (1): Fetch OHLCV data for a single symbol.          Returns:             DataFrame wi
+Nodes (0): 
 
 ### Community 66 - "Community 66"
 Cohesion: 1.0
-Nodes (1): Fetch OHLCV for multiple symbols efficiently (batch/parallel where supported).
+Nodes (1): Unique provider identifier e.g. 'yfinance'.
 
 ### Community 67 - "Community 67"
 Cohesion: 1.0
-Nodes (1): Fetch company metadata: name, sector, industry, market cap, ISIN.         Return
+Nodes (1): Fetch OHLCV data for a single symbol.          Returns:             DataFrame wi
 
 ### Community 68 - "Community 68"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Fetch OHLCV for multiple symbols efficiently (batch/parallel where supported).
 
 ### Community 69 - "Community 69"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Fetch company metadata: name, sector, industry, market cap, ISIN.         Return
 
 ### Community 70 - "Community 70"
 Cohesion: 1.0
@@ -406,7 +408,7 @@ Nodes (0):
 
 ### Community 71 - "Community 71"
 Cohesion: 1.0
-Nodes (1): Compute indicator on OHLCV DataFrame.          Args:             df: OHLCV DataF
+Nodes (0): 
 
 ### Community 72 - "Community 72"
 Cohesion: 1.0
@@ -414,7 +416,7 @@ Nodes (0):
 
 ### Community 73 - "Community 73"
 Cohesion: 1.0
-Nodes (1): Send a list of recommendation dicts to the channel.          Each dict must co
+Nodes (1): Compute indicator on OHLCV DataFrame.          Args:             df: OHLCV DataF
 
 ### Community 74 - "Community 74"
 Cohesion: 1.0
@@ -422,7 +424,7 @@ Nodes (0):
 
 ### Community 75 - "Community 75"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Send a list of recommendation dicts to the channel.          Each dict must co
 
 ### Community 76 - "Community 76"
 Cohesion: 1.0
@@ -452,68 +454,72 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
+### Community 83 - "Community 83"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 84 - "Community 84"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
-- **71 isolated node(s):** `Trade domain model for backtesting.`, `Pydantic-settings based configuration management. Loads from config.yaml, then o`, `Inject YAML values as env vars if not already set (env vars take priority).`, `Domain exception hierarchy. All platform exceptions flow from SwingBaseError so`, `Root exception for the entire platform.` (+66 more)
+- **72 isolated node(s):** `Trade domain model for backtesting.`, `Pydantic-settings based configuration management. Loads from config.yaml, then o`, `Inject YAML values as env vars if not already set (env vars take priority).`, `Domain exception hierarchy. All platform exceptions flow from SwingBaseError so`, `Root exception for the entire platform.` (+67 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 23`** (2 nodes): `MarketCard.jsx`, `MarketCard()`
+- **Thin community `Community 25`** (2 nodes): `MarketCard.jsx`, `MarketCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 24`** (2 nodes): `MetricCard.jsx`, `MetricCard()`
+- **Thin community `Community 26`** (2 nodes): `MetricCard.jsx`, `MetricCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 25`** (2 nodes): `SystemStatusCard.jsx`, `SystemStatusCard()`
+- **Thin community `Community 27`** (2 nodes): `SystemStatusCard.jsx`, `SystemStatusCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (2 nodes): `TableCard.jsx`, `TableCard()`
+- **Thin community `Community 28`** (2 nodes): `TableCard.jsx`, `TableCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (2 nodes): `UniverseBadge.jsx`, `UniverseBadge()`
+- **Thin community `Community 29`** (2 nodes): `UniverseBadge.jsx`, `UniverseBadge()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 28`** (2 nodes): `MonitoringCard.jsx`, `MonitoringCard()`
+- **Thin community `Community 30`** (2 nodes): `MonitoringCard.jsx`, `MonitoringCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 29`** (2 nodes): `MonitoringToolbar.jsx`, `MonitoringToolbar()`
+- **Thin community `Community 31`** (2 nodes): `MonitoringToolbar.jsx`, `MonitoringToolbar()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (2 nodes): `index.js`, `formatExpiryDate()`
+- **Thin community `Community 32`** (2 nodes): `index.js`, `formatExpiryDate()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 31`** (2 nodes): `FnoAnalysis.jsx`, `FnoAnalysis()`
+- **Thin community `Community 33`** (2 nodes): `FnoAnalysis.jsx`, `FnoAnalysis()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (2 nodes): `FnoHistory.jsx`, `FnoHistory()`
+- **Thin community `Community 34`** (2 nodes): `FnoHistory.jsx`, `FnoHistory()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (2 nodes): `FnoSavedDetail.jsx`, `FnoSavedDetail()`
+- **Thin community `Community 35`** (2 nodes): `FnoSavedDetail.jsx`, `FnoSavedDetail()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 34`** (2 nodes): `FnoSavedList.jsx`, `FnoSavedList()`
+- **Thin community `Community 36`** (2 nodes): `FnoSavedList.jsx`, `FnoSavedList()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (2 nodes): `HistoricalScan.jsx`, `HistoricalScan()`
+- **Thin community `Community 37`** (2 nodes): `HistoricalScan.jsx`, `HistoricalScan()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 36`** (2 nodes): `HomeDashboard.jsx`, `HomeDashboard()`
+- **Thin community `Community 38`** (2 nodes): `HomeDashboard.jsx`, `HomeDashboard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 37`** (2 nodes): `Logs.jsx`, `Logs()`
+- **Thin community `Community 39`** (2 nodes): `Logs.jsx`, `Logs()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 38`** (1 nodes): `vite.config.js`
+- **Thin community `Community 40`** (1 nodes): `vite.config.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (1 nodes): `main.jsx`
+- **Thin community `Community 41`** (1 nodes): `main.jsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (1 nodes): `executionService.js`
+- **Thin community `Community 42`** (1 nodes): `executionService.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (1 nodes): `marketService.js`
+- **Thin community `Community 43`** (1 nodes): `marketService.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (1 nodes): `optionChainService.js`
+- **Thin community `Community 44`** (1 nodes): `optionChainService.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (1 nodes): `riskService.js`
+- **Thin community `Community 45`** (1 nodes): `riskService.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (1 nodes): `backtester.js`
+- **Thin community `Community 46`** (1 nodes): `backtester.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (1 nodes): `indicatorEngine.js`
+- **Thin community `Community 47`** (1 nodes): `indicatorEngine.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 46`** (1 nodes): `positionBuilder.js`
+- **Thin community `Community 48`** (1 nodes): `positionBuilder.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (1 nodes): `regimeFilter.js`
+- **Thin community `Community 49`** (1 nodes): `regimeFilter.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (1 nodes): `strategyService.js`
+- **Thin community `Community 50`** (1 nodes): `strategyService.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (1 nodes): `strikeSelection.js`
+- **Thin community `Community 51`** (1 nodes): `strikeSelection.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (1 nodes): `index.js`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (1 nodes): `__init__.py`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (1 nodes): `__init__.py`
+- **Thin community `Community 52`** (1 nodes): `index.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 53`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -521,45 +527,45 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 55`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 56`** (1 nodes): `Convert a canonical internal symbol to the provider's specific format.`
+- **Thin community `Community 56`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 57`** (1 nodes): `Name of the provider (e.g., 'yahoo', 'groww').`
+- **Thin community `Community 57`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 58`** (1 nodes): `Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)`
+- **Thin community `Community 58`** (1 nodes): `Convert a canonical internal symbol to the provider's specific format.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 59`** (1 nodes): `Gets the provider-specific symbol, utilizing caching to prevent redundant format`
+- **Thin community `Community 59`** (1 nodes): `Name of the provider (e.g., 'yahoo', 'groww').`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 60`** (1 nodes): `__init__.py`
+- **Thin community `Community 60`** (1 nodes): `Cleans up a symbol to its canonical form (no whitespace, uppercase, no suffixes)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 61`** (1 nodes): `Converts daily OHLCV DataFrame to Weekly.`
+- **Thin community `Community 61`** (1 nodes): `Gets the provider-specific symbol, utilizing caching to prevent redundant format`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 62`** (1 nodes): `Converts daily OHLCV DataFrame to Monthly.`
+- **Thin community `Community 62`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 63`** (1 nodes): `__init__.py`
+- **Thin community `Community 63`** (1 nodes): `Converts daily OHLCV DataFrame to Weekly.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 64`** (1 nodes): `Unique provider identifier e.g. 'yfinance'.`
+- **Thin community `Community 64`** (1 nodes): `Converts daily OHLCV DataFrame to Monthly.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 65`** (1 nodes): `Fetch OHLCV data for a single symbol.          Returns:             DataFrame wi`
+- **Thin community `Community 65`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 66`** (1 nodes): `Fetch OHLCV for multiple symbols efficiently (batch/parallel where supported).`
+- **Thin community `Community 66`** (1 nodes): `Unique provider identifier e.g. 'yfinance'.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 67`** (1 nodes): `Fetch company metadata: name, sector, industry, market cap, ISIN.         Return`
+- **Thin community `Community 67`** (1 nodes): `Fetch OHLCV data for a single symbol.          Returns:             DataFrame wi`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 68`** (1 nodes): `__init__.py`
+- **Thin community `Community 68`** (1 nodes): `Fetch OHLCV for multiple symbols efficiently (batch/parallel where supported).`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (1 nodes): `__init__.py`
+- **Thin community `Community 69`** (1 nodes): `Fetch company metadata: name, sector, industry, market cap, ISIN.         Return`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 70`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 71`** (1 nodes): `Compute indicator on OHLCV DataFrame.          Args:             df: OHLCV DataF`
+- **Thin community `Community 71`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 72`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 73`** (1 nodes): `Send a list of recommendation dicts to the channel.          Each dict must co`
+- **Thin community `Community 73`** (1 nodes): `Compute indicator on OHLCV DataFrame.          Args:             df: OHLCV DataF`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 74`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 75`** (1 nodes): `__init__.py`
+- **Thin community `Community 75`** (1 nodes): `Send a list of recommendation dicts to the channel.          Each dict must co`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 76`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -567,24 +573,28 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 78`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 79`** (1 nodes): `read_exception.py`
+- **Thin community `Community 79`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (1 nodes): `read_scanner_log.py`
+- **Thin community `Community 80`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (1 nodes): `read_task_log.py`
+- **Thin community `Community 81`** (1 nodes): `read_exception.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (1 nodes): `__init__.py`
+- **Thin community `Community 82`** (1 nodes): `read_scanner_log.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 83`** (1 nodes): `read_task_log.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 84`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `get_sync_session()` connect `Community 1` to `Community 2`, `Community 11`, `Community 4`, `Community 5`?**
+- **Why does `get_sync_session()` connect `Community 1` to `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 9`, `Community 12`?**
   _High betweenness centrality (0.074) - this node is a cross-community bridge._
-- **Why does `OHLCVRepository` connect `Community 4` to `Community 0`, `Community 2`, `Community 3`, `Community 6`, `Community 8`, `Community 12`?**
+- **Why does `OHLCVRepository` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`?**
   _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `Stock` connect `Community 4` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 5`, `Community 6`, `Community 7`, `Community 8`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
+- **Why does `Stock` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 5`, `Community 9`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
 - **Are the 49 inferred relationships involving `get_sync_session()` (e.g. with `check_rules()` and `_heal_stale_scan_jobs()`) actually correct?**
   _`get_sync_session()` has 49 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 41 inferred relationships involving `OHLCVRepository` (e.g. with `Presentation-layer only. Returns universe membership badges for a stock symbol.` and `BacktestConfig`) actually correct?**

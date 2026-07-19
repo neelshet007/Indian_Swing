@@ -13,6 +13,7 @@ from indian_swing.strategies.base import (
     StrategyDataRequirements,
     StrategySignal,
 )
+from indian_swing.strategies.vcp_detector import InstitutionalVCPDetector
 
 
 class InstitutionalVCP(BaseStrategy):
@@ -202,53 +203,5 @@ class InstitutionalVCP(BaseStrategy):
 
     @staticmethod
     def _detect_vcp(daily: pd.DataFrame) -> dict:
-        # VCP involves finding a series of tighter contractions.
-        # This is a simplified programmatic institutional representation:
-        # 1. Identify a base (e.g. 30-50 days)
-        # 2. Measure depth of corrections
-        # 3. Verify volume dries up on the right side
-        
-        window = daily.iloc[-51:-1].copy()
-        if len(window) < 50:
-             return {"passed": False, "reason": "Not enough data"}
-             
-        # Detect swing highs and lows in the window
-        highs = []
-        lows = []
-        for i in range(1, len(window)-1):
-            if window['high'].iloc[i] > window['high'].iloc[i-1] and window['high'].iloc[i] > window['high'].iloc[i+1]:
-                highs.append(window.iloc[i])
-            if window['low'].iloc[i] < window['low'].iloc[i-1] and window['low'].iloc[i] < window['low'].iloc[i+1]:
-                lows.append(window.iloc[i])
-
-        if len(highs) < 2 or len(lows) < 2:
-            return {"passed": False, "reason": "Insufficient pivots"}
-
-        recent_highs = highs[-3:]
-        recent_lows = lows[-3:]
-        
-        contractions = []
-        for i in range(min(len(recent_highs), len(recent_lows))):
-            contraction = (recent_highs[i]['high'] - recent_lows[i]['low']) / recent_highs[i]['high']
-            contractions.append(round(contraction * 100, 2))
-            
-        # Is it tightening?
-        is_tightening = False
-        if len(contractions) >= 2:
-             is_tightening = contractions[-1] < contractions[-2]
-             
-        # Volume dry up: recent 5 days volume < average 50 days volume
-        recent_vol = window.iloc[-5:]['volume'].mean()
-        avg_vol = window['volume'].mean()
-        volume_dry_up = recent_vol < (avg_vol * 0.8)
-        
-        passed = is_tightening and volume_dry_up and (contractions[-1] < 10) # last contraction < 10%
-        
-        pivot = float(recent_highs[-1]['high']) if recent_highs else float(window['high'].max())
-        
-        return {
-            "passed": passed,
-            "contractions": contractions,
-            "volume_dry_up_ratio": round(recent_vol / avg_vol, 3) if avg_vol > 0 else 0,
-            "pivot": pivot
-        }
+        detector = InstitutionalVCPDetector()
+        return detector.detect_vcp(daily)
