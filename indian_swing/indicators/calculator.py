@@ -8,6 +8,7 @@ import pandas as pd
 from indian_swing.core.exceptions import InsufficientDataError
 from indian_swing.data.cleaner import OHLCVResampler
 from indian_swing.indicators.standardized import average_true_range, relative_strength_index
+from indian_swing.strategies.stage_detector import InstitutionalStageDetector
 
 
 @dataclass(frozen=True)
@@ -73,28 +74,7 @@ class IndicatorCalculator:
         frame["high_13w"] = frame["high"].rolling(13, min_periods=13).max()
         frame["low_13w"] = frame["low"].rolling(13, min_periods=13).min()
         
-        ma_30 = frame["sma_30w"]
-        ma_40 = frame["sma_40w"]
-        ma_30_slope = ma_30 - ma_30.shift(4)
-
-        stage_2 = (frame["close"] > ma_30) & (ma_30 > ma_40) & (ma_30_slope > 0)
-        stage_4 = (frame["close"] < ma_30) & (ma_30 < ma_40) & (ma_30_slope < 0)
-        
-        # Determine stages 1 to 4
-        frame["stage"] = 0
-        frame.loc[stage_2, "stage"] = 2
-        frame.loc[stage_4, "stage"] = 4
-        
-        # Basic approximation for 1 and 3 if not 2 or 4
-        stage_1 = (~stage_2) & (~stage_4) & (ma_30_slope >= 0)
-        stage_3 = (~stage_2) & (~stage_4) & (ma_30_slope < 0)
-        
-        frame.loc[stage_1, "stage"] = 1
-        frame.loc[stage_3, "stage"] = 3
-        
-        frame["stage2"] = stage_2
-        frame["weekly_uptrend"] = ma_30_slope > 0
-        return frame
+        return InstitutionalStageDetector.calculate_stages(frame)
 
     @staticmethod
     def add_relative_strength(stock_daily: pd.DataFrame, benchmark_daily: pd.DataFrame) -> pd.DataFrame:

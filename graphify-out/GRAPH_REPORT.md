@@ -1,12 +1,12 @@
 # Graph Report - C:\Indian_Swing  (2026-07-19)
 
 ## Corpus Check
-- 135 files · ~176,588 words
+- 137 files · ~178,319 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 811 nodes · 1822 edges · 85 communities detected
-- Extraction: 48% EXTRACTED · 52% INFERRED · 0% AMBIGUOUS · INFERRED: 940 edges (avg confidence: 0.64)
+- 821 nodes · 1839 edges · 86 communities detected
+- Extraction: 48% EXTRACTED · 52% INFERRED · 0% AMBIGUOUS · INFERRED: 948 edges (avg confidence: 0.64)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -95,6 +95,7 @@
 - [[_COMMUNITY_Community 82|Community 82]]
 - [[_COMMUNITY_Community 83|Community 83]]
 - [[_COMMUNITY_Community 84|Community 84]]
+- [[_COMMUNITY_Community 85|Community 85]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `get_sync_session()` - 51 edges
@@ -109,62 +110,62 @@
 10. `HistoricalScanSession` - 25 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Performance metrics engine. All institutional-grade metrics: CAGR, Sharpe, Sorti` --uses--> `Trade`  [INFERRED]
-  C:\Indian_Swing\indian_swing\backtesting\metrics.py → C:\Indian_Swing\indian_swing\backtesting\trade.py
-- `Compute all backtest performance metrics from trade list and equity curve.` --uses--> `Trade`  [INFERRED]
-  C:\Indian_Swing\indian_swing\backtesting\metrics.py → C:\Indian_Swing\indian_swing\backtesting\trade.py
-- `Returns {YYYY-MM: return_pct} for each month.` --uses--> `Trade`  [INFERRED]
-  C:\Indian_Swing\indian_swing\backtesting\metrics.py → C:\Indian_Swing\indian_swing\backtesting\trade.py
+- `SIVCSScanner` --uses--> `DataAggregator`  [INFERRED]
+  C:\Indian_Swing\indian_swing\core\scanner.py → C:\Indian_Swing\indian_swing\data\aggregator.py
 - `check_rules()` --calls--> `InstitutionalVCP`  [INFERRED]
   C:\Indian_Swing\check_rules_stats.py → C:\Indian_Swing\indian_swing\strategies\institutional_vcp.py
 - `check_rules()` --calls--> `add_daily_indicators()`  [INFERRED]
   C:\Indian_Swing\check_rules_stats.py → C:\Indian_Swing\indian_swing\indicators\calculator.py
+- `_heal_stale_scan_jobs()` --calls--> `get_sync_session()`  [INFERRED]
+  C:\Indian_Swing\indian_swing\api\main.py → C:\Indian_Swing\indian_swing\database\connection.py
+- `get_recommendation_detail()` --calls--> `get_sync_session()`  [INFERRED]
+  C:\Indian_Swing\indian_swing\api\routes\fno.py → C:\Indian_Swing\indian_swing\database\connection.py
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.05
-Nodes (57): BaseIndicator, All indicators extend this.     Subclasses implement compute() using vectorized, BaseIndicator, Replay Engine — sync DB version., ReplayEngine, ReplaySession, ReplayState, DatabaseError (+49 more)
+Cohesion: 0.04
+Nodes (61): BaseIndicator, All indicators extend this.     Subclasses implement compute() using vectorized, BaseIndicator, Replay Engine — sync DB version., ReplayEngine, ReplaySession, ReplayState, DatabaseError (+53 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.04
-Nodes (45): _calculate_metrics(), BaseRepository, check_db_rows(), check(), check_jobs(), check_pfc(), check_pfc_history(), check() (+37 more)
+Cohesion: 0.05
+Nodes (44): data_requirements(), IndicatorRequirement, StrategyContext, StrategyDataRequirements, StrategySignal, BaseStrategy, IndicatorCalculator, Enum (+36 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.06
-Nodes (38): BacktestRequest, list_saved_results(), run_backtest(), BaseStrategy, data_requirements(), IndicatorRequirement, StrategyContext, StrategyDataRequirements (+30 more)
+Cohesion: 0.05
+Nodes (42): _calculate_metrics(), list_saved_results(), BaseRepository, check_db_rows(), check(), check_jobs(), check_pfc(), check_pfc_history() (+34 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.09
-Nodes (51): HistoricalScanManager, Evaluate exit triggers for an active trade., Create pending paper trades for all recommendations generated in scan_uuid., Create pending paper trades for all recommendations generated in scan_uuid., Compute final statistics and metrics for completed runs., Validate date format DD/MM/YY and return date object., Generate a professionally formatted Excel workbook representing the trading jour, Compute final statistics and metrics for completed runs. (+43 more)
+Cohesion: 0.05
+Nodes (41): BacktestRequest, run_backtest(), BaseStrategy, data_download(), db_init(), list_strategies(), scan_historical(), scan_run() (+33 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.07
-Nodes (23): OHLCVCleaner, OHLCVResampler, Data cleaning and corporate action adjustment. All timeframes are derived intern, Clean and adjust raw OHLCV data., Fill gaps in trading days (holidays etc.) using forward fill — max 3 days., Replace negative or zero volume with NaN then ffill., Derive weekly, monthly, quarterly, yearly candles from daily data.     Never cal, DataValidationError (+15 more)
+Cohesion: 0.11
+Nodes (44): HistoricalScanManager, Evaluate exit triggers for an active trade., Create pending paper trades for all recommendations generated in scan_uuid., Create pending paper trades for all recommendations generated in scan_uuid., Compute final statistics and metrics for completed runs., Validate date format DD/MM/YY and return date object., Generate a professionally formatted Excel workbook representing the trading jour, Compute final statistics and metrics for completed runs. (+36 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.06
-Nodes (19): ABC, aggregate_monthly(), aggregate_weekly(), DataAggregator, compute(), name(), Base indicator with result caching. All indicators are stateless, vectorized, an, DataFetcher (+11 more)
+Cohesion: 0.05
+Nodes (27): ABC, compute(), name(), Base indicator with result caching. All indicators are stateless, vectorized, an, DataFetcher, Fetches ONLY missing daily data from Yahoo Finance.         Handles provider-spe, get_provider_symbol(), normalize_internal_symbol() (+19 more)
 
 ### Community 6 - "Community 6"
+Cohesion: 0.07
+Nodes (21): aggregate_monthly(), aggregate_weekly(), DataAggregator, OHLCVCleaner, OHLCVResampler, Data cleaning and corporate action adjustment. All timeframes are derived intern, Clean and adjust raw OHLCV data., Fill gaps in trading days (holidays etc.) using forward fill — max 3 days. (+13 more)
+
+### Community 7 - "Community 7"
 Cohesion: 0.08
 Nodes (26): DataProvider, Provider-agnostic interface for fetching OHLCV data and stock metadata.     Impl, Return True if provider is reachable. Default implementation always True., DataProvider, Exception, BacktestError, ConfigurationError, DataError (+18 more)
 
-### Community 7 - "Community 7"
-Cohesion: 0.09
-Nodes (21): data_download(), db_init(), list_strategies(), scan_historical(), scan_run(), Base for strategy errors., Requested strategy is not registered., Strategy received invalid configuration. (+13 more)
-
 ### Community 8 - "Community 8"
-Cohesion: 0.1
-Nodes (13): get_universe_badges(), get_ohlcv(), get_universe_badges(), Metadata, Arbitrary key-value bag attached to signals and recommendations., Universe Badge Lookup — Presentation-layer only.  Loads market universe CSVs o, Check if symbol belongs to a specific universe., List all loaded universe names. (+5 more)
+Cohesion: 0.24
+Nodes (24): BaseModel, DeclarativeBase, Presentation-layer only. Returns universe membership badges for a symbol.     D, Returns only active, ready, or open recommendations from the database., Retrieve full paginated history for audit screens., Saves a recommendation. Prevents duplicates by verifying Symbol, Expiry,     St, Persist market tick. atm_iv stored in payload for future historical IV percentil, A1 — Deterministic synthetic option chain.     Generates LTP values from a simp (+16 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.25
-Nodes (24): BaseModel, DeclarativeBase, _log_tick_to_db(), Presentation-layer only. Returns universe membership badges for a symbol.     D, Returns only active, ready, or open recommendations from the database., Retrieve full paginated history for audit screens., Saves a recommendation. Prevents duplicates by verifying Symbol, Expiry,     St, Persist market tick. atm_iv stored in payload for future historical IV percentil (+16 more)
+Cohesion: 0.14
+Nodes (19): add_daily_indicators(), add_relative_strength(), add_weekly_indicators(), build(), IndicatorBundle, _require_length(), validate_required_columns(), InsufficientDataError (+11 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.12
-Nodes (14): _confidence_label(), _escape_html(), NotificationChannel, notify_recommendations(), Telegram notification channel for IndianSwing.  Architecture ------------ Th, Send recommendations to Telegram.  Never raises., Split a long message at newline boundaries, respecting the 4096-char limit., POST a single message chunk to the Telegram Bot API. (+6 more)
+Cohesion: 0.11
+Nodes (11): get_universe_badges(), get_ohlcv(), get_universe_badges(), Universe Badge Lookup — Presentation-layer only.  Loads market universe CSVs o, Check if symbol belongs to a specific universe., List all loaded universe names., Return count of symbols in a universe., Singleton-pattern badge lookup.     Loads all configured CSVs once at construct (+3 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.14
@@ -176,47 +177,47 @@ Nodes (14): add_column(), dispose_engine(), get_engine(), get_session(), get_ses
 
 ### Community 13 - "Community 13"
 Cohesion: 0.22
-Nodes (12): add_daily_indicators(), add_relative_strength(), add_weekly_indicators(), build(), IndicatorBundle, _require_length(), validate_required_columns(), InsufficientDataError (+4 more)
-
-### Community 14 - "Community 14"
-Cohesion: 0.22
 Nodes (10): calculate_greeks(), FnoStrategyEngine, _is_macro_event_day(), normal_cdf(), normal_pdf(), Returns (is_safe, reason). True means market is safe to trade., High-precision numerical approximation of standard normal CDF., Standard normal probability density function. (+2 more)
 
-### Community 15 - "Community 15"
-Cohesion: 0.27
-Nodes (9): _detect_vcp(), test_vcp_slicing_length_no_not_enough_data(), generate_mock_data(), Generates a mock dataframe of daily stock candles representing specified VCP con, test_vcp_erratic_no_tightening(), test_vcp_insufficient_data(), test_vcp_valid_pattern(), InstitutionalVCPDetector (+1 more)
-
-### Community 16 - "Community 16"
-Cohesion: 0.27
-Nodes (11): compute_metrics(), compute_monthly_returns(), _empty_metrics(), _equity_series(), _max_drawdown(), _profit_factor(), Performance metrics engine. All institutional-grade metrics: CAGR, Sharpe, Sorti, Compute all backtest performance metrics from trade list and equity curve. (+3 more)
-
-### Community 17 - "Community 17"
+### Community 14 - "Community 14"
 Cohesion: 0.27
 Nodes (6): fmt(), fmtCr(), fmtK(), fmtNum(), fmtPct(), TradeDetail()
 
-### Community 18 - "Community 18"
-Cohesion: 0.25
-Nodes (1): _serialize_scan()
+### Community 15 - "Community 15"
+Cohesion: 0.33
+Nodes (7): generate_mock_data(), Generates a mock dataframe of daily stock candles representing specified VCP con, test_vcp_erratic_no_tightening(), test_vcp_insufficient_data(), test_vcp_valid_pattern(), InstitutionalVCPDetector, Detects Volatility Contraction Pattern (VCP) using institutional-grade swing ana
 
-### Community 19 - "Community 19"
+### Community 16 - "Community 16"
+Cohesion: 0.36
+Nodes (3): Stock universe management — sync DB version., UniverseManager, UniverseStock
+
+### Community 17 - "Community 17"
+Cohesion: 0.29
+Nodes (0): 
+
+### Community 18 - "Community 18"
 Cohesion: 0.33
 Nodes (1): ErrorBoundary
 
-### Community 20 - "Community 20"
+### Community 19 - "Community 19"
 Cohesion: 0.33
 Nodes (1): _serialize_recommendation()
 
-### Community 21 - "Community 21"
+### Community 20 - "Community 20"
 Cohesion: 0.4
 Nodes (2): FOTrading(), useFnoEngine()
 
-### Community 22 - "Community 22"
+### Community 21 - "Community 21"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 23 - "Community 23"
+### Community 22 - "Community 22"
 Cohesion: 0.67
 Nodes (2): getConvictionClass(), RecCard()
+
+### Community 23 - "Community 23"
+Cohesion: 0.5
+Nodes (1): trigger_scan()
 
 ### Community 24 - "Community 24"
 Cohesion: 0.67
@@ -444,7 +445,7 @@ Nodes (0):
 
 ### Community 80 - "Community 80"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Enriches the weekly dataframe with institutional stage classifications,
 
 ### Community 81 - "Community 81"
 Cohesion: 1.0
@@ -462,8 +463,12 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
+### Community 85 - "Community 85"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
-- **72 isolated node(s):** `Trade domain model for backtesting.`, `Pydantic-settings based configuration management. Loads from config.yaml, then o`, `Inject YAML values as env vars if not already set (env vars take priority).`, `Domain exception hierarchy. All platform exceptions flow from SwingBaseError so`, `Root exception for the entire platform.` (+67 more)
+- **73 isolated node(s):** `Trade domain model for backtesting.`, `Pydantic-settings based configuration management. Loads from config.yaml, then o`, `Inject YAML values as env vars if not already set (env vars take priority).`, `Domain exception hierarchy. All platform exceptions flow from SwingBaseError so`, `Root exception for the entire platform.` (+68 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **Thin community `Community 25`** (2 nodes): `MarketCard.jsx`, `MarketCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -575,31 +580,33 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 79`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (1 nodes): `__init__.py`
+- **Thin community `Community 80`** (1 nodes): `Enriches the weekly dataframe with institutional stage classifications,`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (1 nodes): `read_exception.py`
+- **Thin community `Community 81`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (1 nodes): `read_scanner_log.py`
+- **Thin community `Community 82`** (1 nodes): `read_exception.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 83`** (1 nodes): `read_task_log.py`
+- **Thin community `Community 83`** (1 nodes): `read_scanner_log.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 84`** (1 nodes): `__init__.py`
+- **Thin community `Community 84`** (1 nodes): `read_task_log.py`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 85`** (1 nodes): `__init__.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `get_sync_session()` connect `Community 1` to `Community 2`, `Community 3`, `Community 4`, `Community 5`, `Community 9`, `Community 12`?**
-  _High betweenness centrality (0.074) - this node is a cross-community bridge._
-- **Why does `OHLCVRepository` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `Stock` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 5`, `Community 9`?**
-  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+- **Why does `get_sync_session()` connect `Community 2` to `Community 1`, `Community 12`, `Community 4`, `Community 6`?**
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
+- **Why does `OHLCVRepository` connect `Community 4` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 6`?**
+  _High betweenness centrality (0.070) - this node is a cross-community bridge._
+- **Why does `Stock` connect `Community 4` to `Community 0`, `Community 1`, `Community 2`, `Community 3`, `Community 6`, `Community 8`, `Community 16`?**
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **Are the 49 inferred relationships involving `get_sync_session()` (e.g. with `check_rules()` and `_heal_stale_scan_jobs()`) actually correct?**
   _`get_sync_session()` has 49 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 41 inferred relationships involving `OHLCVRepository` (e.g. with `Presentation-layer only. Returns universe membership badges for a stock symbol.` and `BacktestConfig`) actually correct?**
   _`OHLCVRepository` has 41 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 41 inferred relationships involving `str` (e.g. with `health()` and `list_saved_results()`) actually correct?**
-  _`str` has 41 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 42 inferred relationships involving `str` (e.g. with `health()` and `list_saved_results()`) actually correct?**
+  _`str` has 42 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 40 inferred relationships involving `Stock` (e.g. with `Presentation-layer only. Returns universe membership badges for a stock symbol.` and `BacktestConfig`) actually correct?**
   _`Stock` has 40 INFERRED edges - model-reasoned connections that need verification._
