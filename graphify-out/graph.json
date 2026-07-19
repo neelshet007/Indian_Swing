@@ -1241,9 +1241,9 @@
       "file_type": "rationale",
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\historical.py",
       "source_location": "L336",
-      "id": "historical_rationale_336",
       "community": 1,
-      "norm_label": "resume historical scan in the background."
+      "norm_label": "resume historical scan in the background.",
+      "id": "historical_rationale_336"
     },
     {
       "label": "recommendations.py",
@@ -6271,7 +6271,7 @@
       "label": "list_strategies()",
       "file_type": "code",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
-      "source_location": "L236",
+      "source_location": "L280",
       "id": "cli_list_strategies",
       "community": 4,
       "norm_label": "list_strategies()"
@@ -10873,9 +10873,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_27",
       "_tgt": "stock_repo_stockrepository",
+      "confidence_score": 0.5,
       "source": "historical_rationale_27",
-      "target": "stock_repo_stockrepository",
-      "confidence_score": 0.5
+      "target": "stock_repo_stockrepository"
     },
     {
       "relation": "uses",
@@ -10885,9 +10885,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_27",
       "_tgt": "models_stock",
+      "confidence_score": 0.5,
       "source": "historical_rationale_27",
-      "target": "models_stock",
-      "confidence_score": 0.5
+      "target": "models_stock"
     },
     {
       "relation": "uses",
@@ -10957,9 +10957,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_60",
       "_tgt": "stock_repo_stockrepository",
+      "confidence_score": 0.5,
       "source": "historical_rationale_60",
-      "target": "stock_repo_stockrepository",
-      "confidence_score": 0.5
+      "target": "stock_repo_stockrepository"
     },
     {
       "relation": "uses",
@@ -10969,9 +10969,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_60",
       "_tgt": "models_stock",
+      "confidence_score": 0.5,
       "source": "historical_rationale_60",
-      "target": "models_stock",
-      "confidence_score": 0.5
+      "target": "models_stock"
     },
     {
       "relation": "uses",
@@ -11041,9 +11041,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_120",
       "_tgt": "stock_repo_stockrepository",
+      "confidence_score": 0.5,
       "source": "historical_rationale_120",
-      "target": "stock_repo_stockrepository",
-      "confidence_score": 0.5
+      "target": "stock_repo_stockrepository"
     },
     {
       "relation": "uses",
@@ -11053,9 +11053,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_120",
       "_tgt": "models_stock",
+      "confidence_score": 0.5,
       "source": "historical_rationale_120",
-      "target": "models_stock",
-      "confidence_score": 0.5
+      "target": "models_stock"
     },
     {
       "relation": "uses",
@@ -11125,9 +11125,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_156",
       "_tgt": "stock_repo_stockrepository",
+      "confidence_score": 0.5,
       "source": "historical_rationale_156",
-      "target": "stock_repo_stockrepository",
-      "confidence_score": 0.5
+      "target": "stock_repo_stockrepository"
     },
     {
       "relation": "uses",
@@ -11137,9 +11137,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_156",
       "_tgt": "models_stock",
+      "confidence_score": 0.5,
       "source": "historical_rationale_156",
-      "target": "models_stock",
-      "confidence_score": 0.5
+      "target": "models_stock"
     },
     {
       "relation": "uses",
@@ -11209,9 +11209,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_196",
       "_tgt": "stock_repo_stockrepository",
+      "confidence_score": 0.5,
       "source": "historical_rationale_196",
-      "target": "stock_repo_stockrepository",
-      "confidence_score": 0.5
+      "target": "stock_repo_stockrepository"
     },
     {
       "relation": "uses",
@@ -11221,9 +11221,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_196",
       "_tgt": "models_stock",
+      "confidence_score": 0.5,
       "source": "historical_rationale_196",
-      "target": "models_stock",
-      "confidence_score": 0.5
+      "target": "models_stock"
     },
     {
       "relation": "uses",
@@ -11293,9 +11293,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_203",
       "_tgt": "stock_repo_stockrepository",
+      "confidence_score": 0.5,
       "source": "historical_rationale_203",
-      "target": "stock_repo_stockrepository",
-      "confidence_score": 0.5
+      "target": "stock_repo_stockrepository"
     },
     {
       "relation": "uses",
@@ -11305,9 +11305,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_203",
       "_tgt": "models_stock",
+      "confidence_score": 0.5,
       "source": "historical_rationale_203",
-      "target": "models_stock",
-      "confidence_score": 0.5
+      "target": "models_stock"
     },
     {
       "relation": "uses",
@@ -11317,9 +11317,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_336",
       "_tgt": "models_historicalscansession",
+      "confidence_score": 0.5,
       "source": "historical_rationale_336",
-      "target": "models_historicalscansession",
-      "confidence_score": 0.5
+      "target": "models_historicalscansession"
     },
     {
       "relation": "uses",
@@ -11329,9 +11329,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_336",
       "_tgt": "models_papertrade",
+      "confidence_score": 0.5,
       "source": "historical_rationale_336",
-      "target": "models_papertrade",
-      "confidence_score": 0.5
+      "target": "models_papertrade"
     },
     {
       "relation": "uses",
@@ -11341,9 +11341,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_336",
       "_tgt": "models_recommendation",
+      "confidence_score": 0.5,
       "source": "historical_rationale_336",
-      "target": "models_recommendation",
-      "confidence_score": 0.5
+      "target": "models_recommendation"
     },
     {
       "relation": "uses",
@@ -11353,9 +11353,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_336",
       "_tgt": "models_scanjob",
+      "confidence_score": 0.5,
       "source": "historical_rationale_336",
-      "target": "models_scanjob",
-      "confidence_score": 0.5
+      "target": "models_scanjob"
     },
     {
       "relation": "uses",
@@ -11365,9 +11365,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_336",
       "_tgt": "automation_historicalscanmanager",
+      "confidence_score": 0.5,
       "source": "historical_rationale_336",
-      "target": "automation_historicalscanmanager",
-      "confidence_score": 0.5
+      "target": "automation_historicalscanmanager"
     },
     {
       "relation": "uses",
@@ -11377,9 +11377,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_336",
       "_tgt": "stock_repo_stockrepository",
+      "confidence_score": 0.5,
       "source": "historical_rationale_336",
-      "target": "stock_repo_stockrepository",
-      "confidence_score": 0.5
+      "target": "stock_repo_stockrepository"
     },
     {
       "relation": "uses",
@@ -11389,9 +11389,9 @@
       "weight": 0.8,
       "_src": "historical_rationale_336",
       "_tgt": "models_stock",
+      "confidence_score": 0.5,
       "source": "historical_rationale_336",
-      "target": "models_stock",
-      "confidence_score": 0.5
+      "target": "models_stock"
     },
     {
       "relation": "contains",
@@ -21299,8 +21299,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\historical.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "historical_rationale_221",
-      "_tgt": "models_scanjob",
+      "_src": "models_scanjob",
+      "_tgt": "historical_rationale_221",
       "confidence_score": 0.5,
       "source": "models_scanjob",
       "target": "historical_rationale_221"
@@ -21743,8 +21743,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\historical.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "historical_rationale_221",
-      "_tgt": "models_recommendation",
+      "_src": "models_recommendation",
+      "_tgt": "historical_rationale_221",
       "confidence_score": 0.5,
       "source": "models_recommendation",
       "target": "historical_rationale_221"
@@ -21959,8 +21959,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\historical.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "historical_rationale_221",
-      "_tgt": "models_historicalscansession",
+      "_src": "models_historicalscansession",
+      "_tgt": "historical_rationale_221",
       "confidence_score": 0.5,
       "source": "models_historicalscansession",
       "target": "historical_rationale_221"
@@ -22163,8 +22163,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\historical.py",
       "source_location": "L11",
       "weight": 0.8,
-      "_src": "historical_rationale_221",
-      "_tgt": "models_papertrade",
+      "_src": "models_papertrade",
+      "_tgt": "historical_rationale_221",
       "confidence_score": 0.5,
       "source": "models_papertrade",
       "target": "historical_rationale_221"
@@ -26339,8 +26339,8 @@
       "source_file": "C:\\Indian_Swing\\indian_swing\\api\\routes\\historical.py",
       "source_location": "L17",
       "weight": 0.8,
-      "_src": "historical_rationale_221",
-      "_tgt": "automation_historicalscanmanager",
+      "_src": "automation_historicalscanmanager",
+      "_tgt": "historical_rationale_221",
       "confidence_score": 0.5,
       "source": "automation_historicalscanmanager",
       "target": "historical_rationale_221"
@@ -28125,7 +28125,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "C:\\Indian_Swing\\indian_swing\\scripts\\cli.py",
-      "source_location": "L236",
+      "source_location": "L280",
       "weight": 1.0,
       "_src": "c_indian_swing_indian_swing_scripts_cli_py",
       "_tgt": "cli_list_strategies",

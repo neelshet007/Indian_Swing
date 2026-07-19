@@ -130,17 +130,61 @@ def scan_historical():
                     dates.append(dt)
 
         if not dates:
-            num_days = click.prompt("How many trading days do you want to scan?", type=int)
-            typer.echo(f"Please enter {num_days} trading days.")
-            for i in range(num_days):
-                while True:
-                    date_input = click.prompt(f"Please enter Trading Day {i+1} (DD/MM/YY)")
-                    parsed = validate_date(date_input)
-                    if parsed:
-                        dates.append(parsed)
-                        break
-                    else:
-                        typer.echo("Error: Invalid date format. Please use DD/MM/YY (e.g. 11/06/26).")
+            while True:
+                from_str = click.prompt("Enter From Date (YYYY-MM-DD)")
+                to_str = click.prompt("Enter To Date (YYYY-MM-DD)")
+                try:
+                    from_d = datetime.strptime(from_str.strip(), "%Y-%m-%d").date()
+                    to_d = datetime.strptime(to_str.strip(), "%Y-%m-%d").date()
+                    if from_d > to_d:
+                        typer.echo("Error: From Date must be before or equal to To Date.")
+                        continue
+                    break
+                except ValueError:
+                    typer.echo("Error: Invalid date format. Use YYYY-MM-DD.")
+
+            typer.echo("Fetching benchmark calendar to identify active trading days...")
+            from indian_swing.database.repositories.stock_repo import StockRepository
+            from indian_swing.config.settings import settings
+            from indian_swing.database.models import Stock, OHLCVData
+            
+            benchmark_symbol = settings.scanner.benchmark_symbol
+            lookback = 282
+            try:
+                await manager.scanner.pipeline.run_incremental(
+                    [benchmark_symbol],
+                    required_daily_bars=lookback,
+                    end=to_d,
+                    force_refresh=False
+                )
+            except Exception as exc:
+                typer.echo(f"Error fetching benchmark data: {exc}")
+                return
+
+            with get_sync_session() as session:
+                benchmark_stock = StockRepository(session).get_by_symbol(
+                    benchmark_symbol,
+                    exchange=settings.scanner.benchmark_exchange
+                )
+                if not benchmark_stock:
+                    typer.echo("Error: Benchmark stock metadata not found.")
+                    return
+
+                candles = session.execute(
+                    select(OHLCVData)
+                    .where(OHLCVData.stock_uuid == benchmark_stock.stock_uuid)
+                    .where(OHLCVData.timeframe == "1d")
+                    .where(OHLCVData.date >= from_d)
+                    .where(OHLCVData.date <= to_d)
+                    .order_by(OHLCVData.date)
+                ).scalars().all()
+                dates = [c.date for c in candles]
+
+            if not dates:
+                typer.echo("Error: No active trading days found in the selected date range.")
+                return
+
+            typer.echo(f"Found {len(dates)} active trading days to scan.")
             session_obj = manager.create_session(dates)
             start_idx = 0
 
