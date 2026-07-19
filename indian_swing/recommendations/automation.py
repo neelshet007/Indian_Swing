@@ -155,13 +155,8 @@ class HistoricalScanManager:
                 exit_price = c_open  # Gap up above target
             self._close_trade(trade, rec, current_date, exit_price, "Target")
             return
-
-        # Time Exit
-        holding_days = (current_date - trade.entry_date).days
-        max_holding = rec.signal.holding_days if (rec.signal and rec.signal.holding_days is not None) else 45
-        if holding_days >= max_holding:
-            self._close_trade(trade, rec, current_date, c_close, "Time Exit")
-            return
+        # Time Exit is disabled to allow trades to run longer without default restrictions.
+        pass
 
 
     def _close_trade(
@@ -202,17 +197,160 @@ class HistoricalScanManager:
                 select(PaperTrade).where(PaperTrade.recommendation_id == rec.id)
             ).scalars().first()
             if not existing:
+                from indian_swing.core.universe_badge import badge_lookup
+                is_nifty_500 = badge_lookup.has_badge(rec.stock.symbol, "NIFTY 500")
+                universe_label = "NIFTY500" if is_nifty_500 else "NON_NIFTY500"
                 paper_trade = PaperTrade(
                     recommendation_id=rec.id,
                     stock_uuid=rec.stock_uuid,
                     symbol=rec.stock.symbol,
-                    status="Pending"
+                    status="Pending",
+                    stop_loss=rec.stop_loss,
+                    original_target_price=rec.target_price,
+                    execution_universe=universe_label
                 )
                 db_session.add(paper_trade)
                 created_count += 1
         if created_count > 0:
             db_session.flush()
         return created_count
+
+    @staticmethod
+    def _calculate_metrics(trades: list[PaperTrade], total_scans_len: int, total_recs_len: int) -> dict[str, Any]:
+        if not trades:
+            return {
+                "total_scans": total_scans_len,
+                "total_recommendations": total_recs_len,
+                "total_trades": 0,
+                "win_rate": 0.0,
+                "loss_rate": 0.0,
+                "profit_factor": 0.0,
+                "avg_return": 0.0,
+                "avg_winner": 0.0,
+                "avg_loser": 0.0,
+                "expectancy": 0.0,
+                "cagr": 0.0,
+                "max_drawdown": 0.0,
+                "avg_holding_period": 0.0,
+                "avg_r_multiple": 0.0,
+                "total_return": 0.0,
+                "monthly_stats": {},
+                "yearly_stats": {},
+                "equity_curve": [],
+                "journal": []
+            }
+
+        wins = [t for t in trades if (t.pnl or 0.0) > 0]
+        losses = [t for t in trades if (t.pnl or 0.0) <= 0]
+        
+        win_rate = len(wins) / len(trades) * 100
+        loss_rate = len(losses) / len(trades) * 100
+        
+        gross_profit = sum(t.pnl_absolute for t in wins if t.pnl_absolute is not None)
+        gross_loss = abs(sum(t.pnl_absolute for t in losses if t.pnl_absolute is not None))
+        profit_factor = (gross_profit / gross_loss) if gross_loss > 0 else float('inf')
+        
+        r_multiples = [t.r_multiple for t in trades if t.r_multiple is not None]
+        avg_r = sum(r_multiples) / len(trades) if r_multiples else 0.0
+        
+        holding_periods = [t.holding_days for t in trades if t.holding_days is not None]
+        avg_hold = sum(holding_periods) / len(trades) if holding_periods else 0.0
+
+        pnls = [t.pnl for t in trades if t.pnl is not None]
+        avg_return = sum(pnls) / len(trades) if pnls else 0.0
+        avg_winner = sum(t.pnl for t in wins if t.pnl is not None) / len(wins) if wins else 0.0
+        avg_loser = sum(t.pnl for t in losses if t.pnl is not None) / len(losses) if losses else 0.0
+        expectancy = sum(pnls) / len(trades) if pnls else 0.0
+
+        sorted_trades = sorted(trades, key=lambda t: t.exit_date or date.min)
+        
+        capital = 1_000_000.0
+        initial_capital = 1_000_000.0
+        equity_curve = [{"date": str(sorted_trades[0].entry_date or sorted_trades[0].created_at.date()), "equity": capital}]
+        peak_equity = capital
+        max_dd = 0.0
+        
+        for t in sorted_trades:
+            pnl_abs = t.pnl_absolute or 0.0
+            capital += pnl_abs
+            equity_curve.append({"date": str(t.exit_date or t.updated_at.date()), "equity": capital})
+            
+            if capital > peak_equity:
+                peak_equity = capital
+            dd = (peak_equity - capital) / peak_equity * 100
+            if dd > max_dd:
+                max_dd = dd
+
+        total_return_pct = ((capital - initial_capital) / initial_capital) * 100
+
+        if sorted_trades:
+            start_date = sorted_trades[0].entry_date or sorted_trades[0].created_at.date()
+            end_date = sorted_trades[-1].exit_date or sorted_trades[-1].updated_at.date()
+            if start_date and end_date:
+                days = (end_date - start_date).days
+                years = days / 365.25
+                if years > 0 and capital > 0:
+                    cagr = ((capital / initial_capital) ** (1 / years) - 1) * 100
+                else:
+                    cagr = 0.0
+            else:
+                cagr = 0.0
+        else:
+            cagr = 0.0
+
+        monthly_stats = {}
+        yearly_stats = {}
+        for t in sorted_trades:
+            exit_dt = t.exit_date
+            if not exit_dt:
+                continue
+            year_str = str(exit_dt.year)
+            month_str = exit_dt.strftime("%B")
+            pnl_abs = t.pnl_absolute or 0.0
+
+            yearly_stats[year_str] = yearly_stats.get(year_str, 0.0) + pnl_abs
+            if year_str not in monthly_stats:
+                monthly_stats[year_str] = {}
+            monthly_stats[year_str][month_str] = monthly_stats[year_str].get(month_str, 0.0) + pnl_abs
+
+        journal = [
+            {
+                "symbol": t.symbol,
+                "entry_date": str(t.entry_date),
+                "entry_price": t.entry_price,
+                "exit_date": str(t.exit_date),
+                "exit_price": t.exit_price,
+                "exit_reason": t.exit_reason,
+                "holding_days": t.holding_days,
+                "pnl_pct": t.pnl,
+                "pnl_abs": t.pnl_absolute,
+                "r_multiple": t.r_multiple,
+                "execution_universe": t.execution_universe,
+            }
+            for t in sorted_trades
+        ]
+
+        return {
+            "total_scans": total_scans_len,
+            "total_recommendations": total_recs_len,
+            "total_trades": len(trades),
+            "win_rate": round(win_rate, 2),
+            "loss_rate": round(loss_rate, 2),
+            "profit_factor": round(profit_factor, 2) if not math.isinf(profit_factor) else "Infinite",
+            "avg_return": round(avg_return, 2),
+            "avg_winner": round(avg_winner, 2),
+            "avg_loser": round(avg_loser, 2),
+            "expectancy": round(expectancy, 2),
+            "cagr": round(cagr, 2),
+            "max_drawdown": round(max_dd, 2),
+            "avg_holding_period": round(avg_hold, 2),
+            "avg_r_multiple": round(avg_r, 2),
+            "total_return": round(total_return_pct, 2),
+            "monthly_stats": monthly_stats,
+            "yearly_stats": yearly_stats,
+            "equity_curve": equity_curve,
+            "journal": journal
+        }
 
     def generate_final_report(self) -> dict[str, Any]:
         """Compute final statistics and metrics for completed runs."""
@@ -229,122 +367,14 @@ class HistoricalScanManager:
                 select(Recommendation)
             ).scalars().all()
 
-            if not trades:
-                return {
-                    "total_scans": len(total_scans),
-                    "total_recommendations": len(total_recs),
-                    "total_trades": 0,
-                    "win_rate": 0.0,
-                    "loss_rate": 0.0,
-                    "profit_factor": 0.0,
-                    "expectancy": 0.0,
-                    "cagr": 0.0,
-                    "max_drawdown": 0.0,
-                    "avg_holding_period": 0.0,
-                    "avg_r_multiple": 0.0,
-                    "monthly_stats": {},
-                    "yearly_stats": {},
-                    "equity_curve": [],
-                    "journal": []
-                }
+            overall = self._calculate_metrics(trades, len(total_scans), len(total_recs))
+            nifty_trades = [t for t in trades if t.execution_universe == "NIFTY500"]
+            nifty500 = self._calculate_metrics(nifty_trades, len(total_scans), len(total_recs))
 
-            wins = [t for t in trades if t.pnl > 0]
-            losses = [t for t in trades if t.pnl <= 0]
-            
-            win_rate = len(wins) / len(trades) * 100
-            loss_rate = len(losses) / len(trades) * 100
-            
-            gross_profit = sum(t.pnl_absolute for t in wins if t.pnl_absolute is not None)
-            gross_loss = abs(sum(t.pnl_absolute for t in losses if t.pnl_absolute is not None))
-            profit_factor = (gross_profit / gross_loss) if gross_loss > 0 else float('inf')
-            
-            r_multiples = [t.r_multiple for t in trades if t.r_multiple is not None]
-            avg_r = sum(r_multiples) / len(trades) if r_multiples else 0.0
-            
-            holding_periods = [t.holding_days for t in trades if t.holding_days is not None]
-            avg_hold = sum(holding_periods) / len(trades) if holding_periods else 0.0
-
-            pnls = [t.pnl for t in trades if t.pnl is not None]
-            expectancy = sum(pnls) / len(trades) if pnls else 0.0
-
-            sorted_trades = sorted(trades, key=lambda t: t.exit_date or date.min)
-            
-            capital = 1_000_000.0
-            equity_curve = [{"date": str(sorted_trades[0].entry_date), "equity": capital}]
-            peak_equity = capital
-            max_dd = 0.0
-            
-            for t in sorted_trades:
-                pnl_abs = t.pnl_absolute or 0.0
-                capital += pnl_abs
-                equity_curve.append({"date": str(t.exit_date), "equity": capital})
-                
-                if capital > peak_equity:
-                    peak_equity = capital
-                dd = (peak_equity - capital) / peak_equity * 100
-                if dd > max_dd:
-                    max_dd = dd
-
-            if sorted_trades:
-                start_date = sorted_trades[0].entry_date
-                end_date = sorted_trades[-1].exit_date
-                days = (end_date - start_date).days
-                years = days / 365.25
-                if years > 0 and capital > 0:
-                    cagr = ((capital / 1_000_000.0) ** (1 / years) - 1) * 100
-                else:
-                    cagr = 0.0
-            else:
-                cagr = 0.0
-
-            monthly_stats = {}
-            yearly_stats = {}
-            for t in sorted_trades:
-                exit_dt = t.exit_date
-                if not exit_dt:
-                    continue
-                year_str = str(exit_dt.year)
-                month_str = exit_dt.strftime("%B")
-                pnl_abs = t.pnl_absolute or 0.0
-
-                yearly_stats[year_str] = yearly_stats.get(year_str, 0.0) + pnl_abs
-                if year_str not in monthly_stats:
-                    monthly_stats[year_str] = {}
-                monthly_stats[year_str][month_str] = monthly_stats[year_str].get(month_str, 0.0) + pnl_abs
-
-            journal = [
-                {
-                    "symbol": t.symbol,
-                    "entry_date": str(t.entry_date),
-                    "entry_price": t.entry_price,
-                    "exit_date": str(t.exit_date),
-                    "exit_price": t.exit_price,
-                    "exit_reason": t.exit_reason,
-                    "holding_days": t.holding_days,
-                    "pnl_pct": t.pnl,
-                    "pnl_abs": t.pnl_absolute,
-                    "r_multiple": t.r_multiple,
-                }
-                for t in sorted_trades
-            ]
-
-            return {
-                "total_scans": len(total_scans),
-                "total_recommendations": len(total_recs),
-                "total_trades": len(trades),
-                "win_rate": round(win_rate, 2),
-                "loss_rate": round(loss_rate, 2),
-                "profit_factor": round(profit_factor, 2) if not math.isinf(profit_factor) else "Infinite",
-                "expectancy": round(expectancy, 2),
-                "cagr": round(cagr, 2),
-                "max_drawdown": round(max_dd, 2),
-                "avg_holding_period": round(avg_hold, 2),
-                "avg_r_multiple": round(avg_r, 2),
-                "monthly_stats": monthly_stats,
-                "yearly_stats": yearly_stats,
-                "equity_curve": equity_curve,
-                "journal": journal
-            }
+            report_data = dict(overall)
+            report_data["overall"] = overall
+            report_data["nifty500"] = nifty500
+            return report_data
 
     def generate_excel_report(self, db_session) -> None:
         """Generate a professionally formatted Excel workbook representing the trading journal."""
@@ -391,8 +421,8 @@ class HistoricalScanManager:
         
         headers_trades = [
             "Trade ID", "Scan UUID", "Recommendation UUID", "Symbol", "Company Name",
-            "Exchange", "Sector", "Industry", "Scan Date", "Entry Date", "Entry Price",
-            "Stop Loss", "Target", "Quantity", "Capital Allocated", "Exit Date", "Exit Price",
+            "Exchange", "Sector", "Industry", "Execution Universe", "Scan Date", "Entry Date", "Entry Price",
+            "Stop Loss", "Original Target Price", "Quantity", "Capital Allocated", "Exit Date", "Exit Price",
             "Exit Reason", "Holding Days", "Gross P&L", "Net P&L", "Return %", "Risk Amount",
             "Reward Amount", "R Multiple", "MFE %", "MAE %", "Highest Price", "Lowest Price",
             "Trade Status", "Strategy Version", "Indicator Version", "Data Provider"
@@ -403,17 +433,18 @@ class HistoricalScanManager:
         trades = db_session.execute(select(PaperTrade)).scalars().all()
         for idx, t in enumerate(trades, start=2):
             rec = t.recommendation
-            sig = rec.signal if rec else None
             
             scan_date = str(rec.scan_date) if rec else "N/A"
             entry_date = str(t.entry_date) if t.entry_date else "N/A"
             exit_date = str(t.exit_date) if t.exit_date else "N/A"
             
             qty = rec.position_size or 0 if rec else 0
-            capital = qty * (t.entry_price or 0.0)
+            effective_entry = t.entry_price if t.entry_price is not None else (rec.entry_price if rec else None)
+            entry_val = effective_entry if effective_entry is not None else 0.0
+            capital = qty * entry_val
             
-            risk_amt = qty * ((t.entry_price or 0.0) - (rec.stop_loss or 0.0)) if (t.entry_price and rec) else 0.0
-            reward_amt = qty * ((rec.target_price or 0.0) - (t.entry_price or 0.0)) if (t.entry_price and rec) else 0.0
+            risk_amt = qty * (entry_val - (t.stop_loss or 0.0)) if (entry_val and t.stop_loss is not None) else 0.0
+            reward_amt = qty * ((t.original_target_price or 0.0) - entry_val) if (entry_val and t.original_target_price is not None) else 0.0
 
             row_data = [
                 t.id, rec.scan_uuid if rec else "N/A", rec.recommendation_uuid if rec else "N/A",
@@ -421,8 +452,9 @@ class HistoricalScanManager:
                 rec.stock.exchange if (rec and rec.stock) else "N/A",
                 rec.stock.sector if (rec and rec.stock) else "N/A",
                 rec.stock.industry if (rec and rec.stock) else "N/A",
-                scan_date, entry_date, t.entry_price, rec.stop_loss if rec else None,
-                rec.target_price if rec else None, qty, capital, exit_date, t.exit_price,
+                t.execution_universe or "N/A",
+                scan_date, entry_date, effective_entry, t.stop_loss,
+                t.original_target_price, qty, capital, exit_date, t.exit_price,
                 t.exit_reason, t.holding_days, t.pnl_absolute, t.pnl_absolute,
                 (t.pnl / 100.0) if t.pnl is not None else None, risk_amt, reward_amt, t.r_multiple,
                 (t.max_favorable_excursion / 100.0) if t.max_favorable_excursion is not None else None,
@@ -441,7 +473,7 @@ class HistoricalScanManager:
                 cell.border = border_all
                 
                 # Alignments
-                if col_idx in [1, 2, 3, 4, 6, 9, 10, 16, 18, 30, 31, 32, 33]:
+                if col_idx in [1, 2, 3, 4, 6, 9, 10, 11, 17, 19, 31, 32, 33, 34]:
                     cell.alignment = align_center
                 elif col_idx in [5, 7, 8]:
                     cell.alignment = align_left
@@ -449,16 +481,16 @@ class HistoricalScanManager:
                     cell.alignment = align_right
                 
                 # Formats
-                if col_idx in [11, 12, 13, 15, 17, 20, 21, 23, 24, 28, 29]:
+                if col_idx in [12, 13, 14, 16, 18, 21, 22, 24, 25, 29, 30]:
                     cell.number_format = '"₹"#,##0.00'
-                elif col_idx in [22, 26, 27]:
+                elif col_idx in [23, 27, 28]:
                     cell.number_format = '0.00%'
-                elif col_idx in [14, 19]:
+                elif col_idx in [15, 20]:
                     cell.number_format = '#,##0'
 
             # Row colors
-            status_cell = ws_trades.cell(row=idx, column=30)
-            pnl_cell = ws_trades.cell(row=idx, column=22)
+            status_cell = ws_trades.cell(row=idx, column=31)
+            pnl_cell = ws_trades.cell(row=idx, column=23)
             if t.status == "Closed":
                 fill_color = fill_green if (t.pnl or 0) > 0 else fill_red
             else:
@@ -483,7 +515,7 @@ class HistoricalScanManager:
             explanation = sig.explanation if sig else {}
             row_data = [
                 str(r.scan_date), r.stock.symbol, r.stock.name, r.entry_price, r.stop_loss, r.target_price,
-                r.risk_reward, r.confidence_score,
+                sig.risk_reward if sig else 0.0, r.confidence_score,
                 explanation.get("Stage", {}).get("status", "N/A"),
                 explanation.get("Relative Strength", {}).get("status", "N/A"),
                 explanation.get("VCP", {}).get("status", "N/A"),
@@ -508,98 +540,102 @@ class HistoricalScanManager:
                 elif col_idx in [7, 8]:
                     cell.number_format = '0.00'
 
-        # Sheet 3: Performance Summary
-        ws_summary = wb.create_sheet(title="Performance Summary")
-        style_sheet(ws_summary, is_summary=True)
-        ws_summary.append(["Historical Trading Strategy Performance Summary"])
-        ws_summary.cell(row=1, column=1).font = font_title
-        ws_summary.cell(row=1, column=1).alignment = align_left
-        
-        # Calculate stats
-        closed_trades = [t for t in trades if t.status == "Closed"]
-        wins = [t for t in closed_trades if (t.pnl or 0.0) > 0]
-        losses = [t for t in closed_trades if (t.pnl or 0.0) <= 0]
-        active_trades = [t for t in trades if t.status in ["Active", "Pending"]]
-        
-        total_closed = len(closed_trades)
-        win_rate = (len(wins) / total_closed) if total_closed > 0 else 0.0
-        loss_rate = (len(losses) / total_closed) if total_closed > 0 else 0.0
-        
-        gross_profit = sum(t.pnl_absolute for t in wins if t.pnl_absolute is not None)
-        gross_loss = abs(sum(t.pnl_absolute for t in losses if t.pnl_absolute is not None))
-        profit_factor = (gross_profit / gross_loss) if gross_loss > 0 else (float('inf') if gross_profit > 0 else 1.0)
-        
-        avg_hold = sum(t.holding_days or 0 for t in closed_trades) / total_closed if total_closed > 0 else 0.0
-        avg_ret = sum(t.pnl or 0.0 for t in closed_trades) / total_closed if total_closed > 0 else 0.0
-        avg_r = sum(t.r_multiple or 0.0 for t in closed_trades) / total_closed if total_closed > 0 else 0.0
-        
-        largest_winner = max([t.pnl_absolute for t in wins if t.pnl_absolute is not None], default=0.0)
-        largest_loser = min([t.pnl_absolute for t in losses if t.pnl_absolute is not None], default=0.0)
-        
-        avg_winner = gross_profit / len(wins) if wins else 0.0
-        avg_loser = -gross_loss / len(losses) if losses else 0.0
-        
-        # Drawdown and CAGR calculations
-        capital = 1_000_000.0
-        peak = capital
-        max_dd = 0.0
-        sorted_closed = sorted(closed_trades, key=lambda t: t.exit_date or date.min)
-        for t in sorted_closed:
-            capital += (t.pnl_absolute or 0.0)
-            if capital > peak:
-                peak = capital
-            dd = (peak - capital) / peak * 100.0
-            if dd > max_dd:
-                max_dd = dd
+        # Helper to generate Performance Sheets (Overall vs NIFTY500)
+        def create_performance_sheet(ws_name, trades_list):
+            ws_perf = wb.create_sheet(title=ws_name)
+            style_sheet(ws_perf, is_summary=True)
+            ws_perf.append([f"Historical Trading Strategy {ws_name} Summary"])
+            ws_perf.cell(row=1, column=1).font = font_title
+            ws_perf.cell(row=1, column=1).alignment = align_left
+            
+            c_trades = [t for t in trades_list if t.status == "Closed"]
+            w_trades = [t for t in c_trades if (t.pnl or 0.0) > 0]
+            l_trades = [t for t in c_trades if (t.pnl or 0.0) <= 0]
+            a_trades = [t for t in trades_list if t.status in ["Active", "Pending"]]
+            
+            t_closed = len(c_trades)
+            w_rate = (len(w_trades) / t_closed) if t_closed > 0 else 0.0
+            l_rate = (len(l_trades) / t_closed) if t_closed > 0 else 0.0
+            
+            g_profit = sum(t.pnl_absolute for t in w_trades if t.pnl_absolute is not None)
+            g_loss = abs(sum(t.pnl_absolute for t in l_trades if t.pnl_absolute is not None))
+            p_factor = (g_profit / g_loss) if g_loss > 0 else (float('inf') if g_profit > 0 else 1.0)
+            
+            a_hold = sum(t.holding_days or 0 for t in c_trades) / t_closed if t_closed > 0 else 0.0
+            a_ret = sum(t.pnl or 0.0 for t in c_trades) / t_closed if t_closed > 0 else 0.0
+            a_r = sum(t.r_multiple or 0.0 for t in c_trades) / t_closed if t_closed > 0 else 0.0
+            
+            l_winner = max([t.pnl_absolute for t in w_trades if t.pnl_absolute is not None], default=0.0)
+            l_loser = min([t.pnl_absolute for t in l_trades if t.pnl_absolute is not None], default=0.0)
+            
+            a_winner = g_profit / len(w_trades) if w_trades else 0.0
+            a_loser = -g_loss / len(l_trades) if l_trades else 0.0
+            
+            cap_val = 1_000_000.0
+            pk_val = cap_val
+            m_dd = 0.0
+            sorted_c = sorted(c_trades, key=lambda t: t.exit_date or date.min)
+            for t in sorted_c:
+                cap_val += (t.pnl_absolute or 0.0)
+                if cap_val > pk_val:
+                    pk_val = cap_val
+                dd_val = (pk_val - cap_val) / pk_val * 100.0
+                if dd_val > m_dd:
+                    m_dd = dd_val
 
-        cagr = 0.0
-        if sorted_closed:
-            start_d = sorted_closed[0].entry_date
-            end_d = sorted_closed[-1].exit_date
-            if start_d and end_d:
-                days = (end_d - start_d).days
-                years = days / 365.25
-                if years > 0 and capital > 0:
-                    cagr = ((capital / 1_000_000.0) ** (1 / years) - 1) * 100.0
+            cagr_val = 0.0
+            if sorted_c:
+                start_d = sorted_c[0].entry_date or sorted_c[0].created_at.date()
+                end_d = sorted_c[-1].exit_date or sorted_c[-1].updated_at.date()
+                if start_d and end_d:
+                    days_c = (end_d - start_d).days
+                    years_c = days_c / 365.25
+                    if years_c > 0 and cap_val > 0:
+                        cagr_val = ((cap_val / 1_000_000.0) ** (1 / years_c) - 1) * 100.0
 
-        stats = [
-            ("Total Trades (Completed)", total_closed, "#,##0"),
-            ("Winning Trades", len(wins), "#,##0"),
-            ("Losing Trades", len(losses), "#,##0"),
-            ("Open/Active Trades", len(active_trades), "#,##0"),
-            ("Win Rate", win_rate, "0.0%"),
-            ("Loss Rate", loss_rate, "0.0%"),
-            ("Profit Factor", profit_factor if not math.isinf(profit_factor) else "Infinite", "0.00"),
-            ("Average Holding Period", avg_hold, "0.0 days"),
-            ("Average Return per Trade", avg_ret / 100.0, "0.00%"),
-            ("Average R Multiple", avg_r, "0.00"),
-            ("Largest Winner", largest_winner, '"₹"#,##0.00'),
-            ("Largest Loser", largest_loser, '"₹"#,##0.00'),
-            ("Average Winner", avg_winner, '"₹"#,##0.00'),
-            ("Average Loser", avg_loser, '"₹"#,##0.00'),
-            ("Maximum Drawdown During Run", max_dd / 100.0, "0.00%"),
-            ("CAGR", cagr / 100.0, "0.00%"),
-            ("Total Net Return", capital - 1_000_000.0, '"₹"#,##0.00'),
-            ("Ending Capital", capital, '"₹"#,##0.00'),
-        ]
+            stats = [
+                ("Total Trades (Completed)", t_closed, "#,##0"),
+                ("Winning Trades", len(w_trades), "#,##0"),
+                ("Losing Trades", len(l_trades), "#,##0"),
+                ("Open/Active Trades", len(a_trades), "#,##0"),
+                ("Win Rate", w_rate, "0.0%"),
+                ("Loss Rate", l_rate, "0.0%"),
+                ("Profit Factor", p_factor if not math.isinf(p_factor) else "Infinite", "0.00"),
+                ("Average Holding Period", a_hold, "0.0 days"),
+                ("Average Return per Trade", a_ret / 100.0, "0.00%"),
+                ("Average R Multiple", a_r, "0.00"),
+                ("Largest Winner", l_winner, '"₹"#,##0.00'),
+                ("Largest Loser", l_loser, '"₹"#,##0.00'),
+                ("Average Winner", a_winner, '"₹"#,##0.00'),
+                ("Average Loser", a_loser, '"₹"#,##0.00'),
+                ("Maximum Drawdown During Run", m_dd / 100.0, "0.00%"),
+                ("CAGR", cagr_val / 100.0, "0.00%"),
+                ("Total Net Return", cap_val - 1_000_000.0, '"₹"#,##0.00'),
+                ("Ending Capital", cap_val, '"₹"#,##0.00'),
+            ]
 
-        ws_summary.append(["Performance Metric", "Value"])
-        ws_summary.cell(row=2, column=1).font = Font(name="Segoe UI", bold=True)
-        ws_summary.cell(row=2, column=2).font = Font(name="Segoe UI", bold=True)
-        ws_summary.cell(row=2, column=1).border = Border(bottom=Side(style="medium"))
-        ws_summary.cell(row=2, column=2).border = Border(bottom=Side(style="medium"))
-        
-        for r_idx, (m, val, fmt) in enumerate(stats, start=3):
-            ws_summary.append([m, val])
-            cell_m = ws_summary.cell(row=r_idx, column=1)
-            cell_v = ws_summary.cell(row=r_idx, column=2)
-            cell_m.font = font_body
-            cell_v.font = font_body
-            cell_m.border = border_all
-            cell_v.border = border_all
-            cell_v.alignment = align_right
-            if fmt:
-                cell_v.number_format = fmt
+            ws_perf.append(["Performance Metric", "Value"])
+            ws_perf.cell(row=2, column=1).font = Font(name="Segoe UI", bold=True)
+            ws_perf.cell(row=2, column=2).font = Font(name="Segoe UI", bold=True)
+            ws_perf.cell(row=2, column=1).border = Border(bottom=Side(style="medium"))
+            ws_perf.cell(row=2, column=2).border = Border(bottom=Side(style="medium"))
+            
+            for r_idx, (m, val, fmt_str) in enumerate(stats, start=3):
+                ws_perf.append([m, val])
+                cell_m = ws_perf.cell(row=r_idx, column=1)
+                cell_v = ws_perf.cell(row=r_idx, column=2)
+                cell_m.font = font_body
+                cell_v.font = font_body
+                cell_m.border = border_all
+                cell_v.border = border_all
+                cell_v.alignment = align_right
+                if fmt_str:
+                    cell_v.number_format = fmt_str
+
+        # Generate separate performance tabs
+        create_performance_sheet("Overall Performance", trades)
+        nifty_500_trades = [t for t in trades if t.execution_universe == "NIFTY500"]
+        create_performance_sheet("NIFTY500 Performance", nifty_500_trades)
 
         # Sheet 4: Trade Timeline
         ws_timeline = wb.create_sheet(title="Trade Timeline")
@@ -611,6 +647,7 @@ class HistoricalScanManager:
 
         cap = 1_000_000.0
         pk = cap
+        sorted_closed = sorted([t for t in trades if t.status == "Closed"], key=lambda t: t.exit_date or date.min)
         for idx, t in enumerate(sorted_closed, start=2):
             cap += (t.pnl_absolute or 0.0)
             if cap > pk:
@@ -685,8 +722,8 @@ class HistoricalScanManager:
             for col in sheet.columns:
                 max_len = 0
                 for cell in col:
-                    # Ignore title row in Performance Summary when sizing columns
-                    if sheet.title == "Performance Summary" and cell.row == 1:
+                    # Ignore title row in Performance sheets when sizing columns
+                    if "Performance" in sheet.title and cell.row == 1:
                         continue
                     val_str = str(cell.value or "")
                     if cell.number_format and ('%' in cell.number_format):
@@ -697,7 +734,7 @@ class HistoricalScanManager:
                 sheet.column_dimensions[col_letter].width = max(max_len + 4, 12)
                 
             # Add auto-filters on row 1 headers
-            if sheet.title != "Performance Summary":
+            if "Performance" not in sheet.title:
                 sheet.auto_filter.ref = f"A1:{get_column_letter(sheet.max_column)}{sheet.max_row}"
 
         wb.save("c:/Indian_Swing/indian_swing_historical_journal.xlsx")

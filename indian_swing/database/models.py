@@ -513,6 +513,9 @@ class PaperTrade(Base):
     max_adverse_excursion: Mapped[Optional[float]] = mapped_column(Float)
     highest_price: Mapped[Optional[float]] = mapped_column(Float)
     lowest_price: Mapped[Optional[float]] = mapped_column(Float)
+    original_target_price: Mapped[Optional[float]] = mapped_column(Float)
+    stop_loss: Mapped[Optional[float]] = mapped_column(Float)
+    execution_universe: Mapped[Optional[str]] = mapped_column(String(30))
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 

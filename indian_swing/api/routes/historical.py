@@ -137,7 +137,7 @@ async def get_scan_recommendations(scan_uuid: str):
                     "entry_price": r.entry_price,
                     "stop_loss": r.stop_loss,
                     "target_price": r.target_price,
-                    "risk_reward": r.risk_reward,
+                    "risk_reward": sig.risk_reward if sig else 0.0,
                     "confidence_score": r.confidence_score,
                     "stage": explanation.get("Stage", {}).get("status", "N/A"),
                     "relative_strength": explanation.get("Relative Strength", {}).get("status", "N/A"),
@@ -170,14 +170,20 @@ async def list_paper_trades():
                     "entry_date": str(t.entry_date) if t.entry_date else None,
                     "exit_date": str(t.exit_date) if t.exit_date else None,
                     "holding_days": t.holding_days,
-                    "entry_price": t.entry_price,
+                    "entry_price": t.entry_price if t.entry_price is not None else (t.recommendation.entry_price if t.recommendation else None),
                     "exit_price": t.exit_price,
                     "pnl": t.pnl,
                     "pnl_absolute": t.pnl_absolute,
                     "r_multiple": t.r_multiple,
                     "max_favorable_excursion": t.max_favorable_excursion,
                     "max_adverse_excursion": t.max_adverse_excursion,
-                    "exit_reason": t.exit_reason
+                    "exit_reason": t.exit_reason,
+                    "original_target_price": t.original_target_price,
+                    "stop_loss": t.stop_loss,
+                    "execution_universe": t.execution_universe,
+                    "recommendation_date": str(t.recommendation.scan_date) if (t.recommendation and t.recommendation.scan_date) else None,
+                    "scan_uuid": t.recommendation.scan_uuid if t.recommendation else None,
+                    "recommendation_uuid": t.recommendation.recommendation_uuid if t.recommendation else None,
                 }
                 for t in trades
             ]
@@ -241,6 +247,9 @@ async def resume_historical_scan(background_tasks: BackgroundTasks):
         for idx in range(start_idx, total):
             curr_date = dates[idx]
             
+            # Run scan first to fetch/download OHLCV data for curr_date
+            result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
+
             # Update session progress info
             with get_sync_session() as db_session:
                 # Re-fetch session
@@ -250,12 +259,9 @@ async def resume_historical_scan(background_tasks: BackgroundTasks):
                     s_obj.status = "active"
                     db_session.flush()
 
-            # Run paper trade checks
+            # Run paper trade checks AFTER scan is complete so data exists in the database
             with get_sync_session() as db_session:
                 manager.update_paper_trades(db_session, curr_date)
-
-            # Run scan
-            result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
 
             # Insert pending trades and update stats
             with get_sync_session() as db_session:

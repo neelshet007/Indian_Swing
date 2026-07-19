@@ -34,6 +34,7 @@ def db_init():
 def data_download(
     symbols: Optional[str] = typer.Option(None, help="Comma-separated symbols to download."),
     force: bool = typer.Option(False, "--force", help="Force complete refresh of all data."),
+    bars: Optional[int] = typer.Option(None, "--bars", help="Number of historical daily bars to download (e.g. 1150 to go back to Jan 2022)."),
 ):
     configure_logging(fmt="console")
 
@@ -49,7 +50,7 @@ def data_download(
         await init_db()
         strategy_registry.discover()
         strategy = strategy_registry.get("sivcs_vcp")
-        lookback = DynamicLookbackEngine.get_required_lookback(strategy)
+        lookback = bars or DynamicLookbackEngine.get_required_lookback(strategy)
 
         with get_sync_session() as session:
             UniverseLoader(session).load_universe()
@@ -146,15 +147,17 @@ def scan_historical():
             typer.echo(f"Current Date: {date_str}")
             typer.echo("Status: Scanning...")
 
+            # Run scan first to fetch/download OHLCV data for curr_date
+            result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
+
             with get_sync_session() as db_session:
                 # Update session info
                 db_session.add(session_obj)
                 session_obj.current_date = date_str
                 session_obj.status = "active"
                 db_session.flush()
+                # Run paper trade checks AFTER scan is complete so data exists in the database
                 manager.update_paper_trades(db_session, curr_date)
-            
-            result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
 
             with get_sync_session() as db_session:
                 from sqlalchemy import select
@@ -197,17 +200,7 @@ def scan_historical():
             typer.echo("Status: Completed")
 
             if idx + 1 < total:
-                typer.echo("\nTrading Day completed.")
-                typer.echo("Type:")
-                typer.echo("1 -> Continue to next queued date")
-                typer.echo("2 -> Stop and resume later")
-                choice = click.prompt("Enter choice (1 or 2)", type=int, default=1)
-                if choice == 2:
-                    typer.echo("Session paused. You can resume later.")
-                    with get_sync_session() as db_session:
-                        db_session.add(session_obj)
-                        session_obj.status = "paused"
-                    return
+                typer.echo("\nTrading Day completed. Continuing to next queued date...")
 
         typer.echo("\n" + "="*40)
         typer.echo("Historical scan and paper trading simulation completed!")

@@ -273,3 +273,57 @@ def test_risk_allocation_capping_passes():
     assert signals[0].metadata["portfolio_weight_pct"] <= 10.0
     assert signals[0].explanation["Risk"]["status"] == "PASS"
 
+
+@pytest.mark.asyncio
+async def test_pipeline_insufficient_data_error_does_not_deactivate(configured_db, monkeypatch):
+    # Seed a test stock
+    with get_sync_session() as session:
+        stock_repo = StockRepository(session)
+        stock = stock_repo.upsert(
+            symbol="NEWSTOCK",
+            name="New IPO Stock",
+            exchange="NSE",
+        )
+        assert stock.is_active is True
+
+    # Setup pipeline and mock the _run execution or _store to raise DataValidationError
+    pipeline = DataPipeline()
+    
+    # Mock bulk fetch cache to be empty
+    monkeypatch.setattr(pipeline, "_bulk_cache", {})
+    
+    # Mock _provider.fetch_ohlcv to return empty or mock the inner process
+    async def mock_fetch(*args, **kwargs):
+        return pd.DataFrame()
+    monkeypatch.setattr(pipeline._provider, "fetch_ohlcv", mock_fetch)
+
+    # Let's run pipeline for NEWSTOCK with required_daily_bars=282
+    summary = await pipeline.run_incremental(["NEWSTOCK"], required_daily_bars=282, end=date.today())
+    
+    # It should have failed because "No data returned" is permanent, let's check
+    assert summary.failed == 1
+    with get_sync_session() as session:
+        stock_repo = StockRepository(session)
+        stock = stock_repo.get_by_symbol("NEWSTOCK")
+        # Since "No data returned" is permanent, it should be deactivated.
+        assert stock.is_active is False
+        # Reactivate it
+        stock.is_active = True
+        session.commit()
+
+    # Now let's mock _process_symbol to return a result that raises DataValidationError with the "Only X bars" message
+    from indian_swing.data.pipeline import PipelineResult
+    async def mock_process_symbol(*args, **kwargs):
+        return PipelineResult(symbol="NEWSTOCK", success=False, error="[NEWSTOCK] Only 150 bars after load; require 282")
+    monkeypatch.setattr(pipeline, "_process_symbol", mock_process_symbol)
+
+    summary = await pipeline.run_incremental(["NEWSTOCK"], required_daily_bars=282, end=date.today())
+    assert summary.failed == 1
+
+    # Verify that the stock remains active (is_active is still True) because this error is not permanent
+    with get_sync_session() as session:
+        stock_repo = StockRepository(session)
+        stock = stock_repo.get_by_symbol("NEWSTOCK")
+        assert stock.is_active is True
+
+

@@ -83,11 +83,60 @@ async def get_session() -> AsyncGenerator[Session, None]:
 
 
 async def init_db() -> None:
-    from indian_swing.database.models import Base
+    from indian_swing.database.models import Base, PaperTrade, Recommendation
+    from indian_swing.database.connection import get_sync_session
+    from indian_swing.core.universe_badge import badge_lookup
+    from sqlalchemy import select
+
+    from sqlalchemy import select, text
 
     engine = get_engine()
     loop = asyncio.get_running_loop()
     await loop.run_in_executor(None, lambda: Base.metadata.create_all(bind=engine))
+    
+    def _migrate_and_backfill():
+        # Schema migration: Add new columns if they do not exist
+        with engine.connect() as conn:
+            for col_name, col_type in [
+                ("original_target_price", "FLOAT"),
+                ("stop_loss", "FLOAT"),
+                ("execution_universe", "VARCHAR(30)")
+            ]:
+                try:
+                    # In SQLite or Postgres, we can try altering the table in separate transactions
+                    with conn.begin():
+                        conn.execute(text(f"ALTER TABLE sw_paper_trades ADD COLUMN {col_name} {col_type}"))
+                except Exception:
+                    pass
+        
+        # Backfill existing paper trades
+        with get_sync_session() as session:
+            trades = session.execute(select(PaperTrade)).scalars().all()
+            updated_count = 0
+            for t in trades:
+                updated = False
+                rec = t.recommendation
+                if rec:
+                    if t.original_target_price is None:
+                        t.original_target_price = rec.target_price
+                        updated = True
+                    if t.stop_loss is None:
+                        t.stop_loss = rec.stop_loss
+                        updated = True
+                
+                if t.execution_universe is None:
+                    is_nifty500 = badge_lookup.has_badge(t.symbol, "NIFTY 500")
+                    t.execution_universe = "NIFTY500" if is_nifty500 else "NON_NIFTY500"
+                    updated = True
+                
+                if updated:
+                    updated_count += 1
+            
+            if updated_count > 0:
+                session.commit()
+                logger.info("database.backfilled_paper_trades", count=updated_count)
+
+    await loop.run_in_executor(None, _migrate_and_backfill)
     logger.info("database.initialized", url=settings.database.url, environment=settings.app_env)
 
 
