@@ -71,7 +71,7 @@ async def list_historical_scans():
         with get_sync_session() as session:
             jobs = session.execute(
                 select(ScanJob)
-                .where(ScanJob.strategy_name == "sivcs_vcp")
+                .where(ScanJob.strategy_name.in_(["sivcs_vcp", "amrc"]))
                 .order_by(ScanJob.scan_date.desc())
             ).scalars().all()
 
@@ -242,6 +242,13 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
     global _active_task
     if _active_task is not None and not _active_task.done():
         raise HTTPException(status_code=409, detail="A scan session is already running")
+
+    strategy_name = payload.get("strategy", "sivcs_vcp")
+    from indian_swing.strategies.registry import strategy_registry
+    try:
+        _manager.scanner.strategy = strategy_registry.get(strategy_name)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
     from_date_str = payload.get("from_date")
     to_date_str = payload.get("to_date")

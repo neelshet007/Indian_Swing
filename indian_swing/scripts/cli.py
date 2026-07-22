@@ -79,19 +79,29 @@ def data_download(
 
 
 @scan_app.command("run")
-def scan_run():
+def scan_run(strategy: str = typer.Option("all", help="Strategy to run ('sivcs_vcp', 'amrc', or 'all')")):
     configure_logging(fmt="console")
 
     async def _scan():
         from indian_swing.database.connection import init_db
         from indian_swing.recommendations.scanner import RecommendationScanner
+        from indian_swing.strategies.registry import strategy_registry
 
         await init_db()
-        result = await RecommendationScanner().scan(date.today())
-        typer.echo(
-            f"Scan complete. Stocks scanned: {result.stocks_scanned}, "
-            f"recommendations: {result.recommendations_saved}, failed: {result.failed_stocks}"
-        )
+        scanner = RecommendationScanner()
+
+        strategies_to_run = ["sivcs_vcp", "amrc"] if strategy == "all" else [strategy]
+
+        for s in strategies_to_run:
+            try:
+                scanner.strategy = strategy_registry.get(s)
+                result = await scanner.scan(date.today())
+                typer.echo(
+                    f"Scan complete for {s}. Stocks scanned: {result.stocks_scanned}, "
+                    f"recommendations: {result.recommendations_saved}, failed: {result.failed_stocks}"
+                )
+            except Exception as e:
+                typer.echo(f"Failed to scan strategy {s}: {e}")
 
     asyncio.run(_scan())
 

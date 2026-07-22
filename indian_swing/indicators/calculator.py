@@ -45,6 +45,10 @@ class IndicatorCalculator:
         frame["sma_150"] = frame["close"].rolling(150, min_periods=150).mean()
         frame["sma_200"] = frame["close"].rolling(200, min_periods=200).mean()
         frame["ema_20"] = frame["close"].ewm(span=20, adjust=False, min_periods=20).mean()
+        frame["ema_50"] = frame["close"].ewm(span=50, adjust=False, min_periods=50).mean()
+        frame["ema_150"] = frame["close"].ewm(span=150, adjust=False, min_periods=150).mean()
+        frame["ema_200"] = frame["close"].ewm(span=200, adjust=False, min_periods=200).mean()
+        frame["ema_200_slope_20"] = frame["ema_200"] - frame["ema_200"].shift(20)
         frame["vol_20"] = frame["volume"].rolling(20, min_periods=20).mean()
         frame["vol_50"] = frame["volume"].rolling(50, min_periods=50).mean()
         frame["turnover_50"] = frame["vol_50"] * frame["close"]
@@ -85,6 +89,17 @@ class IndicatorCalculator:
         merged["rs_ratio"] = merged["close"] / merged["benchmark_close"]
         merged["rs_sma_252"] = merged["rs_ratio"].rolling(252, min_periods=63).mean()
         merged["rs_score"] = ((merged["rs_ratio"] / merged["rs_sma_252"]) - 1.0) * 100
+        
+        # AMRC Strategy indicators
+        merged["return_126"] = merged["close"].pct_change(126)
+        merged["benchmark_return_126"] = merged["benchmark_close"].pct_change(126)
+        merged["rs_126"] = merged["return_126"] - merged["benchmark_return_126"]
+
+        merged["return_12_1"] = (merged["close"].shift(21) / merged["close"].shift(252)) - 1.0
+        daily_returns = merged["close"].pct_change()
+        merged["volatility_90d"] = daily_returns.rolling(90, min_periods=90).std()
+        merged["momentum_score_amrc"] = merged["return_12_1"] / merged["volatility_90d"].replace(0, np.nan)
+        
         return merged
 
     @staticmethod

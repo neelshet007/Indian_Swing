@@ -22,7 +22,7 @@ async def get_progress():
 
 
 @router.post("/run")
-async def trigger_scan(scan_date: Optional[date] = None, force_refresh: bool = False):
+async def trigger_scan(scan_date: Optional[date] = None, strategy: str = "all", force_refresh: bool = False):
     global _active_task
     if _active_task is not None and not _active_task.done():
         raise HTTPException(status_code=409, detail="A scan is already running")
@@ -31,21 +31,52 @@ async def trigger_scan(scan_date: Optional[date] = None, force_refresh: bool = F
     if target_date > date.today():
         raise HTTPException(status_code=400, detail="Cannot run scans for future dates")
 
+    from indian_swing.strategies.registry import strategy_registry
+
+    if strategy == "all":
+        strategies_to_run = ["sivcs_vcp", "amrc"]
+    else:
+        strategies_to_run = [strategy]
+
+    # Validate strategies
+    for s in strategies_to_run:
+        try:
+            strategy_registry.get(s)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=str(exc))
+
     if not force_refresh:
         loop = asyncio.get_running_loop()
         def _check_existing():
             with get_sync_session() as session:
-                return session.execute(
-                    select(ScanJob).where(
-                        ScanJob.scan_date == target_date,
-                        ScanJob.status == "completed"
-                    )
-                ).scalars().first()
-        existing_job = await loop.run_in_executor(None, _check_existing)
-        if existing_job:
-            return {"status": "completed", "scan_uuid": existing_job.scan_uuid, "scan_date": str(target_date)}
+                completed_count = 0
+                for s in strategies_to_run:
+                    job = session.execute(
+                        select(ScanJob).where(
+                            ScanJob.scan_date == target_date,
+                            ScanJob.status == "completed",
+                            ScanJob.strategy_name == s
+                        )
+                    ).scalars().first()
+                    if job:
+                        completed_count += 1
+                return completed_count == len(strategies_to_run)
 
-    _active_task = asyncio.create_task(_scanner.scan(scan_date=target_date, force_refresh=force_refresh))
+        all_completed = await loop.run_in_executor(None, _check_existing)
+        if all_completed:
+            return {"status": "completed", "scan_date": str(target_date)}
+
+    async def _run_scans():
+        for s in strategies_to_run:
+            try:
+                _scanner.strategy = strategy_registry.get(s)
+                await _scanner.scan(scan_date=target_date, force_refresh=force_refresh)
+            except Exception as exc:
+                # Log error and continue to next strategy
+                import logging
+                logging.getLogger(__name__).error(f"Failed to run strategy {s} in background: {exc}")
+
+    _active_task = asyncio.create_task(_run_scans())
     return {"status": "queued", "scan_date": str(target_date)}
 
 

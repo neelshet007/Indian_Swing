@@ -18,6 +18,7 @@ export default function HistoricalScan() {
   
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
+  const [selectedStrategy, setSelectedStrategy] = useState('sivcs_vcp')
   const [isStarting, setIsStarting] = useState(false)
 
   const handleStartNewScan = async (e) => {
@@ -30,7 +31,8 @@ export default function HistoricalScan() {
     try {
       await axios.post('/api/historical/start', {
         from_date: fromDate,
-        to_date: toDate
+        to_date: toDate,
+        strategy: selectedStrategy
       })
       alert('Historical scan started in background!')
       fetchData()
@@ -192,6 +194,27 @@ export default function HistoricalScan() {
                   outline: 'none'
                 }}
               />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Strategy to Scan</label>
+              <select 
+                value={selectedStrategy}
+                onChange={(e) => setSelectedStrategy(e.target.value)}
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: '#fff',
+                  padding: '8px 12px',
+                  fontSize: '0.9rem',
+                  outline: 'none',
+                  height: '38px',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="sivcs_vcp" style={{ background: '#1c1c1e' }}>SIVCS VCP Strategy</option>
+                <option value="amrc" style={{ background: '#1c1c1e' }}>AMRC Strategy v1.0</option>
+              </select>
             </div>
             <button 
               type="submit"

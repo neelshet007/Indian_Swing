@@ -75,6 +75,7 @@ export default function Dashboard() {
   const [scanning, setScanning] = useState(false)
   const [scanStatus, setScanStatus] = useState(null)
   const [badgeCache, setBadgeCache] = useState({})
+  const [liveStrategy, setLiveStrategy] = useState('all')
 
   function formatDuration(start, end) {
     if (!start || !end) return null
@@ -180,7 +181,7 @@ export default function Dashboard() {
       errors: []
     })
     try {
-      const { data } = await axios.post(`/api/scanner/run?scan_date=${selectedDate}&force_refresh=${force}`)
+      const { data } = await axios.post(`/api/scanner/run?scan_date=${selectedDate}&strategy=${liveStrategy}&force_refresh=${force}`)
       if (data.status === 'completed') {
         setScanning(false)
         loadScanForDate(selectedDate)
@@ -280,6 +281,27 @@ export default function Dashboard() {
               style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--text-primary)', outline: 'none' }}
             />
           </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, marginBottom: '2px' }}>Strategy to Scan</span>
+            <select
+              value={liveStrategy}
+              onChange={(e) => setLiveStrategy(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: '6px',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                outline: 'none',
+                height: '38px',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="all" style={{ background: '#1c1c1e' }}>All Strategies</option>
+              <option value="sivcs_vcp" style={{ background: '#1c1c1e' }}>SIVCS VCP Strategy</option>
+              <option value="amrc" style={{ background: '#1c1c1e' }}>AMRC Strategy v1.0</option>
+            </select>
+          </div>
           <button className="btn btn-ghost" onClick={loadLatest} style={{ marginTop: '16px' }}>Reset to Latest</button>
           {currentScan && !scanning && (
             <button 
@@ -331,7 +353,7 @@ export default function Dashboard() {
               <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                 <div><strong>Scan Date:</strong> {selectedDate}</div>
                 <div><strong>Scanned:</strong> {scanStatus.total_stocks || (currentScan?.total_stocks)} Stocks</div>
-                <div><strong>Recommendations:</strong> {recommendations.length}</div>
+                <div><strong>Recommendations:</strong> {recommendations.length} (SIVCS: {recommendations.filter(r => (r.strategy_name || 'sivcs_vcp') === 'sivcs_vcp').length}, AMRC: {recommendations.filter(r => r.strategy_name === 'amrc').length})</div>
                 {currentScan && (
                   <>
                     <div><strong>Scan Completed At:</strong> {currentScan.completed_at ? new Date(currentScan.completed_at).toLocaleString() : 'N/A'}</div>
@@ -402,16 +424,32 @@ export default function Dashboard() {
           <div className="empty-title">No Scan Completed Yet</div>
           <div className="empty-sub">No scan has been run for {selectedDate}. Please run a scan to evaluate the market.</div>
         </div>
-      ) : recommendations.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-title">No Recommendations Found</div>
-          <div className="empty-sub">Scan was completed successfully for {selectedDate}, but no stocks met the strategy criteria.</div>
-        </div>
       ) : (
-        <div className="rec-grid">
-          {recommendations.map((rec) => (
-            <RecCard key={rec.id} rec={rec} universes={badgeCache[rec.symbol]} />
-          ))}
+        <div>
+          {[
+            { id: 'sivcs_vcp', title: 'SIVCS VCP Strategy' },
+            { id: 'amrc', title: 'AMRC Momentum/Regime Strategy' }
+          ].map((strat) => {
+            const recs = recommendations.filter(r => (r.strategy_name || 'sivcs_vcp') === strat.id);
+            return (
+              <div key={strat.id} style={{ marginBottom: '40px' }}>
+                <h2 className="section-title" style={{ fontSize: '1.4rem', fontWeight: 700, margin: '20px 32px 15px', color: 'var(--accent-blue-bright)', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
+                  {strat.title} ({recs.length})
+                </h2>
+                {recs.length === 0 ? (
+                  <div style={{ margin: '0 32px 15px', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', border: '1px dashed var(--border)', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                    No recommendations available for {strat.title} on this date.
+                  </div>
+                ) : (
+                  <div className="rec-grid">
+                    {recs.map((rec) => (
+                      <RecCard key={rec.id} rec={rec} universes={badgeCache[rec.symbol]} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
