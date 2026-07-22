@@ -17,6 +17,9 @@ from indian_swing.database.models import (
 from indian_swing.recommendations.automation import HistoricalScanManager
 from pathlib import Path
 
+from indian_swing.core.logging_setup import get_logger
+logger = get_logger(__name__)
+
 router = APIRouter()
 _manager = HistoricalScanManager()
 _active_task: Optional[asyncio.Task] = None
@@ -38,8 +41,12 @@ async def get_progress():
             select(PaperTrade).where(PaperTrade.status == "Active")
         ).scalars().all()
         
+        status = session_obj.status
+        if status == "active" and (_active_task is None or _active_task.done()):
+            status = "paused"
+
         return {
-            "status": "running" if session_obj.status == "active" else session_obj.status,
+            "status": "running" if status == "active" else status,
             "completed_days": session_obj.completed_days,
             "total_days": session_obj.total_days,
             "queue": session_obj.queue,
@@ -181,6 +188,7 @@ async def list_paper_trades():
                     "original_target_price": t.original_target_price,
                     "stop_loss": t.stop_loss,
                     "execution_universe": t.execution_universe,
+                    "accuracy_pct": round(t.recommendation.confidence_score * 100, 1) if (t.recommendation and t.recommendation.confidence_score is not None) else 0.0,
                     "recommendation_date": str(t.recommendation.scan_date) if (t.recommendation and t.recommendation.scan_date) else None,
                     "scan_uuid": t.recommendation.scan_uuid if t.recommendation else None,
                     "recommendation_uuid": t.recommendation.recommendation_uuid if t.recommendation else None,
@@ -199,18 +207,31 @@ async def get_performance_report():
 
 
 @router.get("/export")
-async def download_excel_report():
-    """Download generated Excel journal report."""
-    excel_path = Path("c:/Indian_Swing/indian_swing_historical_journal.xlsx")
-    if not excel_path.exists():
-        # Trigger generation dynamically
+async def download_excel_report(universe: str = "all", accuracy: str = "all"):
+    """Download generated Excel journal report with filtering options."""
+    loop = asyncio.get_running_loop()
+    
+    def _generate_and_get_path():
+        temp_dir = Path("c:/Indian_Swing/scratch")
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        filename = f"indian_swing_historical_journal_{universe}_{accuracy}.xlsx"
+        excel_path = temp_dir / filename
+        
         with get_sync_session() as session:
-            _manager.generate_excel_report(session)
+            _manager.generate_excel_report(
+                session, 
+                universe=universe, 
+                accuracy=accuracy, 
+                save_path=str(excel_path)
+            )
+        return excel_path
+
+    excel_path = await loop.run_in_executor(None, _generate_and_get_path)
 
     if excel_path.exists():
         return FileResponse(
             path=excel_path,
-            filename="indian_swing_historical_journal.xlsx",
+            filename=f"indian_swing_historical_journal_{universe}_{accuracy}.xlsx",
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     raise HTTPException(status_code=404, detail="Excel file not generated yet")
@@ -240,7 +261,7 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
 
     from indian_swing.database.repositories.stock_repo import StockRepository
     from indian_swing.config.settings import settings
-    from indian_swing.database.models import Stock, OHLCVData
+    from indian_swing.database.models import Stock, OHLCV
     
     benchmark_symbol = settings.scanner.benchmark_symbol
     lookback = 282
@@ -263,12 +284,12 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
             raise HTTPException(status_code=400, detail="Benchmark stock metadata not found")
 
         candles = session.execute(
-            select(OHLCVData)
-            .where(OHLCVData.stock_uuid == benchmark_stock.stock_uuid)
-            .where(OHLCVData.timeframe == "1d")
-            .where(OHLCVData.date >= from_date)
-            .where(OHLCVData.date <= to_date)
-            .order_by(OHLCVData.date)
+            select(OHLCV)
+            .where(OHLCV.stock_uuid == benchmark_stock.stock_uuid)
+            .where(OHLCV.timeframe == "1d")
+            .where(OHLCV.date >= from_date)
+            .where(OHLCV.date <= to_date)
+            .order_by(OHLCV.date)
         ).scalars().all()
         trading_dates = [c.date for c in candles]
 
@@ -283,12 +304,14 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
         
         for idx in range(0, total):
             curr_date = trading_dates[idx]
+            date_str = curr_date.strftime("%d/%m/%y")
+            logger.info("historical.day_started", day=idx+1, total=total, date=date_str)
             result = await _manager.scanner.scan(scan_date=curr_date, force_refresh=False)
 
             with get_sync_session() as db_session:
                 s_obj = db_session.get(HistoricalScanSession, session_obj.id)
                 if s_obj:
-                    s_obj.current_date = curr_date.strftime("%d/%m/%y")
+                    s_obj.current_date = date_str
                     s_obj.status = "active"
                     db_session.flush()
 
@@ -326,6 +349,8 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
                     db_session.flush()
 
                 _manager.generate_excel_report(db_session)
+            
+            logger.info("historical.day_completed", day=idx+1, total=total, date=date_str, recs_found=result.recommendations_saved, trades_created=trades_created)
 
     _active_task = asyncio.create_task(_run())
     return {"status": "started", "total_days": len(trading_dates)}
@@ -361,6 +386,8 @@ async def resume_historical_scan(background_tasks: BackgroundTasks):
         start_time = datetime.now()
         for idx in range(start_idx, total):
             curr_date = dates[idx]
+            date_str = curr_date.strftime("%d/%m/%y")
+            logger.info("historical.day_started", day=idx+1, total=total, date=date_str)
             
             # Run scan first to fetch/download OHLCV data for curr_date
             result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
@@ -370,7 +397,7 @@ async def resume_historical_scan(background_tasks: BackgroundTasks):
                 # Re-fetch session
                 s_obj = db_session.get(HistoricalScanSession, session_obj.id)
                 if s_obj:
-                    s_obj.current_date = curr_date.strftime("%d/%m/%y")
+                    s_obj.current_date = date_str
                     s_obj.status = "active"
                     db_session.flush()
 
@@ -413,6 +440,8 @@ async def resume_historical_scan(background_tasks: BackgroundTasks):
 
                 # Excel auto-update
                 manager.generate_excel_report(db_session)
+            
+            logger.info("historical.day_completed", day=idx+1, total=total, date=date_str, recs_found=result.recommendations_saved, trades_created=trades_created)
 
     _active_task = asyncio.create_task(_run())
     return {"status": "resumed"}

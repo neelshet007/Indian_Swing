@@ -17,6 +17,24 @@ from indian_swing.database.connection import dispose_engine, init_db
 configure_logging(level=settings.log_level, fmt=settings.log_format)
 logger = get_logger(__name__)
 
+import logging
+
+class ProgressPollingFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        log_msg = record.getMessage()
+        return not any(
+            path in log_msg for path in [
+                "/api/historical/progress",
+                "/api/historical/scans",
+                "/api/historical/paper-trades",
+                "/api/historical/report",
+                "/api/scanner/progress",
+                "/api/health"
+            ]
+        )
+
+logging.getLogger("uvicorn.access").addFilter(ProgressPollingFilter())
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

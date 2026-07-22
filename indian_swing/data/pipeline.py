@@ -115,14 +115,14 @@ class DataPipeline:
             symbols_to_fetch = symbols
 
         if not symbols_to_fetch:
-            logger.info("pipeline.bulk_fetch_skip", count=len(symbols))
+            # logger.info("pipeline.bulk_fetch_skip", count=len(symbols))
             self._bulk_cache = {}
         else:
             try:
                 log_start = min(fetch_start.values()) if isinstance(fetch_start, dict) else fetch_start
                 logger.info("pipeline.bulk_fetch_start", count=len(symbols_to_fetch), start=str(log_start), end=str(end))
                 self._bulk_cache = await self._provider.fetch_bulk_ohlcv(symbols_to_fetch, fetch_start, end)
-                logger.info("pipeline.bulk_fetch_complete", count=len(self._bulk_cache))
+                # logger.info("pipeline.bulk_fetch_complete", count=len(self._bulk_cache))
             except Exception as e:
                 logger.warning("pipeline.bulk_fetch_failed", error=str(e))
                 self._bulk_cache = {}
@@ -253,18 +253,8 @@ class DataPipeline:
                 }
                 progress_callback(progress_data)
                 
-                print(
-                    f"\n========================================\n"
-                    f"Preparing Historical Database\n"
-                    f"Symbols Completed: {completed} / {state['total']}\n"
-                    f"Current Symbol: {symbol}\n"
-                    f"Database Status: {db_status}\n"
-                    f"Required Range: {required_start} → {end}\n"
-                    f"Action: {action}\n"
-                    f"Progress: {progress_bar} ({int(pct*100)}%)\n"
-                    f"ETA: {eta_str}\n"
-                    f"========================================\n"
-                )
+                # Callback runs for API/UI progress, but we skip direct stdout prints to save memory and console clutter
+                pass
 
             frames: list[pd.DataFrame] = []
             rows_downloaded = 0
@@ -279,7 +269,7 @@ class DataPipeline:
                             rows_downloaded += len(fetched)
                     continue
 
-                logger.info("pipeline.fetch_missing", symbol=symbol, start=str(fetch_start), end=str(fetch_end))
+                # logger.info("pipeline.fetch_missing", symbol=symbol, start=str(fetch_start), end=str(fetch_end))
                 fetched = await self._provider.fetch_ohlcv(symbol, fetch_start, fetch_end)
                 if fetched is not None and not fetched.empty:
                     frames.append(fetched)
@@ -289,6 +279,8 @@ class DataPipeline:
                 return PipelineResult(symbol=symbol, success=True, records_added=0)
                 
             if not frames:
+                if count > 0:
+                    return PipelineResult(symbol=symbol, success=True, records_added=0)
                 return PipelineResult(symbol=symbol, success=False, error="No data returned")
 
             merged = pd.concat(frames).sort_index()
@@ -331,14 +323,14 @@ class DataPipeline:
                             logger.error(f"[PROVIDER WARNING] Non-Upstox provider detected: {provider_name}")
                             raise ValueError(f"Non-Upstox provider detected: {provider_name}")
 
-                        logger.info(
-                            f"\n[UPSTOX VERIFIED]\n"
-                            f"{symbol}\n"
-                            f"Provider: Upstox\n"
-                            f"Rows Downloaded: {rows_downloaded}\n"
-                            f"Rows Inserted: {inserted}\n"
-                            f"Status: SUCCESS"
-                        )
+                        # logger.info(
+                        #     f"\n[UPSTOX VERIFIED]\n"
+                        #     f"{symbol}\n"
+                        #     f"Provider: Upstox\n"
+                        #     f"Rows Downloaded: {rows_downloaded}\n"
+                        #     f"Rows Inserted: {inserted}\n"
+                        #     f"Status: SUCCESS"
+                        # )
 
                         if force_refresh:
                             daily_full = cleaned
@@ -353,14 +345,14 @@ class DataPipeline:
                         repo.replace_timeframe(stock.stock_uuid, "1wk", self._df_to_records(weekly, stock.stock_uuid, "1wk"))
                         repo.replace_timeframe(stock.stock_uuid, "1mo", self._df_to_records(monthly, stock.stock_uuid, "1mo"))
 
-                        logger.info("pipeline.store_debug", symbol=symbol, uuid=stock.stock_uuid, coverage_start=str(coverage_start), len_daily_full=len(daily_full))
+                        # logger.info("pipeline.store_debug", symbol=symbol, uuid=stock.stock_uuid, coverage_start=str(coverage_start), len_daily_full=len(daily_full))
                         if required_daily_bars and len(daily_full) < required_daily_bars:
                             raise DataValidationError(
                                 f"[{symbol}] Only {len(daily_full)} bars after load; require {required_daily_bars}"
                             )
                         return inserted
                 except Exception as e:
-                    logger.error("pipeline.store_exception", symbol=symbol, error=str(e), type=type(e).__name__)
+                    # logger.error("pipeline.store_exception", symbol=symbol, error=str(e), type=type(e).__name__)
                     raise
 
             try:

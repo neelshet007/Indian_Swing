@@ -376,7 +376,7 @@ class HistoricalScanManager:
             report_data["nifty500"] = nifty500
             return report_data
 
-    def generate_excel_report(self, db_session) -> None:
+    def generate_excel_report(self, db_session, universe: str = "all", accuracy: str = "all", save_path: str = "c:/Indian_Swing/indian_swing_historical_journal.xlsx") -> None:
         """Generate a professionally formatted Excel workbook representing the trading journal."""
         from openpyxl import Workbook
         from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
@@ -421,7 +421,7 @@ class HistoricalScanManager:
         
         headers_trades = [
             "Trade ID", "Scan UUID", "Recommendation UUID", "Symbol", "Company Name",
-            "Exchange", "Sector", "Industry", "Execution Universe", "Scan Date", "Entry Date", "Entry Price",
+            "Exchange", "Sector", "Industry", "Execution Universe", "Accuracy %", "Scan Date", "Entry Date", "Entry Price",
             "Stop Loss", "Original Target Price", "Quantity", "Capital Allocated", "Exit Date", "Exit Price",
             "Exit Reason", "Holding Days", "Gross P&L", "Net P&L", "Return %", "Risk Amount",
             "Reward Amount", "R Multiple", "MFE %", "MAE %", "Highest Price", "Lowest Price",
@@ -430,7 +430,31 @@ class HistoricalScanManager:
         ws_trades.append(headers_trades)
         style_sheet(ws_trades)
 
-        trades = db_session.execute(select(PaperTrade)).scalars().all()
+        all_trades = db_session.execute(select(PaperTrade)).scalars().all()
+        trades = []
+        for t in all_trades:
+            # Universe Filter
+            if universe == "nifty500" and t.execution_universe != "NIFTY500":
+                continue
+            if universe == "non_nifty500" and t.execution_universe == "NIFTY500":
+                continue
+            
+            # Accuracy Filter
+            score = (t.recommendation.confidence_score * 100) if (t.recommendation and t.recommendation.confidence_score is not None) else 0.0
+            if accuracy == '90_100':
+                if not (90 <= score <= 100):
+                    continue
+            elif accuracy == '80_90':
+                if not (80 <= score < 90):
+                    continue
+            elif accuracy == '70_80':
+                if not (70 <= score < 80):
+                    continue
+            elif accuracy == 'below_70':
+                if not (score < 70):
+                    continue
+            trades.append(t)
+
         for idx, t in enumerate(trades, start=2):
             rec = t.recommendation
             
@@ -453,6 +477,7 @@ class HistoricalScanManager:
                 rec.stock.sector if (rec and rec.stock) else "N/A",
                 rec.stock.industry if (rec and rec.stock) else "N/A",
                 t.execution_universe or "N/A",
+                rec.confidence_score if rec else 0.0,
                 scan_date, entry_date, effective_entry, t.stop_loss,
                 t.original_target_price, qty, capital, exit_date, t.exit_price,
                 t.exit_reason, t.holding_days, t.pnl_absolute, t.pnl_absolute,
@@ -473,7 +498,7 @@ class HistoricalScanManager:
                 cell.border = border_all
                 
                 # Alignments
-                if col_idx in [1, 2, 3, 4, 6, 9, 10, 11, 17, 19, 31, 32, 33, 34]:
+                if col_idx in [1, 2, 3, 4, 6, 9, 10, 11, 12, 18, 20, 32, 33, 34, 35]:
                     cell.alignment = align_center
                 elif col_idx in [5, 7, 8]:
                     cell.alignment = align_left
@@ -481,16 +506,16 @@ class HistoricalScanManager:
                     cell.alignment = align_right
                 
                 # Formats
-                if col_idx in [12, 13, 14, 16, 18, 21, 22, 24, 25, 29, 30]:
+                if col_idx in [13, 14, 15, 17, 19, 22, 23, 25, 26, 30, 31]:
                     cell.number_format = '"₹"#,##0.00'
-                elif col_idx in [23, 27, 28]:
+                elif col_idx in [10, 24, 28, 29]:
                     cell.number_format = '0.00%'
-                elif col_idx in [15, 20]:
+                elif col_idx in [16, 21]:
                     cell.number_format = '#,##0'
 
             # Row colors
-            status_cell = ws_trades.cell(row=idx, column=31)
-            pnl_cell = ws_trades.cell(row=idx, column=23)
+            status_cell = ws_trades.cell(row=idx, column=32)
+            pnl_cell = ws_trades.cell(row=idx, column=24)
             if t.status == "Closed":
                 fill_color = fill_green if (t.pnl or 0) > 0 else fill_red
             else:
@@ -509,7 +534,24 @@ class HistoricalScanManager:
         ws_recs.append(headers_recs)
         style_sheet(ws_recs)
 
-        recs = db_session.execute(select(Recommendation)).scalars().all()
+        all_recs = db_session.execute(select(Recommendation)).scalars().all()
+        recs = []
+        for r in all_recs:
+            score = (r.confidence_score * 100) if r.confidence_score is not None else 0.0
+            if accuracy == '90_100':
+                if not (90 <= score <= 100):
+                    continue
+            elif accuracy == '80_90':
+                if not (80 <= score < 90):
+                    continue
+            elif accuracy == '70_80':
+                if not (70 <= score < 80):
+                    continue
+            elif accuracy == 'below_70':
+                if not (score < 70):
+                    continue
+            recs.append(r)
+
         for idx, r in enumerate(recs, start=2):
             sig = r.signal
             explanation = sig.explanation if sig else {}
@@ -737,5 +779,5 @@ class HistoricalScanManager:
             if "Performance" not in sheet.title:
                 sheet.auto_filter.ref = f"A1:{get_column_letter(sheet.max_column)}{sheet.max_row}"
 
-        wb.save("c:/Indian_Swing/indian_swing_historical_journal.xlsx")
+        wb.save(save_path)
 

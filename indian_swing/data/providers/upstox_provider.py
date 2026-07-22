@@ -70,7 +70,7 @@ class UpstoxProvider(DataProvider):
                 if should_download:
                     url = f"https://assets.upstox.com/market-quote/instruments/exchange/{exchange}.json.gz"
                     try:
-                        logger.info("upstox.download_instrument_master", exchange=exchange, url=url)
+                        # logger.info("upstox.download_instrument_master", exchange=exchange, url=url)
                         async with httpx.AsyncClient() as client:
                             response = await client.get(url, timeout=30.0)
                             response.raise_for_status()
@@ -87,7 +87,7 @@ class UpstoxProvider(DataProvider):
                         )
 
                 try:
-                    logger.info("upstox.parse_instrument_master", exchange=exchange, path=str(local_path))
+                    # logger.info("upstox.parse_instrument_master", exchange=exchange, path=str(local_path))
                     # Read the gzip compressed JSON
                     with gzip.open(local_path, "rt", encoding="utf-8") as f:
                         data = json.load(f)
@@ -233,7 +233,7 @@ class UpstoxProvider(DataProvider):
                     df = await self.fetch_ohlcv(sym, sym_start, end, timeframe)
                     return sym, df
                 except Exception as e:
-                    logger.warning("upstox.bulk_symbol_failed", symbol=sym, error=str(e))
+                    # logger.warning("upstox.bulk_symbol_failed", symbol=sym, error=str(e))
                     return sym, pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
 
         tasks = [fetch_one(s, i) for i, s in enumerate(symbols)]

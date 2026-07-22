@@ -71,12 +71,12 @@ class OHLCVValidator:
         pct_change = df["close"].pct_change().abs() * 100
         extreme = pct_change > self.cfg.max_gap_pct
         if extreme.any():
-            logger.warning(
-                "validator.extreme_gaps",
-                symbol=symbol,
-                count=int(extreme.sum()),
-                threshold_pct=self.cfg.max_gap_pct,
-            )
+            # logger.warning(
+            #     "validator.extreme_gaps",
+            #     symbol=symbol,
+            #     count=int(extreme.sum()),
+            #     threshold_pct=self.cfg.max_gap_pct,
+            # )
             df = df[~extreme]
         return df
 

@@ -12,6 +12,7 @@ export default function HistoricalScan() {
   const [loadingRecs, setLoadingRecs] = useState(false)
   const [isResuming, setIsResuming] = useState(false)
   const [tradeFilter, setTradeFilter] = useState('all')
+  const [accuracyFilter, setAccuracyFilter] = useState('all')
   const [performanceTab, setPerformanceTab] = useState('overall')
   const [selectedTrade, setSelectedTrade] = useState(null)
   
@@ -96,7 +97,7 @@ export default function HistoricalScan() {
   }
 
   const handleDownloadExcel = () => {
-    window.open('/api/historical/export', '_blank')
+    window.open(`/api/historical/export?universe=${tradeFilter}&accuracy=${accuracyFilter}`, '_blank')
   }
 
   // Calculate progress percentage
@@ -458,33 +459,65 @@ export default function HistoricalScan() {
       {activeTab === 'trades' && (
         <div className="card" style={{ padding: '16px' }}>
           
-          {/* Universe Filters */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', alignItems: 'center' }}>
-            <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', fontWeight: 600 }}>Execution Universe:</span>
-            {[
-              { id: 'all', label: 'All Paper Trades' },
-              { id: 'nifty500', label: 'NIFTY 500 Only' },
-              { id: 'non_nifty500', label: 'Non-NIFTY 500 Only' }
-            ].map((f) => (
-              <button
-                key={f.id}
-                onClick={() => setTradeFilter(f.id)}
-                style={{
-                  background: tradeFilter === f.id ? 'var(--accent-blue)' : 'rgba(255,255,255,0.06)',
-                  border: 'none',
-                  borderRadius: 'var(--radius-sm)',
-                  color: '#fff',
-                  padding: '8px 16px',
-                  cursor: 'pointer',
-                  fontSize: '0.8rem',
-                  fontWeight: '600',
-                  transition: 'all 0.2s ease'
-                }}
-                className="card-hover"
-              >
-                {f.label}
-              </button>
-            ))}
+          {/* Universe & Accuracy Filters */}
+          <div style={{ display: 'flex', gap: '24px', marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', fontWeight: 600 }}>Execution Universe:</span>
+              {[
+                { id: 'all', label: 'All Paper Trades' },
+                { id: 'nifty500', label: 'NIFTY 500 Only' },
+                { id: 'non_nifty500', label: 'Non-NIFTY 500 Only' }
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setTradeFilter(f.id)}
+                  style={{
+                    background: tradeFilter === f.id ? 'var(--accent-blue)' : 'rgba(255,255,255,0.06)',
+                    border: 'none',
+                    borderRadius: 'var(--radius-sm)',
+                    color: '#fff',
+                    padding: '8px 16px',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    transition: 'all 0.2s ease'
+                  }}
+                  className="card-hover"
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', fontWeight: 600 }}>Accuracy Score:</span>
+              {[
+                { id: 'all', label: 'All Scores' },
+                { id: '90_100', label: '90% - 100%' },
+                { id: '80_90', label: '80% - 90%' },
+                { id: '70_80', label: '70% - 80%' },
+                { id: 'below_70', label: 'Below 70%' }
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setAccuracyFilter(f.id)}
+                  style={{
+                    background: accuracyFilter === f.id ? 'var(--accent-purple)' : 'rgba(255,255,255,0.06)',
+                    border: 'none',
+                    borderRadius: 'var(--radius-sm)',
+                    color: '#fff',
+                    padding: '8px 16px',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    transition: 'all 0.2s ease'
+                  }}
+                  className="card-hover"
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div style={{ overflowX: 'auto' }}>
@@ -494,6 +527,7 @@ export default function HistoricalScan() {
                   <th style={{ padding: '12px 8px' }}>Symbol</th>
                   <th style={{ padding: '12px 8px' }}>Universe</th>
                   <th style={{ padding: '12px 8px' }}>Status</th>
+                  <th style={{ padding: '12px 8px' }}>Accuracy %</th>
                   <th style={{ padding: '12px 8px' }}>Entry Date</th>
                   <th style={{ padding: '12px 8px' }}>Entry Price</th>
                   <th style={{ padding: '12px 8px' }}>Stop Loss</th>
@@ -509,14 +543,23 @@ export default function HistoricalScan() {
               <tbody>
                 {(() => {
                   const filtered = trades.filter((t) => {
-                    if (tradeFilter === 'nifty500') return t.execution_universe === 'NIFTY500';
-                    if (tradeFilter === 'non_nifty500') return t.execution_universe === 'NON_NIFTY500';
+                    // Universe filter
+                    if (tradeFilter === 'nifty500' && t.execution_universe !== 'NIFTY500') return false;
+                    if (tradeFilter === 'non_nifty500' && t.execution_universe === 'NON_NIFTY500') return false;
+                    
+                    // Accuracy Filter
+                    const score = t.accuracy_pct ?? 0;
+                    if (accuracyFilter === '90_100') return score >= 90 && score <= 100;
+                    if (accuracyFilter === '80_90') return score >= 80 && score < 90;
+                    if (accuracyFilter === '70_80') return score >= 70 && score < 80;
+                    if (accuracyFilter === 'below_70') return score < 70;
+                    
                     return true;
                   });
                   if (filtered.length === 0) {
                     return (
                       <tr>
-                        <td colSpan="13" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                        <td colSpan="14" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)' }}>
                           No paper trades found matching this filter.
                         </td>
                       </tr>
@@ -553,6 +596,9 @@ export default function HistoricalScan() {
                         }}>
                           {t.status}
                         </span>
+                      </td>
+                      <td style={{ padding: '12px 8px', fontWeight: '600', color: 'var(--accent-blue-bright)' }}>
+                        {t.accuracy_pct !== undefined ? `${t.accuracy_pct.toFixed(0)}%` : '0%'}
                       </td>
                       <td style={{ padding: '12px 8px' }}>{t.entry_date || 'N/A'}</td>
                       <td style={{ padding: '12px 8px' }}>{t.entry_price ? `₹${t.entry_price.toFixed(2)}` : 'N/A'}</td>

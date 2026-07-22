@@ -289,7 +289,7 @@ class RecommendationScanner:
                     if "errors" not in self.progress_state:
                         self.progress_state["errors"] = []
                     self.progress_state["errors"].append(error_msg)
-                    logger.error("scanner.stock_failed", symbol=stock.symbol, stage=self.progress_state["current_stage"], error=str(exc))
+                    # logger.error("scanner.stock_failed", symbol=stock.symbol, stage=self.progress_state["current_stage"], error=str(exc))
                     if result.stocks_scanned % 10 == 0 or result.stocks_scanned == len(stocks):
                         await asyncio.get_running_loop().run_in_executor(
                             None,

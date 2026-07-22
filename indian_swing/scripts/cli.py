@@ -98,7 +98,7 @@ def scan_run():
 
 @scan_app.command("historical")
 def scan_historical():
-    configure_logging(fmt="console")
+    configure_logging(level="WARNING", fmt="console")
 
     async def _run():
         from indian_swing.database.connection import get_sync_session, init_db
@@ -146,7 +146,7 @@ def scan_historical():
             typer.echo("Fetching benchmark calendar to identify active trading days...")
             from indian_swing.database.repositories.stock_repo import StockRepository
             from indian_swing.config.settings import settings
-            from indian_swing.database.models import Stock, OHLCVData
+            from indian_swing.database.models import Stock, OHLCV
             
             benchmark_symbol = settings.scanner.benchmark_symbol
             lookback = 282
@@ -171,12 +171,12 @@ def scan_historical():
                     return
 
                 candles = session.execute(
-                    select(OHLCVData)
-                    .where(OHLCVData.stock_uuid == benchmark_stock.stock_uuid)
-                    .where(OHLCVData.timeframe == "1d")
-                    .where(OHLCVData.date >= from_d)
-                    .where(OHLCVData.date <= to_d)
-                    .order_by(OHLCVData.date)
+                    select(OHLCV)
+                    .where(OHLCV.stock_uuid == benchmark_stock.stock_uuid)
+                    .where(OHLCV.timeframe == "1d")
+                    .where(OHLCV.date >= from_d)
+                    .where(OHLCV.date <= to_d)
+                    .order_by(OHLCV.date)
                 ).scalars().all()
                 dates = [c.date for c in candles]
 
@@ -195,11 +195,6 @@ def scan_historical():
             curr_date = dates[idx]
             date_str = curr_date.strftime("%d/%m/%y")
             
-            typer.echo("\n" + "="*40)
-            typer.echo(f"Trading Day {idx+1} of {total}")
-            typer.echo(f"Current Date: {date_str}")
-            typer.echo("Status: Scanning...")
-
             # Run scan first to fetch/download OHLCV data for curr_date
             result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
 
@@ -247,13 +242,9 @@ def scan_historical():
                 # Generate Excel
                 manager.generate_excel_report(db_session)
 
-            typer.echo(f"Recommendations Found: {result.recommendations_saved}")
-            typer.echo("Saved: Yes")
-            typer.echo(f"Paper Trades Created: {trades_created}")
-            typer.echo("Status: Completed")
+            typer.echo(f"Trading Day {idx+1}/{total} | Date: {date_str} | Recs Found: {result.recommendations_saved} | Trades Created: {trades_created} | ETA: {eta_min:.1f}m")
 
-            if idx + 1 < total:
-                typer.echo("\nTrading Day completed. Continuing to next queued date...")
+            pass
 
         typer.echo("\n" + "="*40)
         typer.echo("Historical scan and paper trading simulation completed!")
