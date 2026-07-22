@@ -183,17 +183,35 @@ class RecommendationScanner:
                     start = scan_date - timedelta(days=int(lookback * 1.8))
                     benchmark_daily = repo.to_dataframe(benchmark_stock.stock_uuid, start, scan_date, "1d")
 
+            # Bulk load all daily OHLCV data for all stocks in a single query
+            start_date = scan_date - timedelta(days=int(lookback * 1.8))
+            with get_sync_session() as session:
+                repo = OHLCVRepository(session)
+                all_uuids = [stock.stock_uuid for stock in stocks]
+                bulk_dfs = repo.to_dataframe_bulk(all_uuids, start_date, scan_date, "1d")
+
             for stock in stocks:
                 self.progress_state["current_symbol"] = stock.symbol
                 self.progress_state["current_stage"] = "Generating Indicators"
                 try:
-                    context = await asyncio.get_running_loop().run_in_executor(
-                        None,
-                        self._load_strategy_context,
+                    daily = bulk_dfs.get(stock.stock_uuid)
+                    if daily is None or daily.empty:
+                        with get_sync_session() as session:
+                            repo = OHLCVRepository(session)
+                            daily = repo.to_dataframe(stock.stock_uuid, start_date, scan_date, "1d")
+
+                    if daily.empty:
+                        validation_counter["No daily history available"] += 1
+                        result.failed_stocks += 1
+                        self.progress_state["failed"] = result.failed_stocks
+                        result.stocks_scanned += 1
+                        self.progress_state["completed"] = result.stocks_scanned
+                        continue
+
+                    context = self._build_strategy_context(
                         stock,
-                        lookback,
+                        daily,
                         scan_date,
-                        benchmark_stock,
                         benchmark_daily,
                     )
                     self.progress_state["current_stage"] = "Running Strategy"
@@ -484,6 +502,25 @@ class RecommendationScanner:
             session.add(job)
             session.flush()
             return job.scan_uuid
+
+    def _build_strategy_context(
+        self,
+        stock: Stock,
+        daily: pd.DataFrame,
+        scan_date: date,
+        benchmark_daily: pd.DataFrame | None = None,
+    ) -> StrategyContext:
+        if daily.empty:
+            raise ValueError("No daily history available")
+        bundle = IndicatorCalculator.build(daily, benchmark_daily if benchmark_daily is not None and not benchmark_daily.empty else None)
+        return StrategyContext(
+            symbol=stock.symbol,
+            exchange=stock.exchange,
+            daily=bundle.daily,
+            weekly=bundle.weekly,
+            benchmark_daily=bundle.benchmark_daily,
+            as_of_date=scan_date,
+        )
 
     def _load_strategy_context(
         self,

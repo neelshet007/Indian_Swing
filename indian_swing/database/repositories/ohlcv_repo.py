@@ -73,6 +73,49 @@ class OHLCVRepository(BaseRepository[OHLCV]):
         frame.index.name = "date"
         return frame
 
+    def to_dataframe_bulk(self, stock_uuids: list[str], start: date, end: date, timeframe: str = "1d") -> dict[str, pd.DataFrame]:
+        rows = self._session.execute(
+            select(OHLCV)
+            .where(
+                and_(
+                    OHLCV.stock_uuid.in_(stock_uuids),
+                    OHLCV.date >= start,
+                    OHLCV.date <= end,
+                    OHLCV.timeframe == timeframe,
+                )
+            )
+            .order_by(OHLCV.date)
+        ).scalars().all()
+
+        by_uuid = {}
+        for r in rows:
+            if r.stock_uuid not in by_uuid:
+                by_uuid[r.stock_uuid] = []
+            by_uuid[r.stock_uuid].append(r)
+
+        result = {}
+        for uuid in stock_uuids:
+            uuid_rows = by_uuid.get(uuid, [])
+            if not uuid_rows:
+                result[uuid] = pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
+                continue
+            frame = pd.DataFrame(
+                {
+                    "date": row.date,
+                    "open": row.open,
+                    "high": row.high,
+                    "low": row.low,
+                    "close": row.close,
+                    "volume": row.volume,
+                }
+                for row in uuid_rows
+            )
+            frame["date"] = pd.to_datetime(frame["date"])
+            frame = frame.sort_values("date").set_index("date")
+            frame.index.name = "date"
+            result[uuid] = frame
+        return result
+
     def bulk_insert_ignore(self, records: list[dict]) -> int:
         if not records:
             return 0
