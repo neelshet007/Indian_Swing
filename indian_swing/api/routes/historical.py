@@ -5,7 +5,7 @@ from datetime import date
 from typing import Optional
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, text
 
 from indian_swing.database.connection import get_sync_session
 from indian_swing.database.models import (
@@ -30,8 +30,9 @@ _active_session_id: Optional[str] = None
 def run_migrations():
     with get_sync_session() as session:
         try:
-            session.execute("ALTER TABLE sw_historical_scan_sessions ADD COLUMN IF NOT EXISTS strategy_name VARCHAR(80);")
+            session.execute(text("ALTER TABLE sw_historical_scan_sessions ADD COLUMN IF NOT EXISTS strategy_name VARCHAR(80);"))
             session.commit()
+            logger.info("Database migration (strategy_name column) executed successfully.")
         except Exception as e:
             logger.error(f"Failed to run migration: {e}")
 
