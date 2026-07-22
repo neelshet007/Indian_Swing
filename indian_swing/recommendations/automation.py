@@ -43,12 +43,15 @@ class HistoricalScanManager:
                 .order_by(HistoricalScanSession.created_at.desc())
             ).scalars().first()
 
-    def create_session(self, dates: List[date]) -> HistoricalScanSession:
+    def create_session(self, dates: List[date], strategy_name: str = "sivcs_vcp") -> HistoricalScanSession:
         """Create a new historical scan session."""
+        from sqlalchemy import update
         with get_sync_session() as session:
-            # Delete older active sessions to avoid conflicts
+            # Mark older active sessions as paused to avoid conflicts and retain history
             session.execute(
-                delete(HistoricalScanSession).where(HistoricalScanSession.status == "active")
+                update(HistoricalScanSession)
+                .where(HistoricalScanSession.status == "active")
+                .values(status="paused")
             )
             
             queue_str = [d.strftime("%d/%m/%y") for d in dates]
@@ -56,7 +59,8 @@ class HistoricalScanManager:
                 total_days=len(dates),
                 completed_days=0,
                 queue=queue_str,
-                status="active"
+                status="active",
+                strategy_name=strategy_name
             )
             session.add(new_session)
             session.commit()

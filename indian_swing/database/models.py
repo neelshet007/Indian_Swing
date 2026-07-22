@@ -471,6 +471,7 @@ class HistoricalScanSession(Base):
     completed_days: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     queue: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
     status: Mapped[str] = mapped_column(String(30), default="active", nullable=False) # active, completed, failed
+    strategy_name: Mapped[Optional[str]] = mapped_column(String(80), nullable=True)
     current_date: Mapped[Optional[str]] = mapped_column(String(30))
     current_symbol: Mapped[Optional[str]] = mapped_column(String(30))
     stocks_scanned: Mapped[Optional[int]] = mapped_column(Integer, default=0)

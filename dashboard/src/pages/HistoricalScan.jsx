@@ -18,6 +18,7 @@ export default function HistoricalScan() {
   const [strategyFilter, setStrategyFilter] = useState('all')
   const [perfStrategy, setPerfStrategy] = useState('overall')
   const [perfUniverse, setPerfUniverse] = useState('overall')
+  const [sessions, setSessions] = useState([])
   
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -60,6 +61,9 @@ export default function HistoricalScan() {
 
       const reportRes = await axios.get('/api/historical/report')
       setReport(reportRes.data)
+
+      const sessRes = await axios.get('/api/historical/sessions')
+      setSessions(sessRes.data)
     } catch (err) {
       console.error('Error fetching historical scanner data:', err)
     }
@@ -74,16 +78,39 @@ export default function HistoricalScan() {
     return () => clearInterval(interval)
   }, [])
 
+  // Handle Pause action
+  const handlePause = async () => {
+    try {
+      await axios.post('/api/historical/pause')
+      fetchData()
+    } catch (err) {
+      alert('Failed to pause scan: ' + (err.response?.data?.detail || err.message))
+    }
+  }
+
   // Handle Resume action
-  const handleResume = async () => {
+  const handleResume = async (sessionId = null) => {
     setIsResuming(true)
     try {
-      await axios.post('/api/historical/resume')
+      await axios.post('/api/historical/resume', { session_id: sessionId })
       fetchData()
     } catch (err) {
       alert('Failed to resume scan: ' + (err.response?.data?.detail || err.message))
     } finally {
       setIsResuming(false)
+    }
+  }
+
+  // Handle Delete session
+  const handleDeleteSession = async (sessionId) => {
+    if (!window.confirm("Are you sure you want to delete this scan session? This will remove the session history from the manager.")) {
+      return
+    }
+    try {
+      await axios.delete(`/api/historical/sessions/${sessionId}`)
+      fetchData()
+    } catch (err) {
+      alert('Failed to delete session: ' + (err.response?.data?.detail || err.message))
     }
   }
 
@@ -160,7 +187,7 @@ export default function HistoricalScan() {
       </div>
 
       {/* Date Range Scan Initiator Card */}
-      {(!progress || progress.status !== 'active') && (
+      {(!progress || (progress.status !== 'running' && progress.status !== 'active')) && (
         <div className="card" style={{ padding: '24px', marginBottom: '24px', border: '1px solid var(--border)' }}>
           <h3 style={{ marginBottom: '16px', color: 'var(--text-primary)' }}>Start New Historical Scan</h3>
           <form onSubmit={handleStartNewScan} style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -241,12 +268,30 @@ export default function HistoricalScan() {
       )}
 
       {/* Live Progress Bar Card */}
-      {progress && progress.status === 'active' && (
+      {progress && (progress.status === 'running' || progress.status === 'active') && (
         <div className="card" style={{ padding: '24px', marginBottom: '24px', border: '1px solid var(--border-accent)' }}>
-          <h3 style={{ marginBottom: '12px', color: 'var(--accent-blue-bright)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="status-dot" style={{ background: 'var(--accent-blue)', boxShadow: '0 0 10px var(--accent-blue)' }} />
-            Historical Scan Running...
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <h3 style={{ margin: 0, color: 'var(--accent-blue-bright)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="status-dot" style={{ background: 'var(--accent-blue)', boxShadow: '0 0 10px var(--accent-blue)' }} />
+              Historical Scan Running... ({progress.strategy_name === 'sivcs_vcp' ? 'Stat 1 (VCP)' : 'Stat 2 (AMRC)'})
+            </h3>
+            <button
+              onClick={handlePause}
+              className="card-hover"
+              style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: 'var(--radius-sm)',
+                color: 'var(--accent-red)',
+                padding: '6px 12px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.8rem'
+              }}
+            >
+              ⏸ Pause Scan
+            </button>
+          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.88rem' }}>
             <span>Progress: {progress.completed_days} / {progress.total_days} Trading Days ({progressPct}%)</span>
             <span>ETA: {progress.eta_minutes} Minutes</span>
@@ -275,6 +320,159 @@ export default function HistoricalScan() {
               <strong style={{ fontSize: '1.1rem', color: 'var(--accent-blue-bright)' }}>{progress.paper_trades_created}</strong>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Paused Session Header Card */}
+      {progress && progress.status === 'paused' && (
+        <div className="card" style={{ padding: '24px', marginBottom: '24px', border: '1px solid rgba(245, 158, 11, 0.3)', background: 'rgba(245, 158, 11, 0.02)' }}>
+          <h3 style={{ marginBottom: '12px', color: 'var(--accent-amber)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="status-dot" style={{ background: 'var(--accent-amber)' }} />
+            Historical Scan Session Paused
+          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.88rem' }}>
+            <span>Paused at: {progress.completed_days} / {progress.total_days} Trading Days | Strategy: {progress.strategy_name === 'sivcs_vcp' ? 'Stat 1 (VCP)' : 'Stat 2 (AMRC)'}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+            <button
+              onClick={() => handleResume(progress.session_id)}
+              className="card-hover"
+              style={{
+                background: 'var(--accent-blue)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                color: '#fff',
+                padding: '10px 20px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              {isResuming ? 'Resuming...' : '▶ Resume Historical Scan'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Saved Historical Scan Sessions Manager */}
+      {(!progress || (progress.status !== 'running' && progress.status !== 'active')) && (
+        <div className="card" style={{ padding: '24px', marginBottom: '24px', border: '1px solid var(--border)' }}>
+          <h3 style={{ margin: '0 0 16px', color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>📂 Saved Historical Scan Sessions ({sessions.length})</span>
+            <button 
+              onClick={fetchData} 
+              className="card-hover" 
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                color: '#fff',
+                padding: '6px 12px',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: '600'
+              }}
+            >
+              🔄 Refresh Sessions
+            </button>
+          </h3>
+          {sessions.length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)', border: '1px dashed var(--border)', borderRadius: 'var(--radius-sm)' }}>
+              No saved sessions found. Start a new scan above.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {sessions.map((s) => (
+                <div 
+                  key={s.id} 
+                  style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    padding: '16px', 
+                    background: 'rgba(255,255,255,0.01)', 
+                    borderRadius: 'var(--radius-sm)', 
+                    border: '1px solid var(--border)' 
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <strong style={{ color: 'var(--text-primary)' }}>
+                        Session ({s.total_days} Days)
+                      </strong>
+                      <span 
+                        style={{ 
+                          fontSize: '0.7rem', 
+                          padding: '2px 6px', 
+                          borderRadius: '3px', 
+                          fontWeight: 600,
+                          background: s.strategy_name === 'sivcs_vcp' ? 'rgba(59,130,246,0.1)' : 'rgba(139,92,246,0.1)',
+                          color: s.strategy_name === 'sivcs_vcp' ? 'var(--accent-blue-bright)' : 'var(--accent-purple)'
+                        }}
+                      >
+                        {s.strategy_name === 'sivcs_vcp' ? 'Stat 1 (VCP)' : 'Stat 2 (AMRC)'}
+                      </span>
+                      <span 
+                        style={{
+                          fontSize: '0.7rem',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          fontWeight: '600',
+                          background: s.status === 'completed' ? 'rgba(34,197,94,0.1)' : s.status === 'paused' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)',
+                          color: s.status === 'completed' ? 'var(--accent-green)' : s.status === 'paused' ? 'var(--accent-amber)' : 'var(--accent-red)'
+                        }}
+                      >
+                        {s.status.toUpperCase()}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                      Progress: {s.completed_days} / {s.total_days} days | Scanned: {s.stocks_scanned || 0} stocks | Created: {s.paper_trades_created || 0} trades
+                    </div>
+                    {s.created_at && (
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        Created at: {new Date(s.created_at).toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {(s.status === 'paused' || s.status === 'failed') && (
+                      <button 
+                        onClick={() => handleResume(s.id)}
+                        className="card-hover"
+                        style={{
+                          background: 'var(--accent-blue)',
+                          border: 'none',
+                          borderRadius: 'var(--radius-sm)',
+                          color: '#fff',
+                          padding: '6px 12px',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        ▶ Resume
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => handleDeleteSession(s.id)}
+                      className="card-hover"
+                      style={{
+                        background: 'rgba(239,68,68,0.06)',
+                        border: '1px solid rgba(239,68,68,0.15)',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'var(--accent-red)',
+                        padding: '6px 12px',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '0.8rem'
+                      }}
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

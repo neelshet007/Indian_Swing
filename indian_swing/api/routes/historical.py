@@ -5,7 +5,7 @@ from datetime import date
 from typing import Optional
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
-from sqlalchemy import select
+from sqlalchemy import select, update, delete
 
 from indian_swing.database.connection import get_sync_session
 from indian_swing.database.models import (
@@ -23,12 +23,28 @@ logger = get_logger(__name__)
 router = APIRouter()
 _manager = HistoricalScanManager()
 _active_task: Optional[asyncio.Task] = None
+_active_session_id: Optional[str] = None
+
+
+@router.on_event("startup")
+def run_migrations():
+    with get_sync_session() as session:
+        try:
+            session.execute("ALTER TABLE sw_historical_scan_sessions ADD COLUMN IF NOT EXISTS strategy_name VARCHAR(80);")
+            session.commit()
+        except Exception as e:
+            logger.error(f"Failed to run migration: {e}")
 
 
 @router.get("/progress")
 async def get_progress():
     """Get progress of the active historical scan session."""
-    session_obj = _manager.get_active_session()
+    session_obj = None
+    if _active_session_id:
+        with get_sync_session() as session:
+            session_obj = session.get(HistoricalScanSession, _active_session_id)
+    if not session_obj:
+        session_obj = _manager.get_active_session()
     if not session_obj:
         return {"status": "idle", "session": None}
 
@@ -42,11 +58,14 @@ async def get_progress():
         ).scalars().all()
         
         status = session_obj.status
-        if status == "active" and (_active_task is None or _active_task.done()):
+        is_running = (_active_task is not None and not _active_task.done() and session_obj.id == _active_session_id)
+        if status == "active" and not is_running:
             status = "paused"
 
         return {
-            "status": "running" if status == "active" else status,
+            "status": "running" if is_running else status,
+            "session_id": session_obj.id,
+            "strategy_name": session_obj.strategy_name or "sivcs_vcp",
             "completed_days": session_obj.completed_days,
             "total_days": session_obj.total_days,
             "queue": session_obj.queue,
@@ -240,10 +259,12 @@ async def download_excel_report(universe: str = "all", accuracy: str = "all"):
 
 
 @router.post("/start")
-async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks):
-    global _active_task
+async def start_historical_scan(payload: dict):
+    global _active_task, _active_session_id
     if _active_task is not None and not _active_task.done():
         raise HTTPException(status_code=409, detail="A scan session is already running")
+
+    _manager.stop_requested = False
 
     strategy_name = payload.get("strategy", "sivcs_vcp")
     from indian_swing.strategies.registry import strategy_registry
@@ -305,13 +326,24 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
     if not trading_dates:
         raise HTTPException(status_code=400, detail="No active trading days found in the selected date range")
 
-    session_obj = _manager.create_session(trading_dates)
+    session_obj = _manager.create_session(trading_dates, strategy_name=strategy_name)
+    _active_session_id = session_obj.id
 
     async def _run():
         total = len(trading_dates)
         start_time = datetime.now()
         
         for idx in range(0, total):
+            if _manager.stop_requested:
+                logger.info("historical.scan_stopped_by_user")
+                with get_sync_session() as db_session:
+                    s_obj = db_session.get(HistoricalScanSession, session_obj.id)
+                    if s_obj:
+                        s_obj.status = "paused"
+                        db_session.flush()
+                        db_session.commit()
+                break
+
             curr_date = trading_dates[idx]
             date_str = curr_date.strftime("%d/%m/%y")
             logger.info("historical.day_started", day=idx+1, total=total, date=date_str)
@@ -323,6 +355,7 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
                     s_obj.current_date = date_str
                     s_obj.status = "active"
                     db_session.flush()
+                    db_session.commit()
 
             with get_sync_session() as db_session:
                 _manager.update_paper_trades(db_session, curr_date)
@@ -356,6 +389,7 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
                     if idx + 1 == total:
                         s_obj.status = "completed"
                     db_session.flush()
+                    db_session.commit()
 
                 _manager.generate_excel_report(db_session)
             
@@ -366,57 +400,84 @@ async def start_historical_scan(payload: dict, background_tasks: BackgroundTasks
 
 
 @router.post("/resume")
-async def resume_historical_scan(background_tasks: BackgroundTasks):
+async def resume_historical_scan(payload: dict = None):
     """Resume historical scan in the background."""
-    global _active_task
+    global _active_task, _active_session_id
     if _active_task is not None and not _active_task.done():
         raise HTTPException(status_code=409, detail="A scan session is already running")
 
-    session_obj = _manager.get_active_session()
-    if not session_obj:
-        raise HTTPException(status_code=404, detail="No active historical scan found to resume")
+    _manager.stop_requested = False
+    session_id = payload.get("session_id") if payload else None
 
-    # Run in background non-interactively
+    with get_sync_session() as session:
+        if session_id:
+            session_obj = session.get(HistoricalScanSession, session_id)
+        else:
+            session_obj = _manager.get_active_session()
+
+        if not session_obj:
+            raise HTTPException(status_code=404, detail="No historical scan found to resume")
+
+        session_id = session_obj.id
+        completed_days = session_obj.completed_days
+        queue = list(session_obj.queue)
+        strategy_name = session_obj.strategy_name or "sivcs_vcp"
+
+    _active_session_id = session_id
+
+    # Load strategy
+    from indian_swing.strategies.registry import strategy_registry
+    _manager.scanner.strategy = strategy_registry.get(strategy_name)
+
     async def _run():
         from datetime import datetime
-        manager = HistoricalScanManager()
         
         # Re-parse dates
         dates = []
-        for ds in session_obj.queue:
+        for ds in queue:
             from indian_swing.recommendations.automation import validate_date
             parsed = validate_date(ds)
             if parsed:
                 dates.append(parsed)
 
         total = len(dates)
-        start_idx = session_obj.completed_days
+        start_idx = completed_days
         
         start_time = datetime.now()
         for idx in range(start_idx, total):
+            if _manager.stop_requested:
+                logger.info("historical.scan_stopped_by_user")
+                with get_sync_session() as db_session:
+                    s_obj = db_session.get(HistoricalScanSession, session_id)
+                    if s_obj:
+                        s_obj.status = "paused"
+                        db_session.flush()
+                        db_session.commit()
+                break
+
             curr_date = dates[idx]
             date_str = curr_date.strftime("%d/%m/%y")
             logger.info("historical.day_started", day=idx+1, total=total, date=date_str)
             
             # Run scan first to fetch/download OHLCV data for curr_date
-            result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
+            result = await _manager.scanner.scan(scan_date=curr_date, force_refresh=False)
 
             # Update session progress info
             with get_sync_session() as db_session:
-                # Re-fetch session
-                s_obj = db_session.get(HistoricalScanSession, session_obj.id)
+                s_obj = db_session.get(HistoricalScanSession, session_id)
                 if s_obj:
                     s_obj.current_date = date_str
                     s_obj.status = "active"
                     db_session.flush()
+                    db_session.commit()
 
             # Run paper trade checks AFTER scan is complete so data exists in the database
             with get_sync_session() as db_session:
-                manager.update_paper_trades(db_session, curr_date)
+                _manager.update_paper_trades(db_session, curr_date)
 
             # Insert pending trades and update stats
             with get_sync_session() as db_session:
-                trades_created = manager.create_pending_trades(db_session, result.scan_uuid)
+                trades_created = _manager.create_pending_trades(db_session, result.scan_uuid)
                 
                 # Fetch counts
                 completed_count = len(db_session.execute(
@@ -433,7 +494,7 @@ async def resume_historical_scan(background_tasks: BackgroundTasks):
                 remaining = total - (idx + 1)
                 eta_min = (avg_time * remaining) / 60.0
 
-                s_obj = db_session.get(HistoricalScanSession, session_obj.id)
+                s_obj = db_session.get(HistoricalScanSession, session_id)
                 if s_obj:
                     s_obj.completed_days = idx + 1
                     s_obj.stocks_scanned = result.stocks_scanned
@@ -446,11 +507,59 @@ async def resume_historical_scan(background_tasks: BackgroundTasks):
                     if idx + 1 == total:
                         s_obj.status = "completed"
                     db_session.flush()
+                    db_session.commit()
 
                 # Excel auto-update
-                manager.generate_excel_report(db_session)
+                _manager.generate_excel_report(db_session)
             
             logger.info("historical.day_completed", day=idx+1, total=total, date=date_str, recs_found=result.recommendations_saved, trades_created=trades_created)
 
     _active_task = asyncio.create_task(_run())
     return {"status": "resumed"}
+
+
+@router.post("/pause")
+async def pause_historical_scan():
+    """Pause the currently running historical scan session."""
+    _manager.stop_requested = True
+    return {"status": "pause_requested"}
+
+
+@router.get("/sessions")
+async def list_sessions():
+    """List all historical scan sessions."""
+    loop = asyncio.get_running_loop()
+    def _fetch():
+        with get_sync_session() as session:
+            sessions = session.execute(
+                select(HistoricalScanSession)
+                .order_by(HistoricalScanSession.created_at.desc())
+            ).scalars().all()
+            return [
+                {
+                    "id": s.id,
+                    "total_days": s.total_days,
+                    "completed_days": s.completed_days,
+                    "status": "active" if (_active_task is not None and not _active_task.done() and s.id == _active_session_id) else (s.status if s.status != "active" else "paused"),
+                    "strategy_name": s.strategy_name or "sivcs_vcp",
+                    "current_date": s.current_date,
+                    "stocks_scanned": s.stocks_scanned,
+                    "recommendations_today": s.recommendations_today,
+                    "paper_trades_created": s.paper_trades_created,
+                    "created_at": s.created_at.isoformat() if s.created_at else None
+                }
+                for s in sessions
+            ]
+    return await loop.run_in_executor(None, _fetch)
+
+
+@router.delete("/sessions/{session_id}")
+async def delete_session(session_id: str):
+    """Delete a historical scan session by ID."""
+    with get_sync_session() as session:
+        s_obj = session.get(HistoricalScanSession, session_id)
+        if s_obj:
+            session.delete(s_obj)
+            session.commit()
+            return {"status": "deleted"}
+        raise HTTPException(status_code=404, detail="Session not found")
