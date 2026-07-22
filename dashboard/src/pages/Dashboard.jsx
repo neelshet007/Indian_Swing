@@ -76,6 +76,7 @@ export default function Dashboard() {
   const [scanStatus, setScanStatus] = useState(null)
   const [badgeCache, setBadgeCache] = useState({})
   const [liveStrategy, setLiveStrategy] = useState('all')
+  const [selectedStrategyFilter, setSelectedStrategyFilter] = useState('all')
 
   function formatDuration(start, end) {
     if (!start || !end) return null
