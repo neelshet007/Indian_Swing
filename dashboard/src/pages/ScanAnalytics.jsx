@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 
-const STAGE_ORDER = ['Universe', 'Market Filter', 'Sector Filter', 'Liquidity', 'Trend', 'Stage', 'Relative Strength', 'VCP', 'Breakout', 'Risk', 'BUY']
+const amrcStages = ['Universe', 'Universe Filter', 'Market Regime Filter', 'Quality Filter', 'Momentum Ranking', 'Relative Strength', 'Trend Filter', 'Volatility Filter', 'Volume Confirmation', 'Entry Trigger', 'BUY']
+const vcpStages = ['Universe', 'Market Filter', 'Sector Filter', 'Liquidity', 'Trend', 'Stage', 'Relative Strength', 'VCP', 'Breakout', 'Risk', 'BUY']
 
 function Card({ title, children, noPad = false }) {
   return (
@@ -87,8 +88,9 @@ export default function ScanAnalytics() {
           setAnalytics(anRes.data)
           // Default to first stage with failures if possible
           const funnel = anRes.data.funnel || {}
-          const firstFail = STAGE_ORDER.find(s => funnel[s] && funnel[s].fail > 0)
-          setActiveStage(firstFail || 'Trend')
+          const currentStages = scanRes.data?.strategy_name === 'amrc' ? amrcStages : vcpStages
+          const firstFail = currentStages.find(s => funnel[s] && funnel[s].fail > 0)
+          setActiveStage(firstFail || (scanRes.data?.strategy_name === 'amrc' ? 'Universe Filter' : 'Trend'))
         }
         
         // Reverse history for chron order in charts
@@ -149,7 +151,7 @@ export default function ScanAnalytics() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           <Card title="Strategy Funnel (Click Stage to Drill Down)" noPad>
             <div style={{ padding: '8px 0' }}>
-              {STAGE_ORDER.map(stage => {
+              {(scan?.strategy_name === 'amrc' ? amrcStages : vcpStages).map(stage => {
                 if (!funnel[stage] && stage !== 'Universe') return null
                 
                 let pass = 0, fail = 0, total = 0
