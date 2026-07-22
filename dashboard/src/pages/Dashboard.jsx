@@ -426,30 +426,58 @@ export default function Dashboard() {
         </div>
       ) : (
         <div>
+          {/* Strategy Tabs */}
+          <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', margin: '0 32px 20px', gap: '8px' }}>
+            {[
+              { id: 'all', label: 'All Recommendations' },
+              { id: 'sivcs_vcp', label: 'Stat 1 (VCP)' },
+              { id: 'amrc', label: 'Stat 2 (AMRC)' }
+            ].map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setSelectedStrategyFilter(f.id)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  borderBottom: selectedStrategyFilter === f.id ? '2px solid var(--accent-blue)' : '2px solid transparent',
+                  color: selectedStrategyFilter === f.id ? 'var(--accent-blue-bright)' : 'var(--text-secondary)',
+                  padding: '10px 16px',
+                  fontSize: '0.9rem',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
           {[
-            { id: 'sivcs_vcp', title: 'SIVCS VCP Strategy' },
-            { id: 'amrc', title: 'AMRC Momentum/Regime Strategy' }
-          ].map((strat) => {
-            const recs = recommendations.filter(r => (r.strategy_name || 'sivcs_vcp') === strat.id);
-            return (
-              <div key={strat.id} style={{ marginBottom: '40px' }}>
-                <h2 className="section-title" style={{ fontSize: '1.4rem', fontWeight: 700, margin: '20px 32px 15px', color: 'var(--accent-blue-bright)', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
-                  {strat.title} ({recs.length})
-                </h2>
-                {recs.length === 0 ? (
-                  <div style={{ margin: '0 32px 15px', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', border: '1px dashed var(--border)', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                    No recommendations available for {strat.title} on this date.
-                  </div>
-                ) : (
-                  <div className="rec-grid">
-                    {recs.map((rec) => (
-                      <RecCard key={rec.id} rec={rec} universes={badgeCache[rec.symbol]} />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+            { id: 'sivcs_vcp', title: 'SIVCS VCP Strategy (Stat 1)' },
+            { id: 'amrc', title: 'AMRC Momentum/Regime Strategy (Stat 2)' }
+          ]
+            .filter(strat => selectedStrategyFilter === 'all' || selectedStrategyFilter === strat.id)
+            .map((strat) => {
+              const recs = recommendations.filter(r => (r.strategy_name || 'sivcs_vcp') === strat.id);
+              return (
+                <div key={strat.id} style={{ marginBottom: '40px' }}>
+                  <h2 className="section-title" style={{ fontSize: '1.4rem', fontWeight: 700, margin: '20px 32px 15px', color: 'var(--accent-blue-bright)', borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
+                    {strat.title} ({recs.length})
+                  </h2>
+                  {recs.length === 0 ? (
+                    <div style={{ margin: '0 32px 15px', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', border: '1px dashed var(--border)', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                      No recommendations available for {strat.title} on this date.
+                    </div>
+                  ) : (
+                    <div className="rec-grid">
+                      {recs.map((rec) => (
+                        <RecCard key={rec.id} rec={rec} universes={badgeCache[rec.symbol]} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
         </div>
       )}
     </div>

@@ -15,6 +15,9 @@ export default function HistoricalScan() {
   const [accuracyFilter, setAccuracyFilter] = useState('all')
   const [performanceTab, setPerformanceTab] = useState('overall')
   const [selectedTrade, setSelectedTrade] = useState(null)
+  const [strategyFilter, setStrategyFilter] = useState('all')
+  const [perfStrategy, setPerfStrategy] = useState('overall')
+  const [perfUniverse, setPerfUniverse] = useState('overall')
   
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -276,46 +279,49 @@ export default function HistoricalScan() {
       )}
 
       {/* Performance Summary Metrics Card */}
-      {report && (report.overall?.total_trades > 0 || report.total_trades > 0) && (
+      {report && (report.overall?.overall?.total_trades > 0 || report.overall?.total_trades > 0 || report.total_trades > 0) && (
         <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
             <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>Performance Summary Metrics</h3>
-            <div style={{ display: 'flex', gap: '8px', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: 'var(--radius-sm)' }}>
-              <button 
-                onClick={() => setPerformanceTab('overall')}
-                style={{
-                  background: performanceTab === 'overall' ? 'var(--accent-blue)' : 'none',
-                  border: 'none',
-                  color: '#fff',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '0.8rem'
-                }}
-              >
-                Overall Performance
-              </button>
-              <button 
-                onClick={() => setPerformanceTab('nifty500')}
-                style={{
-                  background: performanceTab === 'nifty500' ? 'var(--accent-blue)' : 'none',
-                  border: 'none',
-                  color: '#fff',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '0.8rem'
-                }}
-              >
-                NIFTY 500 Performance
-              </button>
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+              {/* Strategy selector */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Strategy:</span>
+                <select
+                  value={perfStrategy}
+                  onChange={(e) => setPerfStrategy(e.target.value)}
+                  style={{ padding: '6px 12px', background: 'var(--bg-primary)', border: '1px solid var(--border)', color: '#fff', borderRadius: '4px', fontSize: '0.75rem' }}
+                >
+                  <option value="overall">Overall (All Strategies)</option>
+                  <option value="sivcs_vcp">Stat 1 (VCP)</option>
+                  <option value="amrc">Stat 2 (AMRC)</option>
+                </select>
+              </div>
+              {/* Universe selector */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Universe:</span>
+                <select
+                  value={perfUniverse}
+                  onChange={(e) => setPerfUniverse(e.target.value)}
+                  style={{ padding: '6px 12px', background: 'var(--bg-primary)', border: '1px solid var(--border)', color: '#fff', borderRadius: '4px', fontSize: '0.75rem' }}
+                >
+                  <option value="overall">Overall Universe</option>
+                  <option value="nifty500">Nifty 500</option>
+                  <option value="non_nifty500">Non-Nifty 500</option>
+                </select>
+              </div>
             </div>
           </div>
           
           {(() => {
-            const data = performanceTab === 'nifty500' ? (report.nifty500 || {}) : (report.overall || report);
+            const getPerformanceData = () => {
+              if (!report) return {};
+              if (report[perfStrategy]) {
+                return report[perfStrategy][perfUniverse] || {};
+              }
+              return perfUniverse === 'nifty500' ? (report.nifty500 || {}) : (report.overall || report);
+            };
+            const data = getPerformanceData();
             return (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
                 <div style={{ padding: '12px', borderLeft: '3px solid var(--accent-blue)' }}>
@@ -372,6 +378,35 @@ export default function HistoricalScan() {
         </div>
       )}
 
+      {/* Strategy Filter Selector */}
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '20px', background: 'var(--bg-card)', padding: '12px 16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
+        <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', fontWeight: 600 }}>Strategy Filter:</span>
+        {[
+          { id: 'all', label: 'All Strategies' },
+          { id: 'sivcs_vcp', label: 'Stat 1 (VCP)' },
+          { id: 'amrc', label: 'Stat 2 (AMRC)' }
+        ].map((f) => (
+          <button
+            key={f.id}
+            onClick={() => setStrategyFilter(f.id)}
+            style={{
+              background: strategyFilter === f.id ? 'var(--accent-blue)' : 'rgba(255,255,255,0.06)',
+              border: 'none',
+              borderRadius: 'var(--radius-sm)',
+              color: '#fff',
+              padding: '8px 16px',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              transition: 'all 0.2s ease'
+            }}
+            className="card-hover"
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {/* Tabs Selector */}
       <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '20px', gap: '8px' }}>
         <button
@@ -425,54 +460,59 @@ export default function HistoricalScan() {
               </tr>
             </thead>
             <tbody>
-              {scans.map((scan) => (
-                <tr key={scan.scan_uuid} style={{ borderBottom: '1px solid var(--border)' }} className="table-row-hover">
-                  <td style={{ padding: '12px 8px', fontWeight: '600' }}>{scan.scan_date}</td>
-                  <td style={{ padding: '12px 8px' }}>
-                    <span style={{
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      fontSize: '0.75rem',
-                      fontWeight: '600',
-                      background: scan.status === 'completed' ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-                      color: scan.status === 'completed' ? 'var(--accent-green)' : 'var(--accent-red)'
-                    }}>
-                      {scan.status.toUpperCase()}
-                    </span>
-                  </td>
-                  <td style={{ padding: '12px 8px' }}>{scan.stocks_scanned}</td>
-                  <td style={{ padding: '12px 8px', color: 'var(--accent-amber)', fontWeight: '600' }}>{scan.recommendations_count}</td>
-                  <td style={{ padding: '12px 8px', color: 'var(--accent-blue-bright)' }}>{scan.active_trades}</td>
-                  <td style={{ padding: '12px 8px', color: 'var(--accent-green)' }}>{scan.closed_trades}</td>
-                  <td style={{ padding: '12px 8px' }}>{scan.duration_seconds}s</td>
-                  <td style={{ padding: '12px 8px' }}>v{scan.strategy_version}</td>
-                  <td style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>{scan.data_provider}</td>
-                  <td style={{ padding: '12px 8px' }}>
-                    <button 
-                      onClick={() => handleViewRecommendations(scan)}
-                      style={{
-                        background: 'rgba(255,255,255,0.06)',
-                        border: 'none',
+              {(() => {
+                const filteredScans = scans.filter(scan => strategyFilter === 'all' || (scan.strategy_name || 'sivcs_vcp') === strategyFilter);
+                if (filteredScans.length === 0) {
+                  return (
+                    <tr>
+                      <td colSpan="10" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                        No completed scans found for the selected strategy filter.
+                      </td>
+                    </tr>
+                  );
+                }
+                return filteredScans.map((scan) => (
+                  <tr key={scan.scan_uuid} style={{ borderBottom: '1px solid var(--border)' }} className="table-row-hover">
+                    <td style={{ padding: '12px 8px', fontWeight: '600' }}>{scan.scan_date}</td>
+                    <td style={{ padding: '12px 8px' }}>
+                      <span style={{
+                        padding: '2px 8px',
                         borderRadius: '4px',
-                        color: 'var(--text-primary)',
-                        padding: '6px 12px',
-                        fontSize: '0.8rem',
-                        cursor: 'pointer'
-                      }}
-                      className="card-hover"
-                    >
-                      🔍 View Recommendations
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {scans.length === 0 && (
-                <tr>
-                  <td colSpan="10" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    No completed scans found.
-                  </td>
-                </tr>
-              )}
+                        fontSize: '0.75rem',
+                        fontWeight: '600',
+                        background: scan.status === 'completed' ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                        color: scan.status === 'completed' ? 'var(--accent-green)' : 'var(--accent-red)'
+                      }}>
+                        {scan.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px 8px' }}>{scan.stocks_scanned}</td>
+                    <td style={{ padding: '12px 8px', color: 'var(--accent-amber)', fontWeight: '600' }}>{scan.recommendations_count}</td>
+                    <td style={{ padding: '12px 8px', color: 'var(--accent-blue-bright)' }}>{scan.active_trades}</td>
+                    <td style={{ padding: '12px 8px', color: 'var(--accent-green)' }}>{scan.closed_trades}</td>
+                    <td style={{ padding: '12px 8px' }}>{scan.duration_seconds}s</td>
+                    <td style={{ padding: '12px 8px' }}>v{scan.strategy_version}</td>
+                    <td style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>{scan.data_provider}</td>
+                    <td style={{ padding: '12px 8px' }}>
+                      <button 
+                        onClick={() => handleViewRecommendations(scan)}
+                        style={{
+                          background: 'rgba(255,255,255,0.06)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          color: 'var(--text-primary)',
+                          padding: '6px 12px',
+                          fontSize: '0.8rem',
+                          cursor: 'pointer'
+                        }}
+                        className="card-hover"
+                      >
+                        🔍 View Recommendations
+                      </button>
+                    </td>
+                  </tr>
+                ));
+              })()}
             </tbody>
           </table>
         </div>
@@ -483,33 +523,35 @@ export default function HistoricalScan() {
         <div className="card" style={{ padding: '16px' }}>
           
           {/* Universe & Accuracy Filters */}
-          <div style={{ display: 'flex', gap: '24px', marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', fontWeight: 600 }}>Execution Universe:</span>
-              {[
-                { id: 'all', label: 'All Paper Trades' },
-                { id: 'nifty500', label: 'NIFTY 500 Only' },
-                { id: 'non_nifty500', label: 'Non-NIFTY 500 Only' }
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  onClick={() => setTradeFilter(f.id)}
-                  style={{
-                    background: tradeFilter === f.id ? 'var(--accent-blue)' : 'rgba(255,255,255,0.06)',
-                    border: 'none',
-                    borderRadius: 'var(--radius-sm)',
-                    color: '#fff',
-                    padding: '8px 16px',
-                    cursor: 'pointer',
-                    fontSize: '0.8rem',
-                    fontWeight: '600',
-                    transition: 'all 0.2s ease'
-                  }}
-                  className="card-hover"
-                >
-                  {f.label}
-                </button>
-              ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', fontWeight: 600 }}>Execution Universe:</span>
+                {[
+                  { id: 'all', label: 'All Paper Trades' },
+                  { id: 'nifty500', label: 'NIFTY 500 Only' },
+                  { id: 'non_nifty500', label: 'Non-NIFTY 500 Only' }
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setTradeFilter(f.id)}
+                    style={{
+                      background: tradeFilter === f.id ? 'var(--accent-blue)' : 'rgba(255,255,255,0.06)',
+                      border: 'none',
+                      borderRadius: 'var(--radius-sm)',
+                      color: '#fff',
+                      padding: '8px 16px',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      transition: 'all 0.2s ease'
+                    }}
+                    className="card-hover"
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -566,6 +608,9 @@ export default function HistoricalScan() {
               <tbody>
                 {(() => {
                   const filtered = trades.filter((t) => {
+                    // Strategy filter
+                    if (strategyFilter !== 'all' && (t.strategy_name || 'sivcs_vcp') !== strategyFilter) return false;
+
                     // Universe filter
                     if (tradeFilter === 'nifty500' && t.execution_universe !== 'NIFTY500') return false;
                     if (tradeFilter === 'non_nifty500' && t.execution_universe === 'NON_NIFTY500') return false;

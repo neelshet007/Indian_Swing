@@ -115,7 +115,8 @@ async def list_historical_scans():
                     "data_provider": "Upstox",
                     "market_status": job.market_status,
                     "active_trades": active_count,
-                    "closed_trades": closed_count
+                    "closed_trades": closed_count,
+                    "strategy_name": job.strategy_name
                 })
             return results
 
@@ -192,6 +193,7 @@ async def list_paper_trades():
                     "recommendation_date": str(t.recommendation.scan_date) if (t.recommendation and t.recommendation.scan_date) else None,
                     "scan_uuid": t.recommendation.scan_uuid if t.recommendation else None,
                     "recommendation_uuid": t.recommendation.recommendation_uuid if t.recommendation else None,
+                    "strategy_name": t.recommendation.strategy_name if t.recommendation else "sivcs_vcp",
                 }
                 for t in trades
             ]

@@ -367,13 +367,42 @@ class HistoricalScanManager:
                 select(Recommendation)
             ).scalars().all()
 
-            overall = self._calculate_metrics(trades, len(total_scans), len(total_recs))
-            nifty_trades = [t for t in trades if t.execution_universe == "NIFTY500"]
-            nifty500 = self._calculate_metrics(nifty_trades, len(total_scans), len(total_recs))
+            def get_stats(trade_list):
+                return self._calculate_metrics(trade_list, len(total_scans), len(total_recs))
 
-            report_data = dict(overall)
-            report_data["overall"] = overall
-            report_data["nifty500"] = nifty500
+            overall_trades = trades
+            nifty_trades = [t for t in trades if t.execution_universe == "NIFTY500"]
+            non_nifty_trades = [t for t in trades if t.execution_universe != "NIFTY500"]
+
+            sivcs_trades = [t for t in trades if (t.recommendation.strategy_name if t.recommendation else "sivcs_vcp") == "sivcs_vcp"]
+            sivcs_nifty = [t for t in sivcs_trades if t.execution_universe == "NIFTY500"]
+            sivcs_non_nifty = [t for t in sivcs_trades if t.execution_universe != "NIFTY500"]
+
+            amrc_trades = [t for t in trades if (t.recommendation.strategy_name if t.recommendation else "") == "amrc"]
+            amrc_nifty = [t for t in amrc_trades if t.execution_universe == "NIFTY500"]
+            amrc_non_nifty = [t for t in amrc_trades if t.execution_universe != "NIFTY500"]
+
+            overall_dict = get_stats(overall_trades)
+            nifty500_dict = get_stats(nifty_trades)
+            non_nifty500_dict = get_stats(non_nifty_trades)
+
+            report_data = dict(overall_dict)
+            report_data["overall"] = {
+                "overall": overall_dict,
+                "nifty500": nifty500_dict,
+                "non_nifty500": non_nifty500_dict,
+            }
+            report_data["sivcs_vcp"] = {
+                "overall": get_stats(sivcs_trades),
+                "nifty500": get_stats(sivcs_nifty),
+                "non_nifty500": get_stats(sivcs_non_nifty),
+            }
+            report_data["amrc"] = {
+                "overall": get_stats(amrc_trades),
+                "nifty500": get_stats(amrc_nifty),
+                "non_nifty500": get_stats(amrc_non_nifty),
+            }
+            report_data["nifty500"] = nifty500_dict
             return report_data
 
     def generate_excel_report(self, db_session, universe: str = "all", accuracy: str = "all", save_path: str = "c:/Indian_Swing/indian_swing_historical_journal.xlsx") -> None:
