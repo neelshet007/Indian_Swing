@@ -473,15 +473,16 @@ class HistoricalScanManager:
                 continue
             
             # Accuracy Filter
-            score = (t.recommendation.confidence_score * 100) if (t.recommendation and t.recommendation.confidence_score is not None) else 0.0
+            raw_score = (t.recommendation.confidence_score * 100) if (t.recommendation and t.recommendation.confidence_score is not None) else 0.0
+            score = round(raw_score)
             if accuracy == '90_100':
                 if not (90 <= score <= 100):
                     continue
             elif accuracy == '80_90':
-                if not (80 <= score < 90):
+                if not (80 <= score <= 90):
                     continue
             elif accuracy == '70_80':
-                if not (70 <= score < 80):
+                if not (70 <= score <= 80):
                     continue
             elif accuracy == 'below_70':
                 if not (score < 70):
@@ -570,15 +571,16 @@ class HistoricalScanManager:
         all_recs = db_session.execute(select(Recommendation)).scalars().all()
         recs = []
         for r in all_recs:
-            score = (r.confidence_score * 100) if r.confidence_score is not None else 0.0
+            raw_score = (r.confidence_score * 100) if r.confidence_score is not None else 0.0
+            score = round(raw_score)
             if accuracy == '90_100':
                 if not (90 <= score <= 100):
                     continue
             elif accuracy == '80_90':
-                if not (80 <= score < 90):
+                if not (80 <= score <= 90):
                     continue
             elif accuracy == '70_80':
-                if not (70 <= score < 80):
+                if not (70 <= score <= 80):
                     continue
             elif accuracy == 'below_70':
                 if not (score < 70):

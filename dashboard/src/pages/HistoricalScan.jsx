@@ -814,10 +814,11 @@ export default function HistoricalScan() {
                     if (tradeFilter === 'non_nifty500' && t.execution_universe === 'NON_NIFTY500') return false;
                     
                     // Accuracy Filter
-                    const score = t.accuracy_pct ?? 0;
+                    const rawScore = t.accuracy_pct ?? 0;
+                    const score = Math.round(rawScore);
                     if (accuracyFilter === '90_100') return score >= 90 && score <= 100;
-                    if (accuracyFilter === '80_90') return score >= 80 && score < 90;
-                    if (accuracyFilter === '70_80') return score >= 70 && score < 80;
+                    if (accuracyFilter === '80_90') return score >= 80 && score <= 90;
+                    if (accuracyFilter === '70_80') return score >= 70 && score <= 80;
                     if (accuracyFilter === 'below_70') return score < 70;
                     
                     return true;
