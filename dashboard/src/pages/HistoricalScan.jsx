@@ -128,8 +128,31 @@ export default function HistoricalScan() {
     }
   }
 
-  const handleDownloadExcel = () => {
-    window.open(`/api/historical/export?universe=${tradeFilter}&accuracy=${accuracyFilter}`, '_blank')
+  const [isExporting, setIsExporting] = useState(false)
+
+  const handleDownloadExcel = async () => {
+    try {
+      setIsExporting(true)
+      const res = await axios.get(
+        `/api/historical/export?universe=${tradeFilter}&accuracy=${accuracyFilter}`,
+        { responseType: 'blob' }
+      )
+      const blob = new Blob([res.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      })
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `indian_swing_historical_journal_${tradeFilter}_${accuracyFilter}.xlsx`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Error downloading Excel file:', err)
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   // Calculate progress percentage
@@ -149,6 +172,7 @@ export default function HistoricalScan() {
         <div style={{ display: 'flex', gap: '12px' }}>
           <button 
             onClick={handleDownloadExcel}
+            disabled={isExporting}
             className="card-hover"
             style={{
               background: 'linear-gradient(135deg, #107c41, #1f9a55)',
@@ -157,13 +181,14 @@ export default function HistoricalScan() {
               color: '#fff',
               padding: '10px 20px',
               fontWeight: '600',
-              cursor: 'pointer',
+              cursor: isExporting ? 'not-allowed' : 'pointer',
+              opacity: isExporting ? 0.7 : 1,
               display: 'flex',
               alignItems: 'center',
               gap: '8px'
             }}
           >
-            📊 Download Excel Journal
+            {isExporting ? '⏳ Generating Excel...' : '📊 Download Excel Journal'}
           </button>
           {progress?.status === 'paused' && (
             <button 

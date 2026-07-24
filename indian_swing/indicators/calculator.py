@@ -22,10 +22,21 @@ class IndicatorCalculator:
     _resampler = OHLCVResampler()
 
     @classmethod
-    def build(cls, daily_df: pd.DataFrame, benchmark_df: pd.DataFrame | None = None) -> IndicatorBundle:
+    def build(
+        cls,
+        daily_df: pd.DataFrame,
+        benchmark_df: pd.DataFrame | None = None,
+        precalculated_benchmark: pd.DataFrame | None = None,
+    ) -> IndicatorBundle:
         daily = cls.add_daily_indicators(daily_df)
         weekly = cls.add_weekly_indicators(cls._resampler.resample(daily_df, "1wk"))
-        benchmark = cls.add_daily_indicators(benchmark_df) if benchmark_df is not None and not benchmark_df.empty else None
+        if precalculated_benchmark is not None and not precalculated_benchmark.empty:
+            benchmark = precalculated_benchmark
+        elif benchmark_df is not None and not benchmark_df.empty:
+            benchmark = cls.add_daily_indicators(benchmark_df)
+        else:
+            benchmark = None
+
         if benchmark is not None:
             daily = cls.add_relative_strength(daily, benchmark)
         return IndicatorBundle(daily=daily, weekly=weekly, benchmark_daily=benchmark)

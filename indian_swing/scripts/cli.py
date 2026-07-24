@@ -111,6 +111,7 @@ def scan_historical():
     configure_logging(level="WARNING", fmt="console")
 
     async def _run():
+        from sqlalchemy import select
         from indian_swing.database.connection import get_sync_session, init_db
         from indian_swing.recommendations.automation import HistoricalScanManager, validate_date
         import click
@@ -125,8 +126,11 @@ def scan_historical():
         start_idx = 0
         session_obj = None
 
+        selected_strategy = "sivcs_vcp"
+
         if existing:
             typer.echo("A previous historical scan was found.")
+            typer.echo(f"Strategy: {existing.strategy_name or 'sivcs_vcp'}")
             typer.echo(f"Completed:\n{existing.completed_days} of {existing.total_days} trading days.")
             typer.echo("Do you want to:")
             typer.echo("1 -> Resume")
@@ -135,11 +139,18 @@ def scan_historical():
             if choice == 1:
                 session_obj = existing
                 start_idx = existing.completed_days
+                selected_strategy = existing.strategy_name or "sivcs_vcp"
                 for ds in existing.queue:
                     dt = datetime.strptime(ds, "%d/%m/%y").date()
                     dates.append(dt)
 
         if not dates:
+            typer.echo("\nSelect Strategy to Scan:")
+            typer.echo("1 -> Institutional VCP Strategy (sivcs_vcp)")
+            typer.echo("2 -> Adaptive Market Regime Strategy (amrc)")
+            strat_choice = click.prompt("Enter choice (1 or 2)", type=int, default=1)
+            selected_strategy = "amrc" if strat_choice == 2 else "sivcs_vcp"
+
             while True:
                 from_str = click.prompt("Enter From Date (YYYY-MM-DD)")
                 to_str = click.prompt("Enter To Date (YYYY-MM-DD)")
@@ -195,18 +206,26 @@ def scan_historical():
                 return
 
             typer.echo(f"Found {len(dates)} active trading days to scan.")
-            session_obj = manager.create_session(dates)
+            session_obj = manager.create_session(dates, strategy_name=selected_strategy)
             start_idx = 0
+
+        # Load selected strategy into scanner instance
+        from indian_swing.strategies.registry import strategy_registry
+        manager.scanner.strategy = strategy_registry.get(selected_strategy)
 
         total = len(dates)
         start_time = datetime.now()
         
+        # Pre-calculate bulk indicator bundles across full historical date range once for high-speed execution
+        typer.echo("Pre-calculating indicator bundles for high-speed historical scan...")
+        bundles = manager.preload_bundles(dates)
+
         for idx in range(start_idx, total):
             curr_date = dates[idx]
             date_str = curr_date.strftime("%d/%m/%y")
             
-            # Run scan first to fetch/download OHLCV data for curr_date
-            result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False)
+            # Run scan using preloaded in-memory indicator bundles
+            result = await manager.scanner.scan(scan_date=curr_date, force_refresh=False, preloaded_bundles=bundles)
 
             with get_sync_session() as db_session:
                 # Update session info
@@ -218,7 +237,6 @@ def scan_historical():
                 manager.update_paper_trades(db_session, curr_date)
 
             with get_sync_session() as db_session:
-                from sqlalchemy import select
                 from indian_swing.database.models import PaperTrade
                 trades_created = manager.create_pending_trades(db_session, result.scan_uuid)
                 
@@ -252,7 +270,8 @@ def scan_historical():
                 # Generate Excel
                 manager.generate_excel_report(db_session)
 
-            typer.echo(f"Trading Day {idx+1}/{total} | Date: {date_str} | Recs Found: {result.recommendations_saved} | Trades Created: {trades_created} | ETA: {eta_min:.1f}m")
+            strategy_name = manager.scanner.strategy.name if hasattr(manager.scanner.strategy, "name") else "sivcs_vcp"
+            typer.echo(f"[{strategy_name}] Day {idx+1}/{total} | Date: {date_str} | Recs Found: {result.recommendations_saved} | Trades Created: {trades_created} | ETA: {eta_min:.1f}m")
 
             pass
 

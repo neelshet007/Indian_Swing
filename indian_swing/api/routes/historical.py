@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Optional
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
@@ -334,6 +334,11 @@ async def start_historical_scan(payload: dict):
         total = len(trading_dates)
         start_time = datetime.now()
         
+        # Pre-calculate indicator bundles once for all active stocks across the session date range
+        logger.info("historical.preloading_indicator_bundles_start")
+        bundles = await asyncio.get_running_loop().run_in_executor(None, _manager.preload_bundles, trading_dates)
+        logger.info("historical.preloading_indicator_bundles_complete", stocks_count=len(bundles))
+
         for idx in range(0, total):
             if _manager.stop_requested:
                 logger.info("historical.scan_stopped_by_user")
@@ -348,7 +353,7 @@ async def start_historical_scan(payload: dict):
             curr_date = trading_dates[idx]
             date_str = curr_date.strftime("%d/%m/%y")
             logger.info("historical.day_started", day=idx+1, total=total, date=date_str)
-            result = await _manager.scanner.scan(scan_date=curr_date, force_refresh=False)
+            result = await _manager.scanner.scan(scan_date=curr_date, force_refresh=False, preloaded_bundles=bundles)
 
             with get_sync_session() as db_session:
                 s_obj = db_session.get(HistoricalScanSession, session_obj.id)
@@ -445,6 +450,11 @@ async def resume_historical_scan(payload: dict = None):
         start_idx = completed_days
         
         start_time = datetime.now()
+        # Pre-calculate indicator bundles once for all active stocks across the session date range
+        logger.info("historical.preloading_indicator_bundles_start")
+        bundles = await asyncio.get_running_loop().run_in_executor(None, _manager.preload_bundles, dates)
+        logger.info("historical.preloading_indicator_bundles_complete", stocks_count=len(bundles))
+
         for idx in range(start_idx, total):
             if _manager.stop_requested:
                 logger.info("historical.scan_stopped_by_user")
@@ -460,8 +470,8 @@ async def resume_historical_scan(payload: dict = None):
             date_str = curr_date.strftime("%d/%m/%y")
             logger.info("historical.day_started", day=idx+1, total=total, date=date_str)
             
-            # Run scan first to fetch/download OHLCV data for curr_date
-            result = await _manager.scanner.scan(scan_date=curr_date, force_refresh=False)
+            # Run scan using pre-calculated indicator bundles
+            result = await _manager.scanner.scan(scan_date=curr_date, force_refresh=False, preloaded_bundles=bundles)
 
             # Update session progress info
             with get_sync_session() as db_session:

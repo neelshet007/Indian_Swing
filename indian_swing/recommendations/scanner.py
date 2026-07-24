@@ -4,6 +4,7 @@ import asyncio
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
+import pandas as pd
 from typing import Any
 
 from sqlalchemy import delete, select
@@ -58,7 +59,13 @@ class RecommendationScanner:
             "errors": [],
         }
 
-    async def scan(self, scan_date: date | None = None, force_refresh: bool = False) -> ScanResult:
+    async def scan(
+        self,
+        scan_date: date | None = None,
+        force_refresh: bool = False,
+        preloaded_dfs: dict[str, pd.DataFrame] | None = None,
+        preloaded_bundles: dict[str, Any] | None = None,
+    ) -> ScanResult:
         scan_date = scan_date or date.today()
 
         if not force_refresh:
@@ -130,34 +137,34 @@ class RecommendationScanner:
         )
 
         try:
-            # Download benchmark data first
-            self.progress_state["current_symbol"] = benchmark_symbol
-            self.progress_state["current_stage"] = "Downloading Benchmark Data"
-            try:
-                await self.pipeline.run_incremental(
-                    [benchmark_symbol],
-                    required_daily_bars=lookback,
-                    end=scan_date,
-                    force_refresh=force_refresh,
-                    progress_callback=lambda p: self.progress_state.update(p),
-                )
-            except Exception as exc:
-                logger.error("scanner.benchmark_fetch_failed", symbol=benchmark_symbol, error=str(exc))
+            # Skip incremental network checks if preloaded_dfs provided or not force_refresh
+            if force_refresh:
+                self.progress_state["current_symbol"] = benchmark_symbol
+                self.progress_state["current_stage"] = "Downloading Benchmark Data"
+                try:
+                    await self.pipeline.run_incremental(
+                        [benchmark_symbol],
+                        required_daily_bars=lookback,
+                        end=scan_date,
+                        force_refresh=force_refresh,
+                        progress_callback=lambda p: self.progress_state.update(p),
+                    )
+                except Exception as exc:
+                    logger.error("scanner.benchmark_fetch_failed", symbol=benchmark_symbol, error=str(exc))
 
-            # Download universe data in bulk first
-            self.progress_state["current_symbol"] = "All Universe Stocks"
-            self.progress_state["current_stage"] = "Downloading Universe Data"
-            try:
-                all_symbols = [s.symbol for s in stocks]
-                await self.pipeline.run_incremental(
-                    all_symbols,
-                    required_daily_bars=lookback,
-                    end=scan_date,
-                    force_refresh=force_refresh,
-                    progress_callback=lambda p: self.progress_state.update(p),
-                )
-            except Exception as exc:
-                logger.error("scanner.universe_fetch_failed", error=str(exc))
+                self.progress_state["current_symbol"] = "All Universe Stocks"
+                self.progress_state["current_stage"] = "Downloading Universe Data"
+                try:
+                    all_symbols = [s.symbol for s in stocks]
+                    await self.pipeline.run_incremental(
+                        all_symbols,
+                        required_daily_bars=lookback,
+                        end=scan_date,
+                        force_refresh=force_refresh,
+                        progress_callback=lambda p: self.progress_state.update(p),
+                    )
+                except Exception as exc:
+                    logger.error("scanner.universe_fetch_failed", error=str(exc))
 
             existing_signal_keys: set[tuple[str, str, str]] = set()
             filter_counter: Counter[str] = Counter()
@@ -170,50 +177,91 @@ class RecommendationScanner:
             failure_reasons: dict[str, Counter[str]] = {}
             stock_journeys: dict[str, dict] = {}
 
+            scan_ts = pd.Timestamp(scan_date)
+
             # Load benchmark once before loop to avoid duplicate queries
             benchmark_stock = None
             benchmark_daily = None
-            with get_sync_session() as session:
-                benchmark_stock = StockRepository(session).get_by_symbol(
-                    settings.scanner.benchmark_symbol,
-                    exchange=settings.scanner.benchmark_exchange,
-                )
-                if benchmark_stock is not None:
-                    repo = OHLCVRepository(session)
-                    start = scan_date - timedelta(days=int(lookback * 1.8))
-                    benchmark_daily = repo.to_dataframe(benchmark_stock.stock_uuid, start, scan_date, "1d")
+            if not preloaded_bundles:
+                with get_sync_session() as session:
+                    benchmark_stock = StockRepository(session).get_by_symbol(
+                        settings.scanner.benchmark_symbol,
+                        exchange=settings.scanner.benchmark_exchange,
+                    )
+                    if benchmark_stock is not None:
+                        repo = OHLCVRepository(session)
+                        start = scan_date - timedelta(days=int(lookback * 1.8))
+                        benchmark_daily = repo.to_dataframe(benchmark_stock.stock_uuid, start, scan_date, "1d")
 
-            # Bulk load all daily OHLCV data for all stocks in a single query
-            start_date = scan_date - timedelta(days=int(lookback * 1.8))
-            with get_sync_session() as session:
-                repo = OHLCVRepository(session)
-                all_uuids = [stock.stock_uuid for stock in stocks]
-                bulk_dfs = repo.to_dataframe_bulk(all_uuids, start_date, scan_date, "1d")
+            # Precalculate benchmark indicators ONCE before stock loop
+            precalculated_benchmark = None
+            if benchmark_daily is not None and not benchmark_daily.empty:
+                try:
+                    precalculated_benchmark = IndicatorCalculator.add_daily_indicators(benchmark_daily)
+                except Exception as exc:
+                    logger.warning("scanner.precalculate_benchmark_failed", error=str(exc))
+
+            # Bulk load all daily OHLCV data for all stocks in a single query if not provided
+            bulk_dfs: dict[str, pd.DataFrame] = {}
+            if preloaded_dfs is None and preloaded_bundles is None:
+                start_date = scan_date - timedelta(days=int(lookback * 1.8))
+                with get_sync_session() as session:
+                    repo = OHLCVRepository(session)
+                    all_uuids = [stock.stock_uuid for stock in stocks]
+                    bulk_dfs = repo.to_dataframe_bulk(all_uuids, start_date, scan_date, "1d")
 
             for stock in stocks:
                 self.progress_state["current_symbol"] = stock.symbol
                 self.progress_state["current_stage"] = "Generating Indicators"
                 try:
-                    daily = bulk_dfs.get(stock.stock_uuid)
-                    if daily is None or daily.empty:
-                        with get_sync_session() as session:
-                            repo = OHLCVRepository(session)
-                            daily = repo.to_dataframe(stock.stock_uuid, start_date, scan_date, "1d")
+                    context = None
 
-                    if daily.empty:
-                        validation_counter["No daily history available"] += 1
-                        result.failed_stocks += 1
-                        self.progress_state["failed"] = result.failed_stocks
-                        result.stocks_scanned += 1
-                        self.progress_state["completed"] = result.stocks_scanned
-                        continue
+                    # FAST PATH: Use precalculated indicator bundles if available
+                    if preloaded_bundles and stock.stock_uuid in preloaded_bundles:
+                        bundle = preloaded_bundles[stock.stock_uuid]
+                        if bundle and bundle.daily is not None and scan_ts in bundle.daily.index:
+                            daily_slice = bundle.daily.loc[:scan_ts].iloc[-282:]
+                            weekly_slice = bundle.weekly.loc[:scan_ts].iloc[-40:]
+                            bm_slice = bundle.benchmark_daily.loc[:scan_ts].iloc[-282:] if bundle.benchmark_daily is not None else None
+                            context = StrategyContext(
+                                symbol=stock.symbol,
+                                exchange=stock.exchange,
+                                daily=daily_slice,
+                                weekly=weekly_slice,
+                                benchmark_daily=bm_slice,
+                                as_of_date=scan_date,
+                            )
 
-                    context = self._build_strategy_context(
-                        stock,
-                        daily,
-                        scan_date,
-                        benchmark_daily,
-                    )
+                    if context is None:
+                        daily = None
+                        if preloaded_dfs and stock.stock_uuid in preloaded_dfs:
+                            full_df = preloaded_dfs[stock.stock_uuid]
+                            if full_df is not None and not full_df.empty:
+                                daily = full_df.loc[:scan_ts].iloc[-282:]
+                        else:
+                            daily = bulk_dfs.get(stock.stock_uuid)
+
+                        if daily is None or daily.empty:
+                            with get_sync_session() as session:
+                                repo = OHLCVRepository(session)
+                                start_date = scan_date - timedelta(days=int(lookback * 1.8))
+                                daily = repo.to_dataframe(stock.stock_uuid, start_date, scan_date, "1d")
+
+                        if daily.empty or len(daily) < 252:
+                            validation_counter["No daily history available"] += 1
+                            result.failed_stocks += 1
+                            self.progress_state["failed"] = result.failed_stocks
+                            result.stocks_scanned += 1
+                            self.progress_state["completed"] = result.stocks_scanned
+                            continue
+
+                        context = self._build_strategy_context(
+                            stock,
+                            daily,
+                            scan_date,
+                            benchmark_daily=benchmark_daily,
+                            precalculated_benchmark=precalculated_benchmark,
+                        )
                     self.progress_state["current_stage"] = "Running Strategy"
                     signals = self.strategy.generate_signals(stock.symbol, context)
 
@@ -509,10 +557,15 @@ class RecommendationScanner:
         daily: pd.DataFrame,
         scan_date: date,
         benchmark_daily: pd.DataFrame | None = None,
+        precalculated_benchmark: pd.DataFrame | None = None,
     ) -> StrategyContext:
         if daily.empty:
             raise ValueError("No daily history available")
-        bundle = IndicatorCalculator.build(daily, benchmark_daily if benchmark_daily is not None and not benchmark_daily.empty else None)
+        bundle = IndicatorCalculator.build(
+            daily,
+            benchmark_df=benchmark_daily if benchmark_daily is not None and not benchmark_daily.empty else None,
+            precalculated_benchmark=precalculated_benchmark,
+        )
         return StrategyContext(
             symbol=stock.symbol,
             exchange=stock.exchange,

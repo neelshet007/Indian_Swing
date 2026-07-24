@@ -75,45 +75,40 @@ class OHLCVRepository(BaseRepository[OHLCV]):
 
     def to_dataframe_bulk(self, stock_uuids: list[str], start: date, end: date, timeframe: str = "1d") -> dict[str, pd.DataFrame]:
         rows = self._session.execute(
-            select(OHLCV)
-            .where(
+            select(
+                OHLCV.stock_uuid,
+                OHLCV.date,
+                OHLCV.open,
+                OHLCV.high,
+                OHLCV.low,
+                OHLCV.close,
+                OHLCV.volume,
+            ).where(
                 and_(
                     OHLCV.stock_uuid.in_(stock_uuids),
                     OHLCV.date >= start,
                     OHLCV.date <= end,
                     OHLCV.timeframe == timeframe,
                 )
-            )
-            .order_by(OHLCV.date)
-        ).scalars().all()
+            ).order_by(OHLCV.date)
+        ).all()
 
-        by_uuid = {}
-        for r in rows:
-            if r.stock_uuid not in by_uuid:
-                by_uuid[r.stock_uuid] = []
-            by_uuid[r.stock_uuid].append(r)
+        if not rows:
+            return {uuid: pd.DataFrame(columns=["open", "high", "low", "close", "volume"]) for uuid in stock_uuids}
+
+        df_all = pd.DataFrame(rows, columns=["stock_uuid", "date", "open", "high", "low", "close", "volume"])
+        df_all["date"] = pd.to_datetime(df_all["date"])
 
         result = {}
-        for uuid in stock_uuids:
-            uuid_rows = by_uuid.get(uuid, [])
-            if not uuid_rows:
-                result[uuid] = pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
-                continue
-            frame = pd.DataFrame(
-                {
-                    "date": row.date,
-                    "open": row.open,
-                    "high": row.high,
-                    "low": row.low,
-                    "close": row.close,
-                    "volume": row.volume,
-                }
-                for row in uuid_rows
-            )
-            frame["date"] = pd.to_datetime(frame["date"])
-            frame = frame.sort_values("date").set_index("date")
+        for uuid, group in df_all.groupby("stock_uuid", sort=False):
+            frame = group.drop(columns=["stock_uuid"]).sort_values("date").set_index("date")
             frame.index.name = "date"
             result[uuid] = frame
+
+        for uuid in stock_uuids:
+            if uuid not in result:
+                result[uuid] = pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
+
         return result
 
     def bulk_insert_ignore(self, records: list[dict]) -> int:

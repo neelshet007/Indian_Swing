@@ -34,6 +34,45 @@ class HistoricalScanManager:
     def __init__(self) -> None:
         self.scanner = RecommendationScanner()
 
+    def preload_bundles(self, trading_dates: list[date]) -> dict[str, Any]:
+        """Pre-calculate indicator bundles once for all active stocks across the session date range."""
+        lookback = 282
+        min_date = min(trading_dates) - timedelta(days=int(lookback * 1.8))
+        max_date = max(trading_dates)
+        
+        with get_sync_session() as session:
+            from indian_swing.config.settings import settings
+            from indian_swing.database.repositories.ohlcv_repo import OHLCVRepository
+            from indian_swing.database.repositories.stock_repo import StockRepository
+            from indian_swing.indicators.calculator import IndicatorCalculator
+            
+            active_stocks = StockRepository(session).get_active()
+            all_uuids = [s.stock_uuid for s in active_stocks]
+            bulk_dfs = OHLCVRepository(session).to_dataframe_bulk(all_uuids, min_date, max_date, "1d")
+            
+            benchmark_stock = StockRepository(session).get_by_symbol(
+                settings.scanner.benchmark_symbol,
+                exchange=settings.scanner.benchmark_exchange,
+            )
+            precalculated_benchmark = None
+            if benchmark_stock and benchmark_stock.stock_uuid in bulk_dfs:
+                benchmark_df = bulk_dfs[benchmark_stock.stock_uuid]
+                if not benchmark_df.empty:
+                    precalculated_benchmark = IndicatorCalculator.add_daily_indicators(benchmark_df)
+            
+            bundles = {}
+            for stock in active_stocks:
+                df = bulk_dfs.get(stock.stock_uuid)
+                if df is None or len(df) < 252:
+                    continue
+                try:
+                    bundles[stock.stock_uuid] = IndicatorCalculator.build(
+                        df, precalculated_benchmark=precalculated_benchmark
+                    )
+                except Exception:
+                    pass
+            return bundles
+
     def get_active_session(self) -> Optional[HistoricalScanSession]:
         """Find an active historical scan session."""
         with get_sync_session() as session:
@@ -70,9 +109,14 @@ class HistoricalScanManager:
 
     def update_paper_trades(self, db_session, current_date: date) -> None:
         """Update entry/exit triggers for all active/pending paper trades on current_date."""
-        # 1. Fetch pending and active paper trades
+        # 1. Fetch pending and active paper trades where recommendation scan_date is on or before current_date
         trades = db_session.execute(
-            select(PaperTrade).where(PaperTrade.status.in_(["Pending", "Active"]))
+            select(PaperTrade)
+            .join(Recommendation)
+            .where(
+                PaperTrade.status.in_(["Pending", "Active"]),
+                Recommendation.scan_date <= current_date
+            )
         ).scalars().all()
 
         ohlcv_repo = OHLCVRepository(db_session)
@@ -114,6 +158,10 @@ class HistoricalScanManager:
                         self._evaluate_exits(trade, rec, c_open, c_high, c_low, c_close, current_date)
 
             elif trade.status == "Active":
+                # Only update/exit active trades if current_date is on or after the entry_date
+                if trade.entry_date and current_date < trade.entry_date:
+                    continue
+
                 # Update metrics
                 trade.highest_price = max(trade.highest_price or c_high, c_high)
                 trade.lowest_price = min(trade.lowest_price or c_low, c_low)
@@ -762,15 +810,21 @@ class HistoricalScanManager:
         ws_scans.append(headers_scans)
         style_sheet(ws_scans)
 
-        jobs = db_session.execute(select(ScanJob).where(ScanJob.strategy_name == "sivcs_vcp").order_by(ScanJob.scan_date)).scalars().all()
+        jobs = db_session.execute(select(ScanJob).order_by(ScanJob.scan_date)).scalars().all()
+        # Pre-query all recommendation IDs mapped to scan_uuid
+        recs_rows = db_session.execute(select(Recommendation.scan_uuid, Recommendation.id)).all()
+        rec_ids_by_scan: dict[str, list[str]] = {}
+        for s_uuid, r_id in recs_rows:
+            rec_ids_by_scan.setdefault(s_uuid, []).append(r_id)
+
+        # Pre-query paper trades status mapped to recommendation_id
+        trades_rows = db_session.execute(select(PaperTrade.recommendation_id, PaperTrade.status)).all()
+        trade_status_by_rec: dict[str, str] = {r_id: status for r_id, status in trades_rows}
+
         for idx, j in enumerate(jobs, start=2):
-            recs_for_job = db_session.execute(select(Recommendation).where(Recommendation.scan_uuid == j.scan_uuid)).scalars().all()
-            rec_ids = [r.id for r in recs_for_job]
-            active_cnt = 0
-            closed_cnt = 0
-            if rec_ids:
-                active_cnt = len(db_session.execute(select(PaperTrade).where(PaperTrade.recommendation_id.in_(rec_ids), PaperTrade.status == "Active")).scalars().all())
-                closed_cnt = len(db_session.execute(select(PaperTrade).where(PaperTrade.recommendation_id.in_(rec_ids), PaperTrade.status == "Closed")).scalars().all())
+            rec_ids = rec_ids_by_scan.get(j.scan_uuid, [])
+            active_cnt = sum(1 for r_id in rec_ids if trade_status_by_rec.get(r_id) == "Active")
+            closed_cnt = sum(1 for r_id in rec_ids if trade_status_by_rec.get(r_id) == "Closed")
 
             duration = ""
             if j.completed_at and j.started_at:
