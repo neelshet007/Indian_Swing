@@ -301,6 +301,7 @@ export default function Dashboard() {
               <option value="all" style={{ background: '#1c1c1e' }}>All Strategies</option>
               <option value="sivcs_vcp" style={{ background: '#1c1c1e' }}>SIVCS VCP Strategy</option>
               <option value="amrc" style={{ background: '#1c1c1e' }}>AMRC Strategy v1.0</option>
+              <option value="mf_tsm" style={{ background: '#1c1c1e' }}>MF TSM Strategy v1.0 (Stat 3)</option>
             </select>
           </div>
           <button className="btn btn-ghost" onClick={loadLatest} style={{ marginTop: '16px' }}>Reset to Latest</button>
@@ -354,7 +355,7 @@ export default function Dashboard() {
               <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                 <div><strong>Scan Date:</strong> {selectedDate}</div>
                 <div><strong>Scanned:</strong> {scanStatus.total_stocks || (currentScan?.total_stocks)} Stocks</div>
-                <div><strong>Recommendations:</strong> {recommendations.length} (SIVCS: {recommendations.filter(r => (r.strategy_name || 'sivcs_vcp') === 'sivcs_vcp').length}, AMRC: {recommendations.filter(r => r.strategy_name === 'amrc').length})</div>
+                <div><strong>Recommendations:</strong> {recommendations.length} (SIVCS: {recommendations.filter(r => (r.strategy_name || 'sivcs_vcp') === 'sivcs_vcp').length}, AMRC: {recommendations.filter(r => r.strategy_name === 'amrc').length}, MF TSM: {recommendations.filter(r => r.strategy_name === 'mf_tsm').length})</div>
                 {currentScan && (
                   <>
                     <div><strong>Scan Completed At:</strong> {currentScan.completed_at ? new Date(currentScan.completed_at).toLocaleString() : 'N/A'}</div>
@@ -432,7 +433,8 @@ export default function Dashboard() {
             {[
               { id: 'all', label: 'All Recommendations' },
               { id: 'sivcs_vcp', label: 'Stat 1 (VCP)' },
-              { id: 'amrc', label: 'Stat 2 (AMRC)' }
+              { id: 'amrc', label: 'Stat 2 (AMRC)' },
+              { id: 'mf_tsm', label: 'Stat 3 (MF TSM)' }
             ].map((f) => (
               <button
                 key={f.id}
@@ -455,7 +457,8 @@ export default function Dashboard() {
 
           {[
             { id: 'sivcs_vcp', title: 'SIVCS VCP Strategy (Stat 1)' },
-            { id: 'amrc', title: 'AMRC Momentum/Regime Strategy (Stat 2)' }
+            { id: 'amrc', title: 'AMRC Momentum/Regime Strategy (Stat 2)' },
+            { id: 'mf_tsm', title: 'Multi-Factor TSM Strategy (Stat 3)' }
           ]
             .filter(strat => selectedStrategyFilter === 'all' || selectedStrategyFilter === strat.id)
             .map((strat) => {

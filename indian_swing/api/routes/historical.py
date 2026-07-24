@@ -91,7 +91,7 @@ async def list_historical_scans():
         with get_sync_session() as session:
             jobs = session.execute(
                 select(ScanJob)
-                .where(ScanJob.strategy_name.in_(["sivcs_vcp", "amrc"]))
+                .where(ScanJob.strategy_name.in_(["sivcs_vcp", "amrc", "mf_tsm"]))
                 .order_by(ScanJob.scan_date.desc())
             ).scalars().all()
 

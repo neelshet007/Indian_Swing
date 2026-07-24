@@ -434,6 +434,10 @@ class HistoricalScanManager:
             amrc_nifty = [t for t in amrc_trades if t.execution_universe == "NIFTY500"]
             amrc_non_nifty = [t for t in amrc_trades if t.execution_universe != "NIFTY500"]
 
+            mftsm_trades = [t for t in trades if (t.recommendation.strategy_name if t.recommendation else "") == "mf_tsm"]
+            mftsm_nifty = [t for t in mftsm_trades if t.execution_universe == "NIFTY500"]
+            mftsm_non_nifty = [t for t in mftsm_trades if t.execution_universe != "NIFTY500"]
+
             overall_dict = get_stats(overall_trades)
             nifty500_dict = get_stats(nifty_trades)
             non_nifty500_dict = get_stats(non_nifty_trades)
@@ -453,6 +457,11 @@ class HistoricalScanManager:
                 "overall": get_stats(amrc_trades),
                 "nifty500": get_stats(amrc_nifty),
                 "non_nifty500": get_stats(amrc_non_nifty),
+            }
+            report_data["mf_tsm"] = {
+                "overall": get_stats(mftsm_trades),
+                "nifty500": get_stats(mftsm_nifty),
+                "non_nifty500": get_stats(mftsm_non_nifty),
             }
             report_data["nifty500"] = nifty500_dict
             return report_data

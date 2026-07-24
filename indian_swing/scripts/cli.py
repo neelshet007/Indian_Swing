@@ -90,7 +90,7 @@ def scan_run(strategy: str = typer.Option("all", help="Strategy to run ('sivcs_v
         await init_db()
         scanner = RecommendationScanner()
 
-        strategies_to_run = ["sivcs_vcp", "amrc"] if strategy == "all" else [strategy]
+        strategies_to_run = ["sivcs_vcp", "amrc", "mf_tsm"] if strategy == "all" else [strategy]
 
         for s in strategies_to_run:
             try:
@@ -148,8 +148,14 @@ def scan_historical():
             typer.echo("\nSelect Strategy to Scan:")
             typer.echo("1 -> Institutional VCP Strategy (sivcs_vcp)")
             typer.echo("2 -> Adaptive Market Regime Strategy (amrc)")
-            strat_choice = click.prompt("Enter choice (1 or 2)", type=int, default=1)
-            selected_strategy = "amrc" if strat_choice == 2 else "sivcs_vcp"
+            typer.echo("3 -> Multi-Factor TSM Strategy (mf_tsm)")
+            strat_choice = click.prompt("Enter choice (1, 2 or 3)", type=int, default=1)
+            if strat_choice == 3:
+                selected_strategy = "mf_tsm"
+            elif strat_choice == 2:
+                selected_strategy = "amrc"
+            else:
+                selected_strategy = "sivcs_vcp"
 
             while True:
                 from_str = click.prompt("Enter From Date (YYYY-MM-DD)")

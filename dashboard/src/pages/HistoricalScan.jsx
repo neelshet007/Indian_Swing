@@ -267,8 +267,9 @@ export default function HistoricalScan() {
                   cursor: 'pointer'
                 }}
               >
-                <option value="sivcs_vcp" style={{ background: '#1c1c1e' }}>SIVCS VCP Strategy</option>
-                <option value="amrc" style={{ background: '#1c1c1e' }}>AMRC Strategy v1.0</option>
+                <option value="sivcs_vcp" style={{ background: '#1c1c1e' }}>SIVCS VCP Strategy (Stat 1)</option>
+                <option value="amrc" style={{ background: '#1c1c1e' }}>AMRC Strategy v1.0 (Stat 2)</option>
+                <option value="mf_tsm" style={{ background: '#1c1c1e' }}>MF TSM Strategy v1.0 (Stat 3)</option>
               </select>
             </div>
             <button 
@@ -518,6 +519,7 @@ export default function HistoricalScan() {
                   <option value="overall">Overall (All Strategies)</option>
                   <option value="sivcs_vcp">Stat 1 (VCP)</option>
                   <option value="amrc">Stat 2 (AMRC)</option>
+                  <option value="mf_tsm">Stat 3 (MF TSM)</option>
                 </select>
               </div>
               {/* Universe selector */}
@@ -607,7 +609,8 @@ export default function HistoricalScan() {
         {[
           { id: 'all', label: 'All Strategies' },
           { id: 'sivcs_vcp', label: 'Stat 1 (VCP)' },
-          { id: 'amrc', label: 'Stat 2 (AMRC)' }
+          { id: 'amrc', label: 'Stat 2 (AMRC)' },
+          { id: 'mf_tsm', label: 'Stat 3 (MF TSM)' }
         ].map((f) => (
           <button
             key={f.id}
